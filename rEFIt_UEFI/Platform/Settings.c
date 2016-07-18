@@ -1152,16 +1152,16 @@ IsPatchEnabled (CHAR8 *MatchOSEntry, CHAR8 *CurrOS)
   INTN i;
   BOOLEAN ret = FALSE;
   struct MatchOSes *mos; // = AllocatePool(sizeof(struct MatchOSes));
-  
+
   if (!MatchOSEntry || !CurrOS) {
     return TRUE; //undefined matched corresponds to old behavior
   }
-  
+
   mos = GetStrArraySeparatedByChar(MatchOSEntry, ',');
   if (!mos) {
     return TRUE; //memory fails -> anyway the patch enabled
   }
-  
+
   for (i = 0; i < mos->count; ++i) {
     // dot represent MatchOS
     if (
@@ -1180,11 +1180,11 @@ IsPatchEnabled (CHAR8 *MatchOSEntry, CHAR8 *CurrOS)
 struct
 MatchOSes *GetStrArraySeparatedByChar(CHAR8 *str, CHAR8 sep)
 {
-  struct MatchOSes *mo;  
+  struct MatchOSes *mo;
   INTN len = 0, i = 0, inc = 1, newLen = 0;
   //  CHAR8 *comp = NULL; //unused
   CHAR8 doubleSep[2];
-  
+
   mo = AllocatePool(sizeof(struct MatchOSes));
   if (!mo) {
     return NULL;
@@ -1193,18 +1193,18 @@ MatchOSes *GetStrArraySeparatedByChar(CHAR8 *str, CHAR8 sep)
 //  DBG("found %d %c in %s\n", mo->count, sep, str);
   len = (INTN)AsciiStrLen(str);
   doubleSep[0] = sep; doubleSep[1] = sep;
-  
+
   if(AsciiStrStr(str, doubleSep) || !len || str[0] == sep || str[len -1] == sep) {
     mo->count = 0;
     mo->array[0] = NULL;
 //    DBG("emtpy string\n");
     return mo;
   }
-  
+
   if (mo->count > 1) {
     //INTN indexes[mo->count + 1];
     INTN *indexes = (INTN *) AllocatePool(mo->count + 1);
-    
+
     for (i = 0; i < len; ++i) {
       CHAR8 c = str[i];
       if (c == sep) {
@@ -1217,11 +1217,11 @@ MatchOSes *GetStrArraySeparatedByChar(CHAR8 *str, CHAR8 sep)
     indexes[0] = 0;
     // manually add last index
     indexes[mo->count] = len;
-    
+
     for (i = 0; i < mo->count; ++i) {
       INTN startLocation, endLocation;
       mo->array[i] = 0;
-      
+
       if (i == 0) {
         startLocation = indexes[0];
         endLocation = indexes[1] - 1;
@@ -1257,18 +1257,18 @@ BOOLEAN IsOSValid(CHAR8 *MatchOS, CHAR8 *CurrOS)
    10.10.2 only 10.10.2 (10.10.1 or 10.10.5 will be skipped)
    10.10.x (or 10.10.X), in this case is valid for all minor version of 10.10 (10.10.(0-9))
    */
-  
+
   BOOLEAN ret = FALSE;
   struct MatchOSes *osToc;
   struct MatchOSes *currOStoc;
-  
+
   if (!MatchOS || !CurrOS) {
     return TRUE; //undefined matched corresponds to old behavior
   }
-  
+
   osToc = GetStrArraySeparatedByChar(MatchOS, '.');
   currOStoc = GetStrArraySeparatedByChar(CurrOS,  '.');
-  
+
   if (osToc->count == 2) {
     if (AsciiStrCmp(osToc->array[0], currOStoc->array[0]) == 0
         && AsciiStrCmp(osToc->array[1], currOStoc->array[1]) == 0) {
@@ -1295,9 +1295,9 @@ BOOLEAN IsOSValid(CHAR8 *MatchOS, CHAR8 *CurrOS)
         ret = TRUE;
       }
     }
-    
+
   }
-  
+
   deallocMatchOSes(osToc);
   deallocMatchOSes(currOStoc);
   return ret;
@@ -1313,17 +1313,17 @@ INTN countOccurrences( CHAR8 *s, CHAR8 c )
 VOID deallocMatchOSes(struct MatchOSes *s)
 {
   INTN i;
-  
+
   if (!s) {
     return;
   }
-  
+
   for (i = 0; i < s->count; i++) {
     if (s->array[i]) {
       FreePool(s->array[i]);
     }
   }
-  
+
   FreePool(s);
 }
 // End of MatchOS
@@ -1625,15 +1625,15 @@ FillinCustomEntry (
           if (EFI_ERROR (GetElement (Prop, i, &Prop2))) {
             continue;
           }
-          
+
           if (Prop2 == NULL) {
             break;
           }
-          
+
           if ((Prop2->type != kTagTypeString) || (Prop2->string == NULL)) {
             continue;
           }
-          
+
           if (AsciiStriCmp (Prop2->string, "Internal") == 0) {
             Entry->VolumeType |= VOLTYPE_INTERNAL;
           } else if (AsciiStriCmp (Prop2->string, "External") == 0) {
@@ -5231,7 +5231,7 @@ GetUserSettings(
 */
       // CsrActiveConfig
       Prop = GetProperty (DictPointer, "CsrActiveConfig");
-      gSettings.CsrActiveConfig = (UINT32)GetPropertyInteger (Prop, 0x67); //the value 0xFFFF means not set
+      gSettings.CsrActiveConfig = (UINT32)GetPropertyInteger (Prop, 0xFFFF); //the value 0xFFFF means not set
       SysVarsTmpCsrActiveConfig = gSettings.CsrActiveConfig;
 
       //BooterConfig
