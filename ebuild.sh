@@ -677,7 +677,7 @@ MainBuildScript() {
       if [[ -n "${XCODE_VERSION:-}" ]]; then
         clover_build_info="${clover_build_info} | XCODE: ${XCODE_VERSION}"
       fi
-    
+
       echo "#define BUILDINFOS_STR \"${clover_build_info}\"" >> "$CLOVERROOT"/Version.h
 
       cp "$CLOVERROOT"/Version.h "$CLOVERROOT"/rEFIt_UEFI/
@@ -696,9 +696,9 @@ copyBin() {
   [[ ! -f  "$cpSrc" || ! -d  "$cpDestDIR" ]] && return
   [[ -d  "$cpDest" ]] && cpFile=$(basename "$cpSrc")
   #[[ "$cpFile" == *"-64"* ]] && cpArch=64
-  
+
   echo "  -> $cpFile"
-  cp -f "$cpSrc" "$cpDest" 2>/dev/null 
+  cp -f "$cpSrc" "$cpDest" 2>/dev/null
 }
 
 setInitBootMsg(){
@@ -925,7 +925,7 @@ MainPostBuildScript() {
         done
       fi
 
-      # drivers64UEFI      
+      # drivers64UEFI
       binArray=( CsmVideoDxe DataHubDxe EmuVariableUefi OsxAptioFix2Drv OsxAptioFixDrv OsxLowMemFixDrv PartitionDxe )
       for efi in "${binArray[@]}"
       do

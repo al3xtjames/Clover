@@ -38,7 +38,7 @@
 //#include "Platform.h"
 //#include "../include/Handle.h"
 
-#include "Version.h"
+#include "../Version.h"
 
 #ifndef DEBUG_ALL
 #define DEBUG_MAIN 1
@@ -700,7 +700,7 @@ static VOID StartLoader(IN LOADER_ENTRY *Entry)
       ConOutOutputString = gST->ConOut->OutputString;
       gST->ConOut->OutputString = NullConOutOutputString;
     }
-    
+
     // Initialize the boot screen
     if (EFI_ERROR(Status = InitBootScreen(Entry))) {
       if (Status != EFI_ABORTED) DBG("Failed to initialize custom boot screen: %r!\n", Status);
@@ -731,7 +731,7 @@ static VOID StartLoader(IN LOADER_ENTRY *Entry)
     }
     SetupBooterLog(!DoHibernateWake);
   }
-  
+
   DBG("Closing log\n");
   if (SavePreBootLog) {
     Status = SaveBooterLog(SelfRootDir, PREBOOT_LOG);
