@@ -37,7 +37,7 @@
 //#include "Platform.h"
 #include "libegint.h"   //this includes platform.h
 #include "../include/scroll_images.h"
-#include "Version.h"
+#include "../Version.h"
 
 #ifndef DEBUG_ALL
 #define DEBUG_MENU 1
@@ -249,7 +249,7 @@ VOID FillInputs(BOOLEAN New)
     InputItems[InputItemsCount].SValue = AllocateZeroPool(63);
   }
   UnicodeSPrint(InputItems[InputItemsCount++].SValue, 63, L"%s", gSettings.BlockKexts);
-  
+
   InputItems[InputItemsCount].ItemType = RadioSwitch;  //3 - Themes chooser
   InputItems[InputItemsCount++].IValue = 3;
 
@@ -417,7 +417,7 @@ VOID FillInputs(BOOLEAN New)
     InputItems[InputItemsCount].SValue = AllocateZeroPool(16);
   }
   UnicodeSPrint(InputItems[InputItemsCount++].SValue, 16, L"0x%04x", gSettings.ProductEDID);
-  
+
   // ErmaC: NvidiaGeneric menu selector y/n
   InputItems[InputItemsCount].ItemType = BoolValue; //55
   InputItems[InputItemsCount++].BValue = gSettings.NvidiaGeneric;
@@ -436,10 +436,10 @@ VOID FillInputs(BOOLEAN New)
   InputItems[InputItemsCount++].IValue = gSettings.BooterConfig;
   InputItems[InputItemsCount].ItemType = CheckBit; //66
   InputItems[InputItemsCount++].IValue = gSettings.CsrActiveConfig;
-  
+
 
   InputItems[InputItemsCount].ItemType = CheckBit; //67
-  InputItems[InputItemsCount++].IValue = gSettings.FixDsdt; 
+  InputItems[InputItemsCount++].IValue = gSettings.FixDsdt;
   InputItems[InputItemsCount].ItemType = CheckBit; //68
   InputItems[InputItemsCount++].IValue = gSettings.OptionsBits;
   InputItems[InputItemsCount].ItemType = CheckBit; //69
@@ -457,7 +457,7 @@ VOID FillInputs(BOOLEAN New)
   UnicodeSPrint(InputItems[InputItemsCount++].SValue, 16, L"%04d", gSettings.DoubleClickTime);
   InputItems[InputItemsCount].ItemType = BoolValue; //72
   InputItems[InputItemsCount++].BValue = gSettings.PointerMirror;
-  
+
   //reserve for mouse and continue
 
   InputItemsCount = 74;
@@ -544,7 +544,7 @@ VOID FillInputs(BOOLEAN New)
 */
   InputItems[InputItemsCount].ItemType = RadioSwitch; //90
   InputItems[InputItemsCount++].IValue = 90;
-  
+
   InputItems[InputItemsCount].ItemType = BoolValue; //91
   InputItems[InputItemsCount++].BValue = gSettings.KernelAndKextPatches.KPLapicPanic;
 
@@ -596,7 +596,7 @@ VOID FillInputs(BOOLEAN New)
   }
   UnicodeSPrint(InputItems[InputItemsCount++].SValue, 26, L"0x%04X", dropDSM);
  */
-  
+
   InputItems[InputItemsCount].ItemType = BoolValue; //102
   InputItems[InputItemsCount++].BValue = gSettings.DebugDSDT;
   InputItems[InputItemsCount].ItemType = Hex;  //103
@@ -619,7 +619,7 @@ VOID FillInputs(BOOLEAN New)
   InputItems[InputItemsCount].ItemType = BoolValue; //108
   InputItems[InputItemsCount++].BValue = gSettings.KernelPatchesAllowed;
 
-  
+
   //menu for drop table
   if (gSettings.ACPIDropTables) {
     ACPI_DROP_TABLE *DropTable = gSettings.ACPIDropTables;
@@ -880,15 +880,15 @@ VOID ApplyInputs(VOID)
   if (InputItems[i].Valid) {
     gSettings.AFGLowPowerState = InputItems[i].BValue;
   }
-  
+
   // CSR
-  i = 65; 
+  i = 65;
   if (InputItems[i].Valid) {
-    gSettings.BooterConfig = InputItems[i].IValue & 0x7F; 
-  }  
+    gSettings.BooterConfig = InputItems[i].IValue & 0x7F;
+  }
   i++; //66
   if (InputItems[i].Valid) {
-    gSettings.CsrActiveConfig = InputItems[i].IValue; 
+    gSettings.CsrActiveConfig = InputItems[i].IValue;
   }
 
   i++; //67
@@ -903,7 +903,7 @@ VOID ApplyInputs(VOID)
   if (InputItems[i].Valid) {
     gSettings.FlagsBits = InputItems[i].IValue;
   }
-  
+
 
   i++; //70
   if (InputItems[i].Valid) {
@@ -1054,7 +1054,7 @@ VOID ApplyInputs(VOID)
       FillInputs(FALSE);
       NeedSave = FALSE;
     }
-*/    
+*/
     FillInputs(FALSE);
     NeedSave = FALSE;
 
@@ -1609,7 +1609,7 @@ VOID InitSelection(VOID)
       SelectionImages[2]->HasAlpha = TRUE;
     }
   }
-    
+
   // BootCampStyle indicator image
   if (GlobalConfig.BootCampStyle) {
     // load indicator selection image
@@ -1618,7 +1618,7 @@ VOID InitSelection(VOID)
     }
     if (!SelectionImages[4]) {
       SelectionImages[4] = egDecodePNG(&emb_selection_indicator[0], sizeof(emb_selection_indicator), TRUE);
-      
+
     }
     SelectionImages[4] = egEnsureImageSize(SelectionImages[4], INDICATOR_SIZE, INDICATOR_SIZE, &MenuBackgroundPixel);
     if (!SelectionImages[4]) {
@@ -1648,7 +1648,7 @@ VOID InitSelection(VOID)
     Buttons[1] = egDecodePNG(&emb_radio_button_selected[0], sizeof(emb_radio_button_selected), TRUE);
   }
 //  Buttons[1] = egEnsureImageSize(Buttons[1], TextHeight, TextHeight, &MenuBackgroundPixel);
-    
+
   // Checkbox
   Buttons[2] = egLoadImage(ThemeDir, GetIconsExt(L"checkbox", L"png"), TRUE);
   Buttons[3] = egLoadImage(ThemeDir, GetIconsExt(L"checkbox_checked", L"png"), TRUE);
@@ -1660,7 +1660,7 @@ VOID InitSelection(VOID)
     Buttons[3] = egDecodePNG(&emb_checkbox_checked[0], sizeof(emb_checkbox_checked), TRUE);
   }
 //  Buttons[3] = egEnsureImageSize(Buttons[3], TextHeight, TextHeight, &MenuBackgroundPixel);
-    
+
   // non-selected background images
   //TODO FALSE -> TRUE
   if (GlobalConfig.SelectionBigFileName != NULL) {
@@ -1690,7 +1690,7 @@ static VOID InitScroll(OUT SCROLL_STATE *State, IN INTN ItemCount, IN UINTN MaxC
   //MaxCount - total number (Row0 + Row1)
   //VisibleSpace - a number to fit
 // DBG("InitScroll <= %d %d %d\n", ItemCount, MaxCount, VisibleSpace);
-  // main menu  <= 2 8 5 
+  // main menu  <= 2 8 5
   // about menu <= 21 21 14
   State->LastSelection = State->CurrentSelection = Selected;
   //MaxIndex, MaxScroll, MaxVisible are indexes, 0..N-1
@@ -1911,14 +1911,14 @@ VOID FreeMenu(IN REFIT_MENU_SCREEN *Screen)
 {
   INTN i;
   REFIT_MENU_ENTRY *Tentry = NULL;
-//TODO - here we must FreePool for a list of Entries, Screens, InputBootArgs  
+//TODO - here we must FreePool for a list of Entries, Screens, InputBootArgs
   if (Screen->EntryCount > 0) {
     for (i = 0; i < Screen->EntryCount; i++) {
       Tentry = Screen->Entries[i];
       if (Tentry->SubScreen) {
         if (Tentry->SubScreen->Title) {
           FreePool(Tentry->SubScreen->Title);
-          Tentry->SubScreen->Title = NULL;          
+          Tentry->SubScreen->Title = NULL;
         }
         // don't free image because of reusing them
    //     egFreeImage(Tentry->SubScreen->Image);
@@ -2654,7 +2654,7 @@ INTN DrawTextXY(IN CHAR16 *Text, IN INTN XPos, IN INTN YPos, IN UINT8 XAlign)
   if (!Text) {
     return 0;
   }
-    
+
   egMeasureText(Text, &TextWidth, NULL);
   if (XAlign == X_IS_LEFT) {
     TextWidth = UGAWidth - XPos - 1;
@@ -2687,12 +2687,12 @@ VOID DrawBCSText(IN CHAR16 *Text, IN INTN XPos, IN INTN YPos, IN UINT8 XAlign)
   INTN      i = 0;
   EG_IMAGE  *TextBufferXY = NULL;
   CHAR16    *BCSText = NULL;
-  
+
   // check if text was provided
   if (!Text) {
     return;
   }
-  
+
   // more space, more characters
   if (GlobalConfig.TileXSpace >= 25 && GlobalConfig.TileXSpace < 30) {
     ChrsNum = 13;
@@ -2707,11 +2707,11 @@ VOID DrawBCSText(IN CHAR16 *Text, IN INTN XPos, IN INTN YPos, IN UINT8 XAlign)
   } else if (GlobalConfig.TileXSpace >= 50 && GlobalConfig.TileXSpace < 55) {
     ChrsNum = 18;
   }
-  
+
   // calculate text's width
   TextWidth = ((StrLen(Text) <= ChrsNum - Ellipsis) ? StrLen(Text) : ChrsNum) * ((FontWidth > GlobalConfig.CharWidth) ?
                FontWidth : GlobalConfig.CharWidth);
-  
+
   // render the text
   TextBufferXY = egCreateFilledImage(TextWidth, FontHeight, TRUE, &MenuBackgroundPixel);
 
@@ -2732,26 +2732,26 @@ VOID DrawBCSText(IN CHAR16 *Text, IN INTN XPos, IN INTN YPos, IN UINT8 XAlign)
         BCSText[i] = L'.';
       }
     }
-    
+
     BCSText[ChrsNum] = '\0';
-    
+
     // error check
     if (!BCSText) {
       return;
     }
-    
+
     TextWidth = egRenderText(BCSText, TextBufferXY, 0, 0, 0xFFFF);
-    
+
     // free the allocated memory
     FreePool(BCSText);
   } else {
     TextWidth = egRenderText(Text, TextBufferXY, 0, 0, 0xFFFF);
   }
-  
+
   if (XAlign != X_IS_LEFT) { // shift 64 is prohibited
     XText = XPos - (TextWidth >> XAlign);
   }
-    
+
   BltImageAlpha(TextBufferXY, XText, YPos,  &MenuBackgroundPixel, 16);
   egFreeImage(TextBufferXY);
 }
@@ -2979,7 +2979,7 @@ VOID GraphicsMenuStyle(IN REFIT_MENU_SCREEN *Screen, IN SCROLL_STATE *State, IN 
   CHAR16 ResultString[SVALUE_MAX_SIZE / sizeof(CHAR16) + 128]; // assume a title max length of around 128
   INTN PlaceCentre = (TextHeight / 2) - 7;
   INTN OldChosenItem;
-  
+
   HidePointer();
 
   switch (Function) {
@@ -3000,7 +3000,7 @@ VOID GraphicsMenuStyle(IN REFIT_MENU_SCREEN *Screen, IN SCROLL_STATE *State, IN 
           }
         } else if (((REFIT_INPUT_DIALOG*)(Screen->Entries[0]))->Item->IValue == 90) {
           j = OldChosenConfig;
-        }        
+        }
       }
       InitScroll(State, Screen->EntryCount, Screen->EntryCount, VisibleHeight, j);
       // determine width of the menu -- not working
@@ -3078,7 +3078,7 @@ VOID GraphicsMenuStyle(IN REFIT_MENU_SCREEN *Screen, IN SCROLL_STATE *State, IN 
         Entry->Place.Width = TitleLen * GlobalConfig.CharWidth;
         Entry->Place.Height = (UINTN)TextHeight;
         StrCpy(ResultString, Entry->Title);
-        
+
         if (Entry->Tag == TAG_SWITCH) {
           if (((REFIT_INPUT_DIALOG*)Entry)->Item->IValue == 3) {
             OldChosenItem = OldChosenTheme;
@@ -3172,12 +3172,12 @@ VOID GraphicsMenuStyle(IN REFIT_MENU_SCREEN *Screen, IN SCROLL_STATE *State, IN 
         DrawMenuText(ResultString, 0, EntriesPosX + (TextHeight + TEXT_XMARGIN), EntryL->Place.YPos, 0xFFFF);
         BltImageAlpha((((REFIT_INPUT_DIALOG*)EntryL)->Item->IValue & EntryL->Row) ? Buttons[3] :Buttons[2],
                       EntriesPosX + TEXT_XMARGIN, EntryL->Place.YPos + PlaceCentre,
-                      &MenuBackgroundPixel, 16);        
+                      &MenuBackgroundPixel, 16);
       } else {
         DrawMenuText(EntryL->Title, 0, EntriesPosX,
                      EntriesPosY + (State->LastSelection - State->FirstVisible) * TextHeight, 0xFFFF);
       }
-      
+
       // Current selection
       StrCpy(ResultString, EntryC->Title);
       TitleLen = StrLen(EntryC->Title);
@@ -3236,7 +3236,7 @@ VOID GraphicsMenuStyle(IN REFIT_MENU_SCREEN *Screen, IN SCROLL_STATE *State, IN 
       DrawMenuText(ParamText, 0, X, TimeoutPosY, 0xFFFF);
       break;
   }
-  
+
   MouseBirth();
 }
 
@@ -3248,7 +3248,7 @@ static VOID DrawMainMenuEntry(REFIT_MENU_ENTRY *Entry, BOOLEAN selected, INTN XP
 {
 //  EG_IMAGE *TmpBuffer = NULL;
   INTN Scale = GlobalConfig.MainEntriesSize >> 3;
-/*  
+/*
   if (GlobalConfig.BootCampStyle && (Entry->Row == 1)) {
     return;
   }
@@ -3288,7 +3288,7 @@ static VOID DrawMainMenuEntry(REFIT_MENU_ENTRY *Entry, BOOLEAN selected, INTN XP
                            MainImage, (Entry->Row == 0) ? Entry->BadgeImage:NULL,
       XPos, YPos, Scale);
   }
-    
+
   if (GlobalConfig.BootCampStyle) {
     if (Entry->Row == 0) {
       BltImageAlpha(SelectionImages[(4) + (selected ? 0 : 1)],
@@ -3300,7 +3300,7 @@ static VOID DrawMainMenuEntry(REFIT_MENU_ENTRY *Entry, BOOLEAN selected, INTN XP
 
     }
   }
-    
+
   Entry->Place.XPos = XPos;
   Entry->Place.YPos = YPos;
   Entry->Place.Width = MainImage->Width;
@@ -3333,12 +3333,12 @@ static VOID DrawMainMenuLabel(IN CHAR16 *Text, IN INTN XPos, IN INTN YPos, IN RE
   INTN TextWidth;
 
   egMeasureText(Text, &TextWidth, NULL);
-  
+
   //Clear old text
   if (OldTextWidth > TextWidth) {
     FillRectAreaOfScreen(OldX, OldY, OldTextWidth, TextHeight, &MenuBackgroundPixel, X_IS_CENTER);
   }
-    
+
   if (!(GlobalConfig.BootCampStyle)
       && (GlobalConfig.HideBadges & HDBADGES_INLINE) && (!OldRow)
       && (OldTextWidth) && (OldTextWidth != TextWidth)) {
@@ -3586,14 +3586,14 @@ VOID MainMenuStyle(IN REFIT_MENU_SCREEN *Screen, IN SCROLL_STATE *State, IN UINT
       row0PosY = ((UGAHeight - LayoutMainMenuHeight) >> 1) + LayoutBannerOffset; //LAYOUT_BANNER_YOFFSET;
 
       row1PosX = (UGAWidth + 8 - (row1TileSize + TILE_XSPACING) * row1Count) >> 1;
-          
+
       if (GlobalConfig.BootCampStyle) {
         row1PosY = row0PosY + row0TileSize + LayoutButtonOffset + GlobalConfig.TileYSpace + INDICATOR_SIZE
                      + ((GlobalConfig.HideUIFlags & HIDEUI_FLAG_LABEL) ? 15 : (FontHeight + 30));
       } else {
         row1PosY = row0PosY + EntriesHeight + GlobalConfig.TileYSpace + LayoutButtonOffset;
       }
-      
+
       if (row1Count > 0) {
         if (GlobalConfig.BootCampStyle) {
           textPosY = row0PosY + row0TileSize + 10;
@@ -3607,7 +3607,7 @@ VOID MainMenuStyle(IN REFIT_MENU_SCREEN *Screen, IN SCROLL_STATE *State, IN UINT
           textPosY = row1PosY;
         }
       }
-      
+
       FunctextPosY = row1PosY + row1TileSize + GlobalConfig.TileYSpace + LayoutTextOffset;
       if (!itemPosX) {
         itemPosX = AllocatePool(sizeof(UINT64) * Screen->EntryCount);
@@ -3665,14 +3665,14 @@ VOID MainMenuStyle(IN REFIT_MENU_SCREEN *Screen, IN SCROLL_STATE *State, IN UINT
                             itemPosX[i], row1PosY);
         }
       }
-      
+
       // clear the text from the second row, required by the BootCampStyle
       if ((GlobalConfig.BootCampStyle) && (Screen->Entries[State->LastSelection]->Row == 1)
           && (Screen->Entries[State->CurrentSelection]->Row == 0) && !(GlobalConfig.HideUIFlags & HIDEUI_FLAG_LABEL)) {
           FillRectAreaOfScreen((UGAWidth >> 1), FunctextPosY,
                                OldTextWidth, TextHeight, &MenuBackgroundPixel, X_IS_CENTER);
       }
-      
+
       // something is wrong with the DrawMainMenuLabel or Screen->Entries[State->CurrentSelection]
       // and it's required to create the first selection text from here
       // used for the second row entries, when BootCampStyle is used
@@ -3681,7 +3681,7 @@ VOID MainMenuStyle(IN REFIT_MENU_SCREEN *Screen, IN SCROLL_STATE *State, IN UINT
           DrawMainMenuLabel(Screen->Entries[State->CurrentSelection]->Title,
                             (UGAWidth >> 1), FunctextPosY, Screen, State);
       }
-          
+
       // something is wrong with the DrawMainMenuLabel or Screen->Entries[State->CurrentSelection]
       // and it's required to create the first selection text from here
       // used for all the entries
@@ -3712,14 +3712,14 @@ VOID MainMenuStyle(IN REFIT_MENU_SCREEN *Screen, IN SCROLL_STATE *State, IN UINT
         DrawMainMenuEntry(Screen->Entries[State->CurrentSelection], TRUE,
                           itemPosX[State->CurrentSelection], row1PosY);
       }
-      
+
       // create dynamic text for the second row if BootCampStyle is used
       if ((GlobalConfig.BootCampStyle) && (!(GlobalConfig.HideUIFlags & HIDEUI_FLAG_LABEL))
           && Screen->Entries[State->CurrentSelection]->Row == 1) {
           DrawMainMenuLabel(Screen->Entries[State->CurrentSelection]->Title,
                             (UGAWidth >> 1), FunctextPosY, Screen, State);
       }
-      
+
       // create dynamic text for all the entries
       if ((!(GlobalConfig.BootCampStyle)) && (!(GlobalConfig.HideUIFlags & HIDEUI_FLAG_LABEL))) {
           DrawMainMenuLabel(Screen->Entries[State->CurrentSelection]->Title,
@@ -3756,10 +3756,10 @@ UINTN RunMenu(IN REFIT_MENU_SCREEN *Screen, OUT REFIT_MENU_ENTRY **ChosenEntry)
 {
   INTN Index = -1;
   MENU_STYLE_FUNC Style = TextMenuStyle;
-  
+
   if (AllowGraphicsMode)
     Style = GraphicsMenuStyle;
-  
+
   return RunGenericMenu(Screen, Style, &Index, ChosenEntry);
 }
 
@@ -3772,7 +3772,7 @@ VOID NewEntry(REFIT_MENU_ENTRY **Entry, REFIT_MENU_SCREEN **SubScreen, ACTION At
   } else {
     (*Entry)->Title = AllocateZeroPool(128);
   }
-  
+
   (*Entry)->Image =  OptionMenu.TitleImage;
   (*Entry)->Tag = TAG_OPTIONS;
   (*Entry)->AtClick = AtClick;
@@ -3788,7 +3788,7 @@ VOID NewEntry(REFIT_MENU_ENTRY **Entry, REFIT_MENU_SCREEN **SubScreen, ACTION At
 VOID AddMenuCheck(REFIT_MENU_SCREEN *SubScreen, CONST CHAR8 *Text, UINTN Bit, INTN ItemNum)
 {
   REFIT_INPUT_DIALOG *InputBootArgs;
-  
+
   InputBootArgs = AllocateZeroPool(sizeof(REFIT_INPUT_DIALOG));
   InputBootArgs->Entry.Title = PoolPrint(L"%a", Text);
   InputBootArgs->Entry.Tag = TAG_CHECKBIT;
@@ -3812,7 +3812,7 @@ VOID ModifyTitles(REFIT_MENU_ENTRY *ChosenEntry)
     if (gSettings.CsrActiveConfig != 0 && gSettings.BooterConfig == 0) {
       gSettings.BooterConfig = 0x28;
     }
-    
+
   } else if (ChosenEntry->SubScreen->ID == SCREEN_BLC) {
     UnicodeSPrint(ChosenEntry->Title, 128, L"boot_args->flags [0x%04x]->", gSettings.BooterConfig);
   } else if (ChosenEntry->SubScreen->ID == SCREEN_DSM) {
@@ -3851,7 +3851,7 @@ REFIT_MENU_ENTRY  *SubMenuGraphics()
     AddMenuInfo(SubScreen, PoolPrint(L"Card DeviceID=%04x", gGraphics[i].DeviceID));
     N = 20 + i * 6;
     AddMenuItem(SubScreen, N, "Model:", TAG_INPUT, TRUE);
-    
+
     if (gGraphics[i].Vendor == Nvidia) {
       AddMenuItem(SubScreen, N+1, "InjectNVidia", TAG_INPUT, FALSE);
     } else if (gGraphics[i].Vendor == Ati) {
@@ -4086,14 +4086,14 @@ REFIT_MENU_ENTRY *SubMenuDropDSM()
   // init
   REFIT_MENU_ENTRY   *Entry;
   REFIT_MENU_SCREEN  *SubScreen;
-  
+
   // create the entry in the main menu
   NewEntry(&Entry, &SubScreen, ActionEnter, SCREEN_DSM, NULL);
   //  Entry->Title = PoolPrint(L"Drop OEM _DSM [0x%04x]->", gSettings.DropOEM_DSM);
-  
+
   // submenu description
   AddMenuInfoLine(SubScreen, PoolPrint(L"Choose devices to drop OEM _DSM methods from DSDT"));
-  
+
   AddMenuCheck(SubScreen, "ATI/AMD Graphics",     DEV_ATI, 101);
   AddMenuCheck(SubScreen, "Nvidia Graphics",      DEV_NVIDIA, 101);
   AddMenuCheck(SubScreen, "Intel Graphics",       DEV_INTEL, 101);
@@ -4108,10 +4108,10 @@ REFIT_MENU_ENTRY *SubMenuDropDSM()
   AddMenuCheck(SubScreen, "SMBUS Controller",     DEV_SMBUS, 101);
   AddMenuCheck(SubScreen, "IMEI Device",          DEV_IMEI, 101);
   AddMenuCheck(SubScreen, "Firewire",             DEV_FIREWIRE, 101);
-  
+
   AddMenuEntry(SubScreen, &MenuEntryReturn);
   ModifyTitles(Entry);
-  
+
   return Entry;
 }
 
@@ -4120,10 +4120,10 @@ REFIT_MENU_ENTRY  *SubMenuDsdtFix()
   REFIT_MENU_ENTRY   *Entry; //, *SubEntry;
   REFIT_MENU_SCREEN  *SubScreen;
 //  REFIT_INPUT_DIALOG *InputBootArgs;
-  
+
   NewEntry(&Entry, &SubScreen, ActionEnter, SCREEN_DSDT, NULL);
   //  Entry->Title = PoolPrint(L"DSDT fix mask [0x%08x]->", gSettings.FixDsdt);
-  
+
   AddMenuCheck(SubScreen, "Add DTGP",     FIX_DTGP, 67);
   AddMenuCheck(SubScreen, "Fix Darwin",   FIX_WARNING, 67);
   AddMenuCheck(SubScreen, "Fix shutdown", FIX_SHUTDOWN, 67);
@@ -4153,7 +4153,7 @@ REFIT_MENU_ENTRY  *SubMenuDsdtFix()
   AddMenuCheck(SubScreen, "Rename ACST",  FIX_ACST, 67);
   AddMenuCheck(SubScreen, "Add HDMI",     FIX_HDMI, 67);
   AddMenuCheck(SubScreen, "Fix Regions",  FIX_REGIONS, 67);
-  
+
   AddMenuEntry(SubScreen, &MenuEntryReturn);
   ModifyTitles(Entry);
 
@@ -4166,20 +4166,20 @@ REFIT_MENU_ENTRY *SubMenuACPI()
   // init
   REFIT_MENU_ENTRY   *Entry;
   REFIT_MENU_SCREEN  *SubScreen;
-  
+
   // create the entry in the options menu
   NewEntry(&Entry, &SubScreen, ActionEnter, SCREEN_ACPI, "ACPI patching->");
-  
+
   // submenu description
   AddMenuInfoLine(SubScreen, PoolPrint(L"Choose options to patch ACPI"));
 
   AddMenuItem(SubScreen, 102, "Debug DSDT", TAG_INPUT, FALSE);
   AddMenuItem(SubScreen, 1,   "DSDT name:", TAG_INPUT, TRUE);
-  
+
   AddMenuEntry(SubScreen, SubMenuDropTables());
   AddMenuEntry(SubScreen, SubMenuDropDSM());
-  AddMenuEntry(SubScreen, SubMenuDsdtFix()); 
-  
+  AddMenuEntry(SubScreen, SubMenuDsdtFix());
+
   AddMenuEntry(SubScreen, &MenuEntryReturn);
   return Entry;
 }
@@ -4221,7 +4221,7 @@ REFIT_MENU_ENTRY  *SubMenuThemes()
   AddMenuInfoLine(SubScreen, L"Installed themes:");
   //add embedded
   AddMenuItem(SubScreen, 3,  "embedded", TAG_SWITCH, FALSE);
-  
+
   for (i = 0; i < ThemesNum; i++) {
     InputBootArgs = AllocateZeroPool(sizeof(REFIT_INPUT_DIALOG));
     InputBootArgs->Entry.Title = PoolPrint(L"%s", ThemesList[i]);
@@ -4241,25 +4241,25 @@ REFIT_MENU_ENTRY *SubMenuGUI()
   // init
   REFIT_MENU_ENTRY   *Entry;
   REFIT_MENU_SCREEN  *SubScreen;
-  
+
   // create the entry in the options menu
   NewEntry(&Entry, &SubScreen, ActionEnter, SCREEN_GUI, "GUI tuning->");
-  
+
   // submenu description
   AddMenuInfoLine(SubScreen, PoolPrint(L"Choose options to tune the Interface"));
-  
+
   AddMenuItem(SubScreen, 70, "Pointer Speed:", TAG_INPUT, TRUE);
   AddMenuItem(SubScreen, 72, "Mirror Move", TAG_INPUT, FALSE);
-      
+
   AddMenuEntry(SubScreen, SubMenuThemes());
-  
+
   AddMenuEntry(SubScreen, &MenuEntryReturn);
   return Entry;
 }
 
 
-/* 
- * This is a simple and user friendly submenu which makes it possible to modify 
+/*
+ * This is a simple and user friendly submenu which makes it possible to modify
  * the System Integrity Protection configuration from the Clover's GUI.
  * Author: Needy.
  * The below function is based on the SubMenuDsdtFix function.
@@ -4269,14 +4269,14 @@ REFIT_MENU_ENTRY *SubMenuCSR()
   // init
   REFIT_MENU_ENTRY   *Entry;
   REFIT_MENU_SCREEN  *SubScreen;
-  
+
   // create the entry in the main menu
   NewEntry(&Entry, &SubScreen, ActionEnter, SCREEN_CSR, NULL);
-  
+
   // submenu description
   AddMenuInfoLine(SubScreen, PoolPrint(L"Modify the System Integrity Protection configuration."));
   AddMenuInfoLine(SubScreen, PoolPrint(L"All configuration changes apply to the entire machine."));
-  
+
   // available configurations
   AddMenuCheck(SubScreen, "Allow Untrusted Kexts", CSR_ALLOW_UNTRUSTED_KEXTS, 66);
   AddMenuCheck(SubScreen, "Allow Unrestricted FS", CSR_ALLOW_UNRESTRICTED_FS, 66);
@@ -4286,7 +4286,7 @@ REFIT_MENU_ENTRY *SubMenuCSR()
   AddMenuCheck(SubScreen, "Allow Unrestricted DTrace", CSR_ALLOW_UNRESTRICTED_DTRACE, 66);
   AddMenuCheck(SubScreen, "Allow Unrestricted NVRAM", CSR_ALLOW_UNRESTRICTED_NVRAM, 66);
   AddMenuCheck(SubScreen, "Allow Device Configuration", CSR_ALLOW_DEVICE_CONFIGURATION, 66);
-  
+
   // return
   AddMenuEntry(SubScreen, &MenuEntryReturn);
   ModifyTitles(Entry);
@@ -4298,11 +4298,11 @@ REFIT_MENU_ENTRY *SubMenuBLC()
   // init
   REFIT_MENU_ENTRY   *Entry;
   REFIT_MENU_SCREEN  *SubScreen;
-  
+
   // create the entry in the main menu
   NewEntry(&Entry, &SubScreen, ActionEnter, SCREEN_BLC, NULL);
 //  Entry->Title = PoolPrint(L"boot_args->flags [0x%02x]->", gSettings.BooterConfig);
-  
+
   // submenu description
   AddMenuInfoLine(SubScreen, PoolPrint(L"Modify flags for boot.efi"));
 
@@ -4315,7 +4315,7 @@ REFIT_MENU_ENTRY *SubMenuBLC()
   AddMenuCheck(SubScreen, "Black Background",   kBootArgsFlagBlackBg, 65);
   AddMenuCheck(SubScreen, "Login UI",           kBootArgsFlagLoginUI, 65);
   AddMenuCheck(SubScreen, "Install UI",         kBootArgsFlagInstallUI, 65);
-  
+
   AddMenuEntry(SubScreen, &MenuEntryReturn);
   ModifyTitles(Entry);
   return Entry;
@@ -4326,19 +4326,19 @@ REFIT_MENU_ENTRY *SubMenuSystem()
   // init
   REFIT_MENU_ENTRY   *Entry;
   REFIT_MENU_SCREEN  *SubScreen;
-  
+
   // create the entry in the options menu
   NewEntry(&Entry, &SubScreen, ActionEnter, SCREEN_SYSTEM, "System Parameters->");
-  
+
   // submenu description
   AddMenuInfoLine(SubScreen, PoolPrint(L"Choose options for booted OS"));
-  
+
   AddMenuItem(SubScreen, 2,  "Block kext:", TAG_INPUT, TRUE);
   AddMenuItem(SubScreen, 51, "Set OS version if not:", TAG_INPUT, TRUE);
-  
+
   AddMenuEntry(SubScreen, SubMenuCSR());
   AddMenuEntry(SubScreen, SubMenuBLC());
-  
+
   AddMenuEntry(SubScreen, &MenuEntryReturn);
   return Entry;
 }
@@ -4349,11 +4349,11 @@ REFIT_MENU_ENTRY  *SubMenuConfigs()
   REFIT_MENU_SCREEN  *SubScreen;
   REFIT_INPUT_DIALOG *InputBootArgs;
   UINTN               i;
-  
+
   NewEntry(&Entry, &SubScreen, ActionEnter, SCREEN_THEME, "Configs->");
-  
+
   AddMenuInfoLine(SubScreen, L"Select a config file:");
-  
+
   for (i = 0; i < ConfigsNum; i++) {
     InputBootArgs = AllocateZeroPool(sizeof(REFIT_INPUT_DIALOG));
     InputBootArgs->Entry.Title = PoolPrint(L"%s", ConfigsList[i]);
@@ -4531,14 +4531,14 @@ VOID DecodeOptions(LOADER_ENTRY *Entry)
       Entry->LoadOptions = RemoveLoadOption(Entry->LoadOptions, ArgOptional[Index]);
     }
   }
-  
+
   if (gSettings.OptionsBits & OPT_NVWEBON) {
     if (AsciiOSVersionToUint64(Entry->OSVersion) >= AsciiOSVersionToUint64("10.12")) {
       gSettings.NvidiaWeb = TRUE;
     } else {
       Entry->LoadOptions = AddLoadOption(Entry->LoadOptions, ArgOptional[INX_NVWEBON]);
     }
-  }  
+  }
   if ((gSettings.OptionsBits & OPT_NVWEBON) == 0) {
     if (AsciiOSVersionToUint64(Entry->OSVersion) >= AsciiOSVersionToUint64("10.12")) {
       gSettings.NvidiaWeb = FALSE;
@@ -4580,7 +4580,7 @@ UINTN RunMainMenu(IN REFIT_MENU_SCREEN *Screen, IN INTN DefaultSelection, OUT RE
         TmpArgs = PoolPrint(L"%a", gSettings.BootArgs);
       }
       SubMenuIndex = -1;
-#ifdef CHECK_FLAGS   
+#ifdef CHECK_FLAGS
       gSettings.OptionsBits = EncodeOptions(TmpArgs);
 //      DBG("main OptionsBits = 0x%x\n", gSettings.OptionsBits);
       gSettings.OptionsBits |= EncodeOptions(((LOADER_ENTRY*)MainChosenEntry)->LoadOptions);
@@ -4590,7 +4590,7 @@ UINTN RunMainMenu(IN REFIT_MENU_SCREEN *Screen, IN INTN DefaultSelection, OUT RE
 #endif
       if (TmpArgs) {
         FreePool(TmpArgs);
-      }      
+      }
       SubMenuExit = 0;
       while (!SubMenuExit) {
         SubMenuExit = RunGenericMenu(MainChosenEntry->SubScreen, Style, &SubMenuIndex, &TempChosenEntry);

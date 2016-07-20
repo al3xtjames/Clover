@@ -33,12 +33,12 @@
 #if DEBUG_DH == 0
 #define DBG(...)
 #else
-#define DBG(...) DebugLog(DEBUG_DH, __VA_ARGS__)	
+#define DBG(...) DebugLog(DEBUG_DH, __VA_ARGS__)
 #endif
 
 
 #include "Platform.h"
-#include "Version.h"
+#include "../Version.h"
 
 #include <Guid/DataHubRecords.h>
 
@@ -115,20 +115,20 @@ LogDataHub(IN  EFI_GUID *TypeGuid,
   UINT32        RecordSize;
   EFI_STATUS    Status;
   PLATFORM_DATA *PlatformData;
-  
+
   PlatformData = (PLATFORM_DATA*)AllocatePool(sizeof(PLATFORM_DATA) + DataSize + EFI_CPU_DATA_MAXIMUM_LENGTH);
   if (PlatformData == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   RecordSize = CopyRecord(PlatformData, Name, Data, DataSize);
   Status     = gDataHub->LogData(gDataHub,
-                                 TypeGuid,                   // DataRecordGuid				
+                                 TypeGuid,                   // DataRecordGuid
                                  &gDataHubPlatformGuid,      // ProducerName (always)
                                  EFI_DATA_RECORD_CLASS_DATA,
                                  PlatformData,
                                  RecordSize);
-  
+
   FreePool(PlatformData);
   return Status;
 }
@@ -163,7 +163,7 @@ SetVariablesForOSX()
                    &gUuid);
 
   Attributes     = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS;
-  
+
   if (gSettings.RtMLB != NULL) {
     if (AsciiStrLen(gSettings.RtMLB) != 17) {
       DBG("** Warning: Your MLB is not suitable for iMessage(must be 17 chars long) !\n");
@@ -285,7 +285,7 @@ SetVariablesForOSX()
 VOID EFIAPI
 SetupDataForOSX()
 {
-  EFI_STATUS Status;	
+  EFI_STATUS Status;
 
   UINT32     DevPathSupportedVal;
   UINT64     FrontSideBus;
@@ -308,7 +308,7 @@ SetupDataForOSX()
     DBG("Wrong FrontSideBus=%d, set to 100MHz\n", FrontSideBus);
     FrontSideBus = 100 * Mega;
   }
-  
+
   if (gSettings.QEMU) {
     FrontSideBus = gCPUStructure.TSCFrequency;
     switch (gCPUStructure.Model) {
@@ -328,7 +328,7 @@ SetupDataForOSX()
 
   CpuSpeed = gCPUStructure.CPUFrequency;
   gSettings.CpuFreqMHz = (UINT32)DivU64x32(CpuSpeed,     Mega);
-  
+
   // Locate DataHub Protocol
   Status = gBS->LocateProtocol(&gEfiDataHubProtocolGuid, NULL, (VOID**)&gDataHub);
   if (!EFI_ERROR(Status)) {
@@ -336,10 +336,10 @@ SetupDataForOSX()
     AsciiStrToUnicodeStr(gSettings.ProductName, ProductName);
 
     SerialNumber        = AllocateZeroPool(64);
-    AsciiStrToUnicodeStr(gSettings.SerialNr,    SerialNumber);   
-    
+    AsciiStrToUnicodeStr(gSettings.SerialNr,    SerialNumber);
+
     LogDataHub(&gEfiProcessorSubClassGuid, L"FSBFrequency",     &FrontSideBus,        sizeof(UINT64));
-    
+
     if (gCPUStructure.ARTFrequency && gSettings.UseARTFreq) {
       ARTFrequency = gCPUStructure.ARTFrequency;
       LogDataHub(&gEfiProcessorSubClassGuid, L"ARTFrequency",   &ARTFrequency,        sizeof(UINT64));
@@ -348,7 +348,7 @@ SetupDataForOSX()
     TscFrequency        = gCPUStructure.TSCFrequency;
     LogDataHub(&gEfiProcessorSubClassGuid, L"InitialTSC",         &TscFrequency,        sizeof(UINT64));
     LogDataHub(&gEfiProcessorSubClassGuid, L"CPUFrequency",         &CpuSpeed,            sizeof(UINT64));
-    
+
     DevPathSupportedVal = 1;
     LogDataHub(&gEfiMiscSubClassGuid,      L"DevicePathsSupported", &DevPathSupportedVal, sizeof(UINT32));
     LogDataHub(&gEfiMiscSubClassGuid,      L"Model",                ProductName,         (UINT32)StrSize(ProductName));
@@ -356,7 +356,7 @@ SetupDataForOSX()
 
     if (gSettings.InjectSystemID) {
       LogDataHub(&gEfiMiscSubClassGuid, L"system-id", &gUuid, sizeof(EFI_GUID));
-    }		
+    }
 
     LogDataHub(&gEfiProcessorSubClassGuid, L"clovergui-revision", &Revision, sizeof(UINT32));
 

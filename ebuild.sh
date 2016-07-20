@@ -698,7 +698,7 @@ MainBuildScript() {
       if [[ -n "$@" ]]; then
         clover_build_info="${clover_build_info} $@"
       fi
-      
+
       clover_build_info="${clover_build_info} | $(echo $cmd | xargs | sed -e "s, -p ${PLATFORMFILE} , ,")"
 
       if [[ -n "${OSVER:-}" ]]; then
@@ -730,9 +730,9 @@ copyBin() {
   [[ ! -f  "$cpSrc" || ! -d  "$cpDestDIR" ]] && return
   [[ -d  "$cpDest" ]] && cpFile=$(basename "$cpSrc")
   #[[ "$cpFile" == *"-64"* ]] && cpArch=64
-  
+
   echo "  -> $cpFile"
-  cp -f "$cpSrc" "$cpDest" 2>/dev/null 
+  cp -f "$cpSrc" "$cpDest" 2>/dev/null
 }
 
 setInitBootMsg(){
@@ -958,7 +958,7 @@ MainPostBuildScript() {
         done
       fi
 
-      # drivers64UEFI      
+      # drivers64UEFI
       binArray=( CsmVideoDxe DataHubDxe EmuVariableUefi OsxAptioFix2Drv OsxAptioFixDrv OsxLowMemFixDrv PartitionDxe SMCHelper )
       for efi in "${binArray[@]}"
       do

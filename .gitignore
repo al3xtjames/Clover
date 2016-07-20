@@ -15,7 +15,6 @@
 /BootHFS/boot1f32alt
 
 # /CloverPackage/
-/CloverPackage/Version.h
 /CloverPackage/sym/
 /CloverPackage/CloverV2/BootSectors/boot0ab
 /CloverPackage/CloverV2/BootSectors/boot0af
@@ -46,10 +45,7 @@
 /HFSPlus/X64/
 
 /Version.h
-/vers.txt
 
-/rEFIt_UEFI/Version.h
-/rEFIt_UEFI/vers.txt
 rEFIt_UEFI/rEFIt_proj/rEFIt_proj.xcodeproj/project.xcworkspace/
 rEFIt_UEFI/rEFIt_proj/rEFIt_proj.xcodeproj/xcuserdata/
 CloverX/CloverX.xcodeproj/project.xcworkspace/
