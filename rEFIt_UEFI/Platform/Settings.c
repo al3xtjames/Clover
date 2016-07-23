@@ -5829,7 +5829,7 @@ GetDevices ()
           SlotDevice->BusNum          = (UINT8)Bus;
           SlotDevice->DevFuncNum      = (UINT8)((Device << 3) | (Function & 0x07));
           SlotDevice->Valid           = TRUE;
-          AsciiSPrint (SlotDevice->SlotName, 31, "Airport");
+          AsciiSPrint (SlotDevice->SlotName, 31, "AirPort");
           SlotDevice->SlotID          = 0;
           SlotDevice->SlotType        = SlotTypePciExpressX1;
           DBG(" - WIFI: Vendor=", Pci.Hdr.VendorId);
@@ -5912,7 +5912,7 @@ GetDevices ()
           SlotDevice->BusNum          = (UINT8)Bus;
           SlotDevice->DevFuncNum      = (UINT8)((Device << 3) | (Function & 0x07));
           SlotDevice->Valid           = TRUE;
-          AsciiSPrint (SlotDevice->SlotName, 31, "Firewire");
+          AsciiSPrint (SlotDevice->SlotName, 31, "FireWire");
           SlotDevice->SlotID          = 3;
           SlotDevice->SlotType        = SlotTypePciExpressX4;
         }
