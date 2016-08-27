@@ -979,11 +979,11 @@ FillinKextPatches (IN OUT KERNEL_AND_KEXT_PATCHES *Patches,
         if (Dict != NULL) {
           //this is impossible because UnicodeStrToAsciiStr not extend output size
  //         UnicodeStrToAsciiStr(PoolPrint(L"%a (%a)", KextPatchesLabel, Dict->string), KextPatchesLabel);
-          
+
           AsciiStrCatS(KextPatchesLabel, 255, " (");
           AsciiStrCatS(KextPatchesLabel, 255, Dict->string);
           AsciiStrCatS(KextPatchesLabel, 255, ")");
-          
+
         } else {
           AsciiStrCatS(KextPatchesLabel, 255, " (NoLabel)");
         }
@@ -3551,7 +3551,7 @@ InitTheme(
     }
     Banner  = NULL;
   }
-  
+
   //Free buttons images
   for (i = 0; i < 4; i++) {
     if (Buttons[i] != NULL) {
