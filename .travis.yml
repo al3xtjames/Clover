@@ -15,7 +15,7 @@ install:
  - make -C BaseTools -s
  - source edksetup.sh
  - cd $TRAVIS_BUILD_DIR
- - export PACKAGES_PATH=$TRAVIS_BUILD_DIR
+ - export PACKAGES_PATH=$TRAVIS_BUILD_DIR/../
 
 script:
  - build -t XCODE5 -a IA32 -a X64 -p Clover/Clover.dsc -b RELEASE -D USE_LOW_EBDA
