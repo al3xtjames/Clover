@@ -6,7 +6,7 @@ compiler: clang
 before_install:
  - brew update
  - brew install cctools
- - ln -s /usr/local/Cellar/cctools/855/efi/bin/mtoc /usr/local/bin/mtoc.NEW
+ - ln -s /usr/local/Cellar/cctools/855/efi/bin/mtoc /usr/local/bin/mtoc
  - brew install nasm
 
 install:
