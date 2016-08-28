@@ -150,36 +150,35 @@ Headers collection for procedures
 #define CPU_MODEL_XEON_MP       0x1D  /* MP 7400 UN */
 #define CPU_MODEL_FIELDS        0x1E  /* Lynnfield, Clarksfield, Jasper */
 #define CPU_MODEL_DALES         0x1F  /* Havendale, Auburndale */
-#define CPU_MODEL_CLARKDALE     0x25  /* Clarkdale, Arrandale */
-#define CPU_MODEL_ATOM_SAN      0x26  /* Haswell H ? */
-#define CPU_MODEL_LINCROFT      0x27  /* UN */
-#define CPU_MODEL_SANDY_BRIDGE	0x2A
-#define CPU_MODEL_WESTMERE      0x2C  /* Gulftown LGA1366 */
-#define CPU_MODEL_JAKETOWN      0x2D  /* Sandy Bridge Xeon LGA2011 */
-#define CPU_MODEL_NEHALEM_EX    0x2E
-#define CPU_MODEL_WESTMERE_EX   0x2F
-#define CPU_MODEL_ATOM_2000     0x36  /* UN */
-#define CPU_MODEL_ATOM_3700     0x37  /* Bay Trail */
-#define CPU_MODEL_IVY_BRIDGE    0x3A
-#define CPU_MODEL_HASWELL       0x3C  /* Haswell DT */
-#define CPU_MODEL_HASWELL_U5    0x3D  /* Haswell U5  5th generation Broadwell*/
-#define CPU_MODEL_IVY_BRIDGE_E5 0x3E  /* Ivy Bridge Xeon UN */
-#define CPU_MODEL_HASWELL_E     0x3F	/* Haswell Extreme */
-//#define CPU_MODEL_HASWELL_H		0x??	// Haswell H
-#define CPU_MODEL_HASWELL_ULT		0x45	/* Haswell ULT */
-#define CPU_MODEL_CRYSTALWELL		0x46	/* Haswell ULX CPUID_MODEL_CRYSTALWELL */
-#define CPU_MODEL_BROADWELL_HQ  0x47
-#define CPU_MODEL_AIRMONT       0x4C
+#define CPU_MODEL_DALES_32NM    0x25  /* Arrandale, Clarkdale (BGA1288, PGA988, LGA1156) */
+#define CPU_MODEL_ATOM_SAN      0x26  /* Tunnel Creek (BGA676) */
+#define CPU_MODEL_LINCROFT      0x27  /* Lincroft (BGA518) */
+#define CPU_MODEL_SB_CORE       0x2A  /* Sandy Bridge (LGA1155) */
+#define CPU_MODEL_WESTMERE      0x2C  /* Gulftown, Westmere-EP (LGA1366) */
+#define CPU_MODEL_JAKETOWN      0x2D  /* Sandy Bridge-E, Sandy Bridge-EN, Sandy Bridge-EP (LGA1356, LGA2011) */
+#define CPU_MODEL_NEHALEM_EX    0x2E  /* Nehalem-EX (LGA1567) */
+#define CPU_MODEL_WESTMERE_EX   0x2F  /* Westmere-EX (LGA1567) */
+#define CPU_MODEL_ATOM_2000     0x36  /* Cedarview (BGA559) */
+#define CPU_MODEL_ATOM_3700     0x37  /* Bay Trail (BGA1170, BGA1380) */
+#define CPU_MODEL_IB_CORE       0x3A  /* Ivy Bridge (LGA1155) */
+#define CPU_MODEL_HASWELL       0x3C  /* Haswell (LGA1150) */
+#define CPU_MODEL_BROADWELL     0x3D  /* Broadwell (LGA1150) */
+#define CPU_MODEL_IB_CORE_XEON  0x3E  /* Ivy Bridge-E, Ivy Bridge-EP (LGA2011) */
+#define CPU_MODEL_HASWELL_SVR   0x3F  /* Haswell-E, Haswell-EP (LGA2011-3) */
+#define CPU_MODEL_HASWELL_ULT   0x45  /* Haswell ULT */
+#define CPU_MODEL_CRYSTALWELL   0x46  /* Crystalwell */
+#define CPU_MODEL_BROADWELL_H   0x47
+#define CPU_MODEL_BRYSTALWELL   0x4C
 #define CPU_MODEL_AVOTON        0x4D
-#define CPU_MODEL_SKYLAKE_U     0x4E
-#define CPU_MODEL_BROADWELL_E5  0x4F
+#define CPU_MODEL_SKYLAKE       0x4E
+#define CPU_MODEL_BROADWELL_E   0x4F
 #define CPU_MODEL_BROADWELL_DE  0x56
 #define CPU_MODEL_KNIGHT        0x57
 #define CPU_MODEL_MOOREFIELD    0x5A
 #define CPU_MODEL_GOLDMONT      0x5C
 #define CPU_MODEL_ATOM_X3       0x5D
-#define CPU_MODEL_SKYLAKE_S     0x5E
-#define CPU_MODEL_CANNONLAKE    0x66
+#define CPU_MODEL_SKYLAKE_DT    0x5E
+// #define CPU_MODEL_CANNONLAKE    0x66
 
 #define CPU_VENDOR_INTEL        0x756E6547
 #define CPU_VENDOR_AMD          0x68747541
@@ -1174,7 +1173,7 @@ typedef struct {
   // ACPI/PATCHED/AML
   UINT32                  DisabledAMLCount;
   CHAR16                  **DisabledAML;
-  
+
   UINT32 OptionsBits;
   UINT32 FlagsBits;
   BOOLEAN                 ExposeSysVariables;

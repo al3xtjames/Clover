@@ -568,7 +568,7 @@ SetDMISettingsForModel (MACHINE_TYPES Model, BOOLEAN Redefine)
         }
         break;
 
-      case CPU_MODEL_SANDY_BRIDGE:
+      case CPU_MODEL_SB_CORE:
         if (gSettings.Mobile) {
           AsciiStrCpy (gSettings.RPlt, "k90i");
         } else {
@@ -576,11 +576,11 @@ SetDMISettingsForModel (MACHINE_TYPES Model, BOOLEAN Redefine)
         }
         break;
 
-      case CPU_MODEL_IVY_BRIDGE:
+      case CPU_MODEL_IB_CORE:
         AsciiStrCpy (gSettings.RPlt, "j30");
         break;
 
-      case CPU_MODEL_IVY_BRIDGE_E5:
+      case CPU_MODEL_IB_CORE_XEON:
         AsciiStrCpy (gSettings.RPlt, "j90");
         break;
 
@@ -588,7 +588,7 @@ SetDMISettingsForModel (MACHINE_TYPES Model, BOOLEAN Redefine)
         AsciiStrCpy (gSettings.RPlt, "j44");
         break;
 
-      case CPU_MODEL_SKYLAKE_S:
+      case CPU_MODEL_SKYLAKE_DT:
         AsciiStrCpy (gSettings.RPlt, "j95");
         break;
 
@@ -668,7 +668,7 @@ GetDefaultSettings ()
   gSettings.CsrActiveConfig      = 0xFFFF;
   gSettings.BooterConfig         = 0;
 
-  if (gCPUStructure.Model >= CPU_MODEL_IVY_BRIDGE) {
+  if (gCPUStructure.Model >= CPU_MODEL_IB_CORE) {
     gSettings.GeneratePStates    = TRUE;
     gSettings.GenerateCStates    = TRUE;
     //  gSettings.EnableISS          = FALSE;
@@ -676,7 +676,7 @@ GetDefaultSettings ()
     gSettings.EnableC6           = TRUE;
     gSettings.PluginType         = 1;
 
-    if (gCPUStructure.Model == CPU_MODEL_IVY_BRIDGE) {
+    if (gCPUStructure.Model == CPU_MODEL_IB_CORE) {
       gSettings.MinMultiplier    = 7;
     }
     //  gSettings.DoubleFirstState   = FALSE;

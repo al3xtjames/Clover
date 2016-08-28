@@ -87,14 +87,14 @@ SSDT_TABLE *generate_pss_ssdt(UINT8 FirstID, UINTN Number)
 
   switch (gCPUStructure.Model) {
     case CPU_MODEL_HASWELL:
-    case CPU_MODEL_IVY_BRIDGE_E5:
-    case CPU_MODEL_HASWELL_E:
+    case CPU_MODEL_IB_CORE_XEON:
+    case CPU_MODEL_HASWELL_SVR:
     case CPU_MODEL_HASWELL_ULT:
     case CPU_MODEL_CRYSTALWELL:
-    case CPU_MODEL_HASWELL_U5:
-    case CPU_MODEL_BROADWELL_HQ:
-    case CPU_MODEL_SKYLAKE_U:
-    case CPU_MODEL_SKYLAKE_S:
+    case CPU_MODEL_BROADWELL:
+    case CPU_MODEL_BROADWELL_H:
+    case CPU_MODEL_SKYLAKE:
+    case CPU_MODEL_SKYLAKE_DT:
     case CPU_MODEL_ATOM_3700:
     {
       Aplf = 0;
@@ -206,23 +206,23 @@ SSDT_TABLE *generate_pss_ssdt(UINT8 FirstID, UINTN Number)
 					}
 					case CPU_MODEL_FIELDS:		// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
 					case CPU_MODEL_DALES:
-					case CPU_MODEL_CLARKDALE:	// Intel Core i3, i5 LGA1156 (32nm)
+					case CPU_MODEL_DALES_32NM:	// Intel Core i3, i5 LGA1156 (32nm)
 					case CPU_MODEL_NEHALEM:		// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
 					case CPU_MODEL_NEHALEM_EX:	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65x
 					case CPU_MODEL_WESTMERE:	// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
 					case CPU_MODEL_WESTMERE_EX:	// Intel Xeon E7
-          case CPU_MODEL_SANDY_BRIDGE:		// Intel Core i3, i5, i7 LGA1155 (32nm)
+          case CPU_MODEL_SB_CORE:		// Intel Core i3, i5, i7 LGA1155 (32nm)
           case CPU_MODEL_JAKETOWN:	// Intel Xeon E3
-          case CPU_MODEL_IVY_BRIDGE:
+          case CPU_MODEL_IB_CORE:
           case CPU_MODEL_HASWELL:
-          case CPU_MODEL_IVY_BRIDGE_E5:
-          case CPU_MODEL_HASWELL_E:
+          case CPU_MODEL_IB_CORE_XEON:
+          case CPU_MODEL_HASWELL_SVR:
           case CPU_MODEL_HASWELL_ULT:
           case CPU_MODEL_CRYSTALWELL:
-          case CPU_MODEL_HASWELL_U5:
-          case CPU_MODEL_BROADWELL_HQ:
-          case CPU_MODEL_SKYLAKE_U:
-          case CPU_MODEL_SKYLAKE_S:
+          case CPU_MODEL_BROADWELL:
+          case CPU_MODEL_BROADWELL_H:
+          case CPU_MODEL_SKYLAKE:
+          case CPU_MODEL_SKYLAKE_DT:
           case CPU_MODEL_ATOM_3700:
 					{
             maximum.Control.Control = RShiftU64(AsmReadMsr64(MSR_PLATFORM_INFO), 8) & 0xff;
@@ -260,17 +260,17 @@ SSDT_TABLE *generate_pss_ssdt(UINT8 FirstID, UINTN Number)
 							
 							for (i = maximum.Control.Control; i >= minimum.Control.Control; i--) {
                 j = i;
-                if ((gCPUStructure.Model == CPU_MODEL_SANDY_BRIDGE) ||
-                    (gCPUStructure.Model == CPU_MODEL_IVY_BRIDGE) ||
+                if ((gCPUStructure.Model == CPU_MODEL_SB_CORE) ||
+                    (gCPUStructure.Model == CPU_MODEL_IB_CORE) ||
                     (gCPUStructure.Model == CPU_MODEL_HASWELL) ||
-                    (gCPUStructure.Model == CPU_MODEL_HASWELL_E) ||
+                    (gCPUStructure.Model == CPU_MODEL_HASWELL_SVR) ||
                     (gCPUStructure.Model == CPU_MODEL_HASWELL_ULT) ||
                     (gCPUStructure.Model == CPU_MODEL_CRYSTALWELL) ||
-                    (gCPUStructure.Model == CPU_MODEL_IVY_BRIDGE_E5) ||
-                    (gCPUStructure.Model == CPU_MODEL_HASWELL_U5) ||
-                    (gCPUStructure.Model == CPU_MODEL_BROADWELL_HQ) ||
-                    (gCPUStructure.Model == CPU_MODEL_SKYLAKE_U) ||
-                    (gCPUStructure.Model == CPU_MODEL_SKYLAKE_S) ||
+                    (gCPUStructure.Model == CPU_MODEL_IB_CORE_XEON) ||
+                    (gCPUStructure.Model == CPU_MODEL_BROADWELL) ||
+                    (gCPUStructure.Model == CPU_MODEL_BROADWELL_H) ||
+                    (gCPUStructure.Model == CPU_MODEL_SKYLAKE) ||
+                    (gCPUStructure.Model == CPU_MODEL_SKYLAKE_DT) ||
                     (gCPUStructure.Model == CPU_MODEL_JAKETOWN)) {
                   j = i << 8;
                   p_states[p_states_count].Frequency = (UINT32)(100 * i);

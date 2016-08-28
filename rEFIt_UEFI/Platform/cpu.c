@@ -238,29 +238,29 @@ VOID GetCPUProperties (VOID)
     {
       case CPU_MODEL_NEHALEM: // Intel Core i7 LGA1366 (45nm)
       case CPU_MODEL_FIELDS: // Intel Core i5, i7 LGA1156 (45nm)
-      case CPU_MODEL_CLARKDALE: // Intel Core i3, i5, i7 LGA1156 (32nm)
+      case CPU_MODEL_DALES_32NM: // Intel Core i3, i5, i7 LGA1156 (32nm)
       case CPU_MODEL_NEHALEM_EX:
       case CPU_MODEL_JAKETOWN:
-      case CPU_MODEL_SANDY_BRIDGE:
-      case CPU_MODEL_IVY_BRIDGE:
-      case CPU_MODEL_IVY_BRIDGE_E5:
+      case CPU_MODEL_SB_CORE:
+      case CPU_MODEL_IB_CORE:
+      case CPU_MODEL_IB_CORE_XEON:
       case CPU_MODEL_HASWELL:
-      case CPU_MODEL_HASWELL_U5:
-      case CPU_MODEL_HASWELL_E:
+      case CPU_MODEL_BROADWELL:
+      case CPU_MODEL_HASWELL_SVR:
       case CPU_MODEL_HASWELL_ULT:
       case CPU_MODEL_CRYSTALWELL:
-      case CPU_MODEL_BROADWELL_HQ:
-      case CPU_MODEL_AIRMONT:
+      case CPU_MODEL_BROADWELL_H:
+      case CPU_MODEL_BRYSTALWELL:
       case CPU_MODEL_AVOTON:
-      case CPU_MODEL_SKYLAKE_U:
+      case CPU_MODEL_SKYLAKE:
       case CPU_MODEL_BROADWELL_DE:
-      case CPU_MODEL_BROADWELL_E5:
+      case CPU_MODEL_BROADWELL_E:
       case CPU_MODEL_KNIGHT:
       case CPU_MODEL_MOOREFIELD:
       case CPU_MODEL_GOLDMONT:
       case CPU_MODEL_ATOM_X3:
-      case CPU_MODEL_SKYLAKE_S:
-      case CPU_MODEL_CANNONLAKE:
+      case CPU_MODEL_SKYLAKE_DT:
+      // case CPU_MODEL_CANNONLAKE:
         msr = AsmReadMsr64(MSR_CORE_THREAD_COUNT);  //0x35
         gCPUStructure.Cores   = (UINT8)bitfield((UINT32)msr, 31, 16);
         gCPUStructure.Threads = (UINT8)bitfield((UINT32)msr, 15,  0);
@@ -389,7 +389,7 @@ VOID GetCPUProperties (VOID)
            case CPU_MODEL_NEHALEM:// Core i7 LGA1366, Xeon 5500, "Bloomfield", "Gainstown", 45nm
            case CPU_MODEL_FIELDS:// Core i7, i5 LGA1156, "Clarksfield", "Lynnfield", "Jasper", 45nm
            case CPU_MODEL_DALES:// Core i7, i5, Nehalem
-           case CPU_MODEL_CLARKDALE:// Core i7, i5, i3 LGA1156, "Westmere", "Clarkdale", , 32nm
+           case CPU_MODEL_DALES_32NM:// Core i7, i5, i3 LGA1156, "Westmere", "Clarkdale", , 32nm
            case CPU_MODEL_WESTMERE:// Core i7 LGA1366, Six-core, "Westmere", "Gulftown", 32nm
            case CPU_MODEL_NEHALEM_EX:// Core i7, Nehalem-Ex Xeon, "Beckton"
            case CPU_MODEL_WESTMERE_EX:// Core i7, Nehalem-Ex Xeon, "Eagleton"
@@ -438,20 +438,20 @@ VOID GetCPUProperties (VOID)
              gCPUStructure.Turbo4 *= 10;
 
              break;
-           case CPU_MODEL_SANDY_BRIDGE:// Sandy Bridge, 32nm
-           case CPU_MODEL_IVY_BRIDGE:
-           case CPU_MODEL_IVY_BRIDGE_E5:
+           case CPU_MODEL_SB_CORE:// Sandy Bridge, 32nm
+           case CPU_MODEL_IB_CORE:
+           case CPU_MODEL_IB_CORE_XEON:
            case CPU_MODEL_JAKETOWN:
            case CPU_MODEL_ATOM_3700:
            case CPU_MODEL_HASWELL:
-           case CPU_MODEL_HASWELL_U5:
-           case CPU_MODEL_HASWELL_E:
+           case CPU_MODEL_BROADWELL:
+           case CPU_MODEL_HASWELL_SVR:
            case CPU_MODEL_HASWELL_ULT:
            case CPU_MODEL_CRYSTALWELL:
-           case CPU_MODEL_BROADWELL_HQ:
-           case CPU_MODEL_BROADWELL_E5:
-           case CPU_MODEL_SKYLAKE_U:
-           case CPU_MODEL_SKYLAKE_S:
+           case CPU_MODEL_BROADWELL_H:
+           case CPU_MODEL_BROADWELL_E:
+           case CPU_MODEL_SKYLAKE:
+           case CPU_MODEL_SKYLAKE_DT:
              gCPUStructure.TSCFrequency = MultU64x32(gCPUStructure.CurrentSpeed, Mega); //MHz -> Hz
              gCPUStructure.CPUFrequency = gCPUStructure.TSCFrequency;
 
@@ -807,142 +807,138 @@ typedef struct {
 } PCI_TYPE00;
 */
 
-UINT16 GetStandardCpuType()
+UINT16 GetStandardCpuType(VOID)
 {
 	if (gCPUStructure.Threads >= 4) {
-		return 0x402;   // Quad-Core Xeon
+		return 0x402; // Quad-Core Xeon
 	}
 	else if (gCPUStructure.Threads == 1) {
-		return 0x201;   // Core Solo
+		return 0x201; // Core Solo
 	}
-	return 0x301;   // Core 2 Duo
+
+	return 0x301; // Core 2 Duo
 }
 
-UINT16 GetAdvancedCpuType ()
+UINT16 GetAdvancedCpuType(VOID)
 {
-	if (gCPUStructure.Vendor == CPU_VENDOR_INTEL) {
-		switch (gCPUStructure.Family) {
-			case 0x06:
-			{
-				switch (gCPUStructure.Model) {
-          case CPU_MODEL_PENTIUM_M:
-					case CPU_MODEL_DOTHAN:// Dothan
-					case CPU_MODEL_YONAH: // Yonah
-						return 0x201;
-          case CPU_MODEL_CELERON: //M520
-					case CPU_MODEL_MEROM: // Merom
-					case CPU_MODEL_PENRYN:// Penryn
-            if (AsciiStrStr(gCPUStructure.BrandString, "Xeon"))
-              return 0x402; // Xeon
-					case CPU_MODEL_ATOM:  // Atom (45nm)
-						return GetStandardCpuType();
+  if ((gCPUStructure.Vendor == CPU_VENDOR_INTEL) && (gCPUStructure.Family == 0x06)) {
+    switch (gCPUStructure.Model) {
+    case CPU_MODEL_PENTIUM_M:
+    case CPU_MODEL_DOTHAN:// Dothan
+    case CPU_MODEL_YONAH: // Yonah
+      return 0x201;
 
-					case CPU_MODEL_NEHALEM_EX: //Xeon 5300
-						return 0x402;
+    case CPU_MODEL_CELERON: //M520
+    case CPU_MODEL_MEROM: // Merom
+    case CPU_MODEL_PENRYN:// Penryn
+      if (AsciiStrStr(gCPUStructure.BrandString, "Xeon(R)")) {
+        return 0x402; // Xeon
+    }
 
-					case CPU_MODEL_NEHALEM: // Intel Core i7 LGA1366 (45nm)
-            if (AsciiStrStr(gCPUStructure.BrandString, "Xeon"))
-               return 0x501; // Xeon
-						return 0x701; // Core i7
+    case CPU_MODEL_ATOM:  // Atom (45nm)
+    return GetStandardCpuType();
 
-					case CPU_MODEL_FIELDS: // Lynnfield, Clarksfield, Jasper
-						if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i5"))
-							return 0x601; // Core i5
-						return 0x701; // Core i7
+    case CPU_MODEL_NEHALEM_EX: //Xeon 5300
+      return 0x402;
 
-					case CPU_MODEL_DALES: // Intel Core i5, i7 LGA1156 (45nm) (Havendale, Auburndale)
-						if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i3"))
-							return 0x901; // Core i3 //why not 902? Ask Apple
-						if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i5"))
-							return 0x602; // Core i5
-            if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i7"))
-              return 0x702; // Core i7
-            if (gCPUStructure.Cores <= 2) {
-              return 0x602;
-            }
-						return 0x702; // Core i7
+    case CPU_MODEL_NEHALEM: // Intel Core i7 LGA1366 (45nm)
+      if (AsciiStrStr(gCPUStructure.BrandString, "Xeon(R)")) {
+        return 0x501; // Xeon
+      } else {
+        return 0x701; // Core i7
+      }
 
-					//case CPU_MODEL_ARRANDALE:
-					case CPU_MODEL_CLARKDALE: // Intel Core i3, i5, i7 LGA1156 (32nm) (Clarkdale, Arrandale)
+    case CPU_MODEL_FIELDS: // Lynnfield, Clarksfield, Jasper
+      if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i5")) {
+        return 0x601; // Core i5
+      } else {
+        return 0x701; // Core i7
+      }
 
-						if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i3"))
-							return 0x901; // Core i3
-						if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i5"))
-							return 0x601; // Core i5 - (M540 -> 0x0602)
-            if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i7"))
-              return 0x701; // Core i7
-            if (gCPUStructure.Cores <= 2) {
-              return 0x601;
-            }
-						return 0x701; // Core i7
+    case CPU_MODEL_DALES: // Intel Core i5, i7 LGA1156 (45nm) (Havendale, Auburndale)
+      if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i3")) {
+        return 0x901; // Core i3 //why not 902? Ask Apple
+      }
+      if ((AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i5")) || (gCPUStructure.Cores <= 2)) {
+        return 0x602; // Core i5
+      } else {
+        return 0x702; // Core i7
+      }
 
-					case CPU_MODEL_WESTMERE: // Intel Core i7 LGA1366 (32nm) 6 Core (Gulftown, Westmere-EP, Westmere-WS)
-					case CPU_MODEL_WESTMERE_EX: // Intel Core i7 LGA1366 (45nm) 6 Core ???
-            if (AsciiStrStr(gCPUStructure.BrandString, "Xeon"))
-              return 0x501; // Xeon
-						return 0x701; // Core i7
-					case CPU_MODEL_SANDY_BRIDGE:
-            if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i3"))
-							return 0x903; // Core i3
-            if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i5"))
-              return 0x603; // Core i5
-            if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i7"))
-              return 0x703; // Core i7
-            if (gCPUStructure.Cores <= 2) {
-              return 0x603;
-            }
-						return 0x703;
-          case CPU_MODEL_IVY_BRIDGE:
-            if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i3"))
-							return 0x903; // Core i3 - Apple doesn't use it
-            if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i5"))
-              return 0x604; // Core i5
-            if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i7"))
-              return 0x704; // Core i7
-            if (gCPUStructure.Cores <= 2) {
-              return 0x604;
-            }
-						return 0x704;
-          case CPU_MODEL_HASWELL_U5:
-   //       case CPU_MODEL_SKYLAKE_S:
-            if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) M"))
-              return 0xB06; // Core M
-            if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i3"))
-              return 0x906; // Core i3 - Apple doesn't use it
-            if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i5"))
-              return 0x606; // Core i5
-            if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i7"))
-              return 0x706; // Core i7
-            if (gCPUStructure.Cores <= 2) {
-              return 0x606;
-            }
-            return 0x706;
-          case CPU_MODEL_HASWELL_E:
-            return 0x507;
-          case CPU_MODEL_IVY_BRIDGE_E5:
-            return 0xA01;
-          case CPU_MODEL_ATOM_3700:
-          case CPU_MODEL_HASWELL:
-          case CPU_MODEL_HASWELL_ULT:
-          case CPU_MODEL_CRYSTALWELL:
-          case CPU_MODEL_BROADWELL_HQ:
-          case CPU_MODEL_SKYLAKE_U:
-          case CPU_MODEL_SKYLAKE_S:
-            if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i3"))
-							return 0x905; // Core i3 - Apple doesn't use it
-            if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i5"))
-              return 0x605; // Core i5
-            if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i7"))
-              return 0x705; // Core i7
-            if (gCPUStructure.Cores <= 2) {
-              return 0x605;
-            }
-						return 0x705;
-				}
-			}
-		}
-	}
-	return GetStandardCpuType();
+    case CPU_MODEL_DALES_32NM: // Intel Core i3, i5, i7 LGA1156 (32nm) (Clarkdale, Arrandale)
+      if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i3")) {
+        return 0x901; // Core i3
+      }
+      if ((AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i5")) || (gCPUStructure.Cores <= 2)) {
+        return 0x601; // Core i5 - (M540 -> 0x0602)
+      } else {
+        return 0x701; // Core i7
+    }
+
+    case CPU_MODEL_WESTMERE: // Intel Core i7 LGA1366 (32nm) 6 Core (Gulftown, Westmere-EP, Westmere-WS)
+    case CPU_MODEL_WESTMERE_EX: // Intel Core i7 LGA1366 (45nm) 6 Core ???
+      if (AsciiStrStr(gCPUStructure.BrandString, "Xeon(R)")) {
+        return 0x501; // Xeon
+      } else {
+        return 0x701; // Core i7
+      }
+
+    case CPU_MODEL_SB_CORE:
+      if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i3")) {
+        return 0x903; // Core i3
+      }
+      if ((AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i5")) || (gCPUStructure.Cores <= 2)) {
+        return 0x603; // Core i5
+      } else {
+        return 0x703; // Core i7
+      }
+
+    case CPU_MODEL_IB_CORE:
+      if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i3"))
+      return 0x903; // Core i3 - Apple doesn't use it
+      if ((AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i5")) || (gCPUStructure.Cores <= 2)) {
+        return 0x604; // Core i5
+    } else {
+      return 0x704; // Core i7
+    }
+
+    case CPU_MODEL_BROADWELL:
+    case CPU_MODEL_BROADWELL_H:
+    case CPU_MODEL_BRYSTALWELL:
+      if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) M"))
+        return 0xB06; // Core M
+      if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i3"))
+        return 0x906; // Core i3 - Apple doesn't use it
+      if ((AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i5")) || (gCPUStructure.Cores <= 2)) {
+        return 0x606; // Core i5
+      } else {
+        return 0x706; // Core i7
+      }
+
+    case CPU_MODEL_IB_CORE_XEON:
+      return 0xA01;
+
+    case CPU_MODEL_HASWELL_SVR:
+      return 0x507;
+
+    case CPU_MODEL_ATOM_3700:
+    case CPU_MODEL_HASWELL:
+    case CPU_MODEL_HASWELL_ULT:
+    case CPU_MODEL_CRYSTALWELL:
+    case CPU_MODEL_SKYLAKE:
+    case CPU_MODEL_SKYLAKE_DT:
+      if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i3")) {
+      return 0x905; // Core i3 - Apple doesn't use it
+      }
+      if ((AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i5")) || (gCPUStructure.Cores <= 2)) {
+        return 0x605; // Core i5
+      } else {
+      return 0x706; // Core i7
+      }
+    }
+  }
+
+  return GetStandardCpuType();
 }
 
 MACHINE_TYPES GetDefaultModel()
@@ -976,11 +972,11 @@ MACHINE_TYPES GetDefaultModel()
 				} else
 					DefaultType = MacBook41;
 				break;
-      case CPU_MODEL_CLARKDALE:
+      case CPU_MODEL_DALES_32NM:
         DefaultType = MacBookPro62;
         break;
 			case CPU_MODEL_JAKETOWN:
-			case CPU_MODEL_SANDY_BRIDGE:
+			case CPU_MODEL_SB_CORE:
 				if((AsciiStrStr(gCPUStructure.BrandString, "i3")) ||
 				   (AsciiStrStr(gCPUStructure.BrandString, "i5"))) {
 					DefaultType = MacBookPro81;
@@ -988,20 +984,20 @@ MACHINE_TYPES GetDefaultModel()
 				}
         DefaultType = MacBookPro83;
 				break;
-      case CPU_MODEL_IVY_BRIDGE:
-      case CPU_MODEL_IVY_BRIDGE_E5:
+      case CPU_MODEL_IB_CORE:
+      case CPU_MODEL_IB_CORE_XEON:
         DefaultType = MacBookAir52;
 				break;
       case CPU_MODEL_HASWELL:
-      case CPU_MODEL_HASWELL_E:
+      case CPU_MODEL_HASWELL_SVR:
       case CPU_MODEL_ATOM_3700:
         DefaultType = MacBookAir62;
 				break;
       case CPU_MODEL_HASWELL_ULT:
       case CPU_MODEL_CRYSTALWELL:
-      case CPU_MODEL_HASWELL_U5:
-      case CPU_MODEL_BROADWELL_HQ:
-      case CPU_MODEL_SKYLAKE_U:
+      case CPU_MODEL_BROADWELL:
+      case CPU_MODEL_BROADWELL_H:
+      case CPU_MODEL_SKYLAKE:
         DefaultType = MacBookPro111;
 				break;
 			default:
@@ -1047,7 +1043,7 @@ MACHINE_TYPES GetDefaultModel()
 			case CPU_MODEL_DALES:
 				DefaultType = iMac112;
 				break;
-			case CPU_MODEL_CLARKDALE:
+			case CPU_MODEL_DALES_32NM:
 				DefaultType = iMac112;
 				break;
 			case CPU_MODEL_WESTMERE:
@@ -1056,7 +1052,7 @@ MACHINE_TYPES GetDefaultModel()
 			case CPU_MODEL_WESTMERE_EX:
 				DefaultType = MacPro51;
 				break;
-			case CPU_MODEL_SANDY_BRIDGE:
+			case CPU_MODEL_SB_CORE:
         if (gGraphics[0].Vendor == Intel) {
           DefaultType = MacMini51;
 					break;
@@ -1072,8 +1068,8 @@ MACHINE_TYPES GetDefaultModel()
 				}
 				DefaultType = MacPro51;
 				break;
-      case CPU_MODEL_IVY_BRIDGE:
-      case CPU_MODEL_IVY_BRIDGE_E5:
+      case CPU_MODEL_IB_CORE:
+      case CPU_MODEL_IB_CORE_XEON:
         DefaultType = iMac132;
         if (gGraphics[0].Vendor == Intel) {
           DefaultType = MacMini62;
@@ -1087,14 +1083,14 @@ MACHINE_TYPES GetDefaultModel()
 			case CPU_MODEL_JAKETOWN:
 				DefaultType = MacPro41;
 				break;
-      case CPU_MODEL_HASWELL_U5:
+      case CPU_MODEL_BROADWELL:
         DefaultType = iMac151;
         break;
-      case CPU_MODEL_SKYLAKE_S:
+      case CPU_MODEL_SKYLAKE_DT:
         DefaultType = iMac171;
         break;
       case CPU_MODEL_HASWELL:
-      case CPU_MODEL_HASWELL_E:
+      case CPU_MODEL_HASWELL_SVR:
         DefaultType = iMac142;
         if (AsciiStrStr(gCPUStructure.BrandString, "70S")) {
         	DefaultType = iMac141;
