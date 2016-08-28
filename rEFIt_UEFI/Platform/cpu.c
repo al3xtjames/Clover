@@ -650,7 +650,7 @@ VOID GetCPUProperties (VOID)
 
   tmpU = gCPUStructure.FSBFrequency;
   BusSpeed = (UINT32) DivU64x32(tmpU, kilo); //Hz -> kHz
-  MsgLog("FSBFrequency = %d MHz, DMI FSBFrequency = %d MHz, ", DivU64x32(tmpU, Mega), ExternalClock / 1000);
+  MsgLog("FSBFrequency = %d MHz, DMI FSBFrequency = %d MHz, ", DivU64x32(tmpU, Mega), DivU64x32(ExternalClock, kilo));
   // now check if SMBIOS has ExternalClock = 4xBusSpeed
   if ((BusSpeed > 50 * kilo) && ((ExternalClock > BusSpeed * 3) || (ExternalClock < 50 * kilo))) {
     gCPUStructure.ExternalClock = BusSpeed;
