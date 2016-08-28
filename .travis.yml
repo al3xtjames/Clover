@@ -1,0 +1,21 @@
+language: c
+os: osx
+osx_image: xcode8
+compiler: clang
+
+before_install:
+ - brew update
+ - brew install cctools
+ - ln -s /usr/local/Cellar/cctools/855/efi/bin/mtoc /usr/local/bin/mtoc.NEW
+
+install:
+ - cd $TRAVIS_BUILD_DIR/../
+ - git clone https://github.com/tianocore/edk2
+ - cd edk2
+ - make -C BaseTools -s
+ - source edksetup.sh
+ - cd $TRAVIS_BUILD_DIR
+ - export $PACKAGES_PATH=$TRAVIS_BUILD_DIR
+
+script:
+ - build -t XCODE5 -a IA32 -a X64 -p Clover/Clover.dsc -b RELEASE -D USE_LOW_EBDA
