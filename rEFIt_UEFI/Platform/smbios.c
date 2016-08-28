@@ -763,7 +763,7 @@ VOID PatchTableType4()
 //		if (newSmbiosTable.Type4->CoreCount < newSmbiosTable.Type4->EnabledCoreCount) {
 //			newSmbiosTable.Type4->EnabledCoreCount = gCPUStructure.Cores;
 //		}
-        newSmbiosTable.Type4->ExternalClock = gCPUStructure.ExternalClock / 1000;
+    newSmbiosTable.Type4->ExternalClock = DivU64x32(gCPUStructure.ExternalClock, kilo);
 		newSmbiosTable.Type4->EnabledCoreCount = gSettings.EnabledCores;
     //some verifications
     if ((newSmbiosTable.Type4->ThreadCount < newSmbiosTable.Type4->CoreCount) ||
