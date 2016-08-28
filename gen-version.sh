@@ -1,6 +1,12 @@
 #!/bin/bash
 # Generate Version.h for Clover
 
+if [ -z $(git show-ref | grep refs/remotes/git-svn) ]; then
+	git svn init svn://svn.code.sf.net/p/cloverefiboot/code/
+	git update-ref refs/remotes/git-svn refs/remotes/origin/master
+	git svn rebase
+fi
+
 REVISION=$(git svn info | grep Revision | awk '{print $2}')
 BUILD_DATE=$(date '+%Y-%m-%d %H:%M:%S')
 
