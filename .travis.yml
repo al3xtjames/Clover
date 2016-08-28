@@ -20,4 +20,5 @@ install:
 
 script:
  - ./gen-version.sh
- - build -t XCODE5 -a IA32 -a X64 -p Clover/Clover.dsc -b RELEASE -D USE_LOW_EBDA
+ - build -t XCODE5 -a IA32 -p Clover/Clover.dsc -b RELEASE -D USE_LOW_EBDA
+ - build -t XCODE5 -a X64 -p Clover/Clover.dsc -b RELEASE -D USE_LOW_EBDA
