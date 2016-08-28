@@ -477,12 +477,12 @@ VOID GetCPUProperties (VOID)
              if ((RShiftU64(msr, 16) & 0x01) != 0) {
                // bcc9 patch
                UINT8 flex_ratio = RShiftU64(msr, 8) & 0xff;
-               MsgLog("non-usable FLEX_RATIO = %x\n", msr);
+               MsgLog("Original FLEX_RATIO = %x, ", msr);
                if (flex_ratio == 0) {
                  AsmWriteMsr64(MSR_FLEX_RATIO, (msr & 0xFFFFFFFFFFFEFFFFULL));
                  gBS->Stall(10);
                  msr = AsmReadMsr64(MSR_FLEX_RATIO);
-                 MsgLog("corrected FLEX_RATIO = %x\n", msr);
+                 MsgLog("Corrected FLEX_RATIO = %x\n", msr);
                }
                /*else {
                 if(gCPUStructure.BusRatioMax > flex_ratio)
@@ -648,27 +648,25 @@ VOID GetCPUProperties (VOID)
   if (gSettings.QPI == 0) {
     // Not used, quad-pumped FSB; multiply ExternalClock by 4
     ExternalClock = gCPUStructure.ExternalClock * 4;
-  }
-  else
-  {
-	ExternalClock = gCPUStructure.ExternalClock;
+  } else {
+    // Used, FSB = ExternalClock
+    ExternalClock = gCPUStructure.ExternalClock;
   }
 
-  // DBG("take FSB\n");
   tmpU = gCPUStructure.FSBFrequency;
-  //  DBG("divide by 1000\n");
-  BusSpeed = (UINT32)DivU64x32(tmpU, kilo); //Hz -> kHz
-  DBG("FSBFrequency=%dMHz DMIvalue=%dkHz\n", DivU64x32(tmpU, Mega), ExternalClock);
-  //now check if SMBIOS has ExternalClock = 4xBusSpeed
-  if ((BusSpeed > 50*kilo) &&
-      ((ExternalClock > BusSpeed * 3) || (ExternalClock < 50*kilo))) { //khz
+  BusSpeed = (UINT32) DivU64x32(tmpU, kilo); //Hz -> kHz
+  MsgLog("FSBFrequency = %d MHz, DMI FSBFrequency = %d MHz, ", DivU64x32(tmpU, Mega), ExternalClock / 1000);
+  // now check if SMBIOS has ExternalClock = 4xBusSpeed
+  if ((BusSpeed > 50 * kilo) && ((ExternalClock > BusSpeed * 3) || (ExternalClock < 50 * kilo))) {
     gCPUStructure.ExternalClock = BusSpeed;
+    ExternalClock = gCPUStructure.ExternalClock;
   } else {
     tmpU = MultU64x32(ExternalClock, kilo); //kHz -> Hz
     gCPUStructure.FSBFrequency = tmpU;
   }
+
   tmpU = gCPUStructure.FSBFrequency;
-  DBG("Corrected FSBFrequency=%dMHz\n", DivU64x32(tmpU, Mega));
+  MsgLog("Corrected FSBFrequency = %d MHz\n", DivU64x32(tmpU, Mega));
 
 	if ((gCPUStructure.Vendor == CPU_VENDOR_INTEL) && (gCPUStructure.Model == CPU_MODEL_NEHALEM)) {
 		//Slice - for Nehalem we can do more calculation as in Cham
@@ -736,7 +734,7 @@ VOID GetCPUProperties (VOID)
 	DBG("Features: 0x%08x\n",gCPUStructure.Features);
 	DBG("Threads: %d\n",gCPUStructure.Threads);
 	DBG("Cores: %d\n",gCPUStructure.Cores);
-	DBG("FSB: %d MHz\n", (INT32)(DivU64x32(gCPUStructure.ExternalClock, kilo)));
+	DBG("FSB: %d MHz\n", (INT32)(DivU64x32(ExternalClock, kilo)));
 	DBG("CPU: %d MHz\n", (INT32)(DivU64x32(gCPUStructure.CPUFrequency, Mega)));
 	DBG("TSC: %d MHz\n", (INT32)(DivU64x32(gCPUStructure.TSCFrequency, Mega)));
 	DBG("PIS: %d MHz\n", (INT32)gCPUStructure.ProcessorInterconnectSpeed);
@@ -898,8 +896,8 @@ UINT16 GetAdvancedCpuType(VOID)
       return 0x903; // Core i3 - Apple doesn't use it
       if ((AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i5")) || (gCPUStructure.Cores <= 2)) {
         return 0x604; // Core i5
-    } else {
-      return 0x704; // Core i7
+      } else {
+        return 0x704; // Core i7
     }
 
     case CPU_MODEL_BROADWELL:
@@ -928,12 +926,13 @@ UINT16 GetAdvancedCpuType(VOID)
     case CPU_MODEL_SKYLAKE:
     case CPU_MODEL_SKYLAKE_DT:
       if (AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i3")) {
-      return 0x905; // Core i3 - Apple doesn't use it
+        return 0x905; // Core i3 - Apple doesn't use it
       }
       if ((AsciiStrStr(gCPUStructure.BrandString, "Core(TM) i5")) || (gCPUStructure.Cores <= 2)) {
         return 0x605; // Core i5
       } else {
-      return 0x706; // Core i7
+
+        return 0x706; // Core i7
       }
     }
   }

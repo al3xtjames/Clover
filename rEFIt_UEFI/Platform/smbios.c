@@ -705,7 +705,7 @@ VOID GetTableType4()
   }
 
   gCPUStructure.ExternalClock = (UINT32) ((SmbiosTable.Type4->ExternalClock * 1000) + (res * 110));
-  // Check if QPI speed is used
+  // Check if QPI is used
   if (gSettings.QPI == 0) {
 	// Not used, quad-pumped FSB; divide ExternalClock by 4
 	gCPUStructure.ExternalClock = gCPUStructure.ExternalClock / 4;
