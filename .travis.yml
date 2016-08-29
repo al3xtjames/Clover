@@ -3,6 +3,9 @@ os: osx
 osx_image: xcode8
 compiler: clang
 
+git:
+  depth: 99999
+
 before_install:
  - brew update
  - brew install cctools
