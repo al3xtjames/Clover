@@ -41,8 +41,8 @@
 /CloverPackage/CloverV2/EFI/CLOVER/tools/bdmesg-32.efi
 /CloverPackage/CloverV2/drivers-Off/
 
-/HFSPlus/Ia32/
-/HFSPlus/X64/
+/AppleHfsPlusBinPkg/HfsPlusDxe/Ia32/
+/AppleHfsPlusBinPkg/HfsPlusDxe/X64/
 
 /Version.h
 
@@ -70,4 +70,3 @@ CloverUpdater.strings
 CloverPackage/CloverUpdater/src/*.lproj
 CloverPrefpane.strings
 CloverPackage/CloverPrefpane/src/*.lproj
-

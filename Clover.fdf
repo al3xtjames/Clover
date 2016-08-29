@@ -31,7 +31,7 @@
 
 [FV.DuetEfiMainFvIA32]
 
-!else 
+!else
 [FV.DuetEfiMainFvEBC]
 
 !endif
@@ -117,10 +117,10 @@ INF IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
 #INF IntelFrameworkModulePkg/Universal/DataHubStdErrDxe/DataHubStdErrDxe.inf
 #INF EdkCompatibilityPkg/Compatibility/PiSmbiosRecordOnDataHubSmbiosRecordThunk/PiSmbiosRecordOnDataHubSmbiosRecordThunk.inf
 	# foreign file system support
-INF  Clover/DriverOverride/DriverOverride.inf	
+INF  Clover/DriverOverride/DriverOverride.inf
 !ifndef NO_GRUB_DRIVERS_EMBEDDED
 !ifndef NO_GRUB_DRIVERS
-INF  Clover/GrubFS/src/EXFAT.inf	
+INF  Clover/GrubFS/src/EXFAT.inf
 #INF  Clover/GrubFS/src/NTFS.inf
 !endif
 !endif
@@ -130,7 +130,7 @@ INF  Clover/GrubFS/src/EXFAT.inf
 #INF  Clover/VBoxFsDxe/VBoxExt4.inf
 #INF  Clover/VBoxFsDxe/VBoxReiserFS.inf
 !if $(USE_APPLE_HFSPLUS_DRIVER) AND ( $(ARCH) == X64 )
-INF  RuleOverride=BINARY Clover/HFSPlus/HFSPlus.inf
+INF  RuleOverride=BINARY Clover/AppleHfsPlusBinPkg/HfsPlusDxe/HfsPlusDxe.inf
 !else
 INF  Clover/VBoxFsDxe/VBoxHfs.inf
 !endif
@@ -198,7 +198,7 @@ INF   Clover/LegacyBios/Region2Dxe/LegacyRegion2Dxe.inf
   #INF  MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
   INF  Clover/DVDDisk/ScsiDiskDxe.inf
   #INF  IntelFrameworkModulePkg/Bus/Pci/IdeBusDxe/IdeBusDxe.inf
-!endif  
+!endif
 !endif
 
     # Usb Support
@@ -223,9 +223,9 @@ INF   Clover/LegacyBios/Region2Dxe/LegacyRegion2Dxe.inf
   INF  Clover/Patches_for_EDK2/UsbBusDxe/UsbBusDxe.inf
   INF  MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
   INF  MdeModulePkg/Bus/Usb/UsbMouseDxe/UsbMouseDxe.inf
-!ifndef DISABLE_USB_MASS_STORAGE  
+!ifndef DISABLE_USB_MASS_STORAGE
   INF  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
-!endif  
+!endif
 
 !endif
 
@@ -344,4 +344,3 @@ FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
     UI       STRING ="$(MODULE_NAME)" Optional
     VERSION  STRING ="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
-

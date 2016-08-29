@@ -236,7 +236,7 @@ addEdk2BuildMacro() {
   local macro="$1"
   [[ "$macro" == "NO_GRUB_DRIVERS" ]] && M_NOGRUB=1
   if [[ "$macro" == "USE_APPLE_HFSPLUS_DRIVER" && "$TARGETARCH" == "X64" ]]; then
-    [[ ! -e "${CLOVERROOT}"/HFSPlus/X64/HFSPlus.efi ]] && return
+    [[ ! -e "${CLOVERROOT}"/AppleHfsPlusBinPkg/HfsPlusDxe/X64/HfsPlus.efi ]] && return
     M_APPLEHFS=1
   fi
   addEdk2BuildOption "-D" "$macro"
@@ -937,7 +937,7 @@ MainPostBuildScript() {
       if [[ $M_APPLEHFS -eq 0 ]]; then
         copyBin "$BUILD_DIR_ARCH"/VBoxHfs.efi "$CLOVER_PKG_DIR"/EFI/CLOVER/drivers64UEFI/VBoxHfs-64.efi
       else
-        copyBin "${CLOVERROOT}"/HFSPlus/X64/HFSPlus.efi "$CLOVER_PKG_DIR"/EFI/CLOVER/drivers64UEFI/HFSPlus.efi
+        copyBin "${CLOVERROOT}"/AppleHfsPlusBinPkg/HfsPlusDxe/HfsPlusDxe/X64/HFSPlus.efi "$CLOVER_PKG_DIR"/EFI/CLOVER/drivers64UEFI/HfsPlus.efi
       fi
 
       # Optional drivers
