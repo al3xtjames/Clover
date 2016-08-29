@@ -266,7 +266,7 @@ INF  MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
 # Clover
 #
 INF  IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
-#INF  RuleOverride=BINARY Clover/AppleHfsPlusBinPkg/HfsPlusDxe/HfsPlusDxe.inf
+#INF  RuleOverride=BINARY Clover/AppleHfsPlusBinPkg/HfsPlusDxe/HfsPlus.inf
 #INF  Clover/VBoxFsDxe/VBoxHfs.inf
 #INF  Clover/VBoxFsDxe/VBoxIso9660.inf
 #INF  Clover/VBoxFsDxe/VBoxFsDxe.inf
@@ -297,7 +297,7 @@ INF  RuleOverride=ACPITABLE OvmfPkg/AcpiTables/AcpiTables.inf
 #INF  MdeModulePkg/Universal/Acpi/S3SaveStateDxe/S3SaveStateDxe.inf
 #INF  MdeModulePkg/Universal/Acpi/BootScriptExecutorDxe/BootScriptExecutorDxe.inf
 
-#INF  RuleOverride=BINARY Clover/AppleHfsPlusBinPkg/HfsPlusDxe/HfsPlusDxe.inf
+#INF  RuleOverride=BINARY Clover/AppleHfsPlusBinPkg/HfsPlusDxe/HfsPlus.inf
 INF  RuleOverride = BINARY FatBinPkg/EnhancedFatDxe/Fat.inf
 
 !ifndef $(USE_OLD_SHELL)

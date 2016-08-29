@@ -130,7 +130,7 @@ INF  Clover/GrubFS/src/EXFAT.inf
 #INF  Clover/VBoxFsDxe/VBoxExt4.inf
 #INF  Clover/VBoxFsDxe/VBoxReiserFS.inf
 !if $(USE_APPLE_HFSPLUS_DRIVER) AND ( $(ARCH) == X64 )
-INF  RuleOverride=BINARY Clover/AppleHfsPlusBinPkg/HfsPlusDxe/HfsPlusDxe.inf
+INF  RuleOverride=BINARY Clover/AppleHfsPlusBinPkg/HfsPlusDxe/HfsPlus.inf
 !else
 INF  Clover/VBoxFsDxe/VBoxHfs.inf
 !endif
@@ -259,9 +259,8 @@ INF  Clover/OsxAcpiTableDxe/AcpiTableDxe.inf
     # Misc
 INF  Clover/MsgLog/MsgLog.inf
 
-    # Binary INF file to support toggle among different CPU architectures.
-#INF  RuleOverride=BINARY FatBinPkg/EnhancedFatDxe/Fat.inf
-INF  Clover/FatPkg/EnhancedFatDxe/Fat.inf
+    # FAT Filesystem Driver
+INF  FatPkg/EnhancedFatDxe/Fat.inf
 
 FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
 	SECTION RAW = Clover/Logo/Logo.bmp

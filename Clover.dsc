@@ -81,7 +81,7 @@
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   #EfiFileLib|EmbeddedPkg/Library/EfiFileLib/EfiFileLib.inf
   #EblNetworkLib|EmbeddedPkg/Library/EblNetworkLib/EblNetworkLib.inf
-  #EblCmdLib|EmbeddedPkg/Library/EblCmdLibNull/EblCmdLibNull.inf  
+  #EblCmdLib|EmbeddedPkg/Library/EblCmdLibNull/EblCmdLibNull.inf
   FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
   SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
   UefiCpuLib|UefiCpuPkg/Library/BaseUefiCpuLib/BaseUefiCpuLib.inf
@@ -91,7 +91,7 @@
 !else
   OpensslLib|Clover/Library/OpensslLib/OpensslLibNull.inf
 !endif
-  
+
   #
   # Generic Modules
   #
@@ -135,15 +135,15 @@
   IoApicLib|PcAtChipsetPkg/Library/BaseIoApicLib/BaseIoApicLib.inf
   LocalApicLib|UefiCpuPkg/Library/BaseXApicLib/BaseXApicLib.inf
   #LocalApicLib|UefiCpuPkg/Library/BaseXApicX2ApicLib/BaseXApicX2ApicLib.inf
-  
+
   #
   # To save size, use NULL library for DebugLib and ReportStatusCodeLib.
   # If need status code output, do library instance overriden as below DxeMain.inf does
   #
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
-  DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf  
+  DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
   ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
-  
+
   TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
   AuthVariableLib|MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
   VarCheckLib|MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
@@ -173,9 +173,9 @@
 [LibraryClasses.common.DXE_SMM_DRIVER]
   SmmServicesTableLib|MdePkg/Library/SmmServicesTableLib/SmmServicesTableLib.inf
   MemoryAllocationLib|MdePkg/Library/SmmMemoryAllocationLib/SmmMemoryAllocationLib.inf
-  
- 
-  
+
+
+
 ###################################################################################################
 #
 # Components Section - list of the modules and components that will be processed by compilation
@@ -273,7 +273,7 @@
     <LibraryClasses>
       DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
       BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
-      
+
       #NULL|IntelFrameworkModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
       NULL|Clover/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
   }
@@ -311,12 +311,12 @@
   #MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
   #Clover/PciBusDxe/PciBusDxe.inf
   MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
-  
+
   #DataHub
   #Clover/VBoxAppleSim/VBoxAppleSim.inf
   IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
   #IntelFrameworkModulePkg/Universal/DataHubStdErrDxe/DataHubStdErrDxe.inf
-  
+
   # foreign file system support
   Clover/DriverOverride/DriverOverride.inf
   Clover/VBoxFsDxe/VBoxHfs.inf
@@ -327,7 +327,7 @@
   Clover/VBoxFsDxe/VBoxReiserFS.inf
   #EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
   #Clover/OsxMmcDxe/MmcDxe.inf
-  Clover/FatPkg/EnhancedFatDxe/Fat.inf
+  FatPkg/EnhancedFatDxe/Fat.inf
   # FS from grub
 !ifndef NO_GRUB_DRIVERS
   Clover/GrubFS/src/EXFAT.inf
@@ -393,7 +393,7 @@
   IntelFrameworkModulePkg/Bus/Isa/Ps2MouseAbsolutePointerDxe/Ps2MouseAbsolutePointerDxe.inf
   #IntelFrameworkModulePkg/Bus/Isa/Ps2MouseDxe/Ps2MouseDxe.inf
   Clover/Ps2MouseDxe/Ps2MouseDxe.inf
- 
+
   # ACPI Support
   #MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
   Clover/OsxAcpiTableDxe/AcpiTableDxe.inf
@@ -448,7 +448,7 @@
 
 
 !endif
-  
+
   # Drivers for Aptio loading - should go to Clover's /EFI/drivers64UEFI dir
   Clover/OsxFatBinaryDrv/OsxFatBinaryDrv.inf
 
@@ -473,23 +473,23 @@
   #Clover/Sample/Application/Sample.inf
   #Clover/gptsync/gptsync.inf
   Clover/bdmesg_efi/bdmesg.inf
-  
+
 !ifdef DEBUG_ON_SERIAL_PORT
 
 	Clover/rEFIt_UEFI/refit.inf {
-  
+
 	#
      # Enable debug output.
      #
 
 	<PcdsFixedAtBuild>
- 
+
 		gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x07
- 
+
 		gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0xFFFFFFFF
 
 	<LibraryClasses>
- 
+
 		SerialPortLib|MdeModulePkg/Library/BaseSerialPortLib16550/BaseSerialPortLib16550.inf
 
 		DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
@@ -500,7 +500,7 @@
 
 	Clover/rEFIt_UEFI/refit.inf {
     <LibraryClasses>
-      BaseMemoryLib|MdePkg/Library/UefiMemoryLib/UefiMemoryLib.inf      
+      BaseMemoryLib|MdePkg/Library/UefiMemoryLib/UefiMemoryLib.inf
   }
 !endif
 
@@ -509,7 +509,7 @@
   Clover/OsxAptioFixDrv/OsxAptioFixDrv.inf
   Clover/OsxAptioFixDrv/OsxAptioFix2Drv.inf
   Clover/OsxLowMemFixDrv/OsxLowMemFixDrv.inf
-#!endif  
+#!endif
   #Clover/OsxAptioFixDrv/OsxAptioFixDrv.inf {
     #
     # Enable debug output.
@@ -526,9 +526,9 @@
 ###################################################################################################
 #
 # BuildOptions Section - Define the module specific tool chain flags that should be used as
-#                        the default flags for a module. These flags are appended to any 
-#                        standard flags that are defined by the build process. They can be 
-#                        applied for any modules or only those modules with the specific 
+#                        the default flags for a module. These flags are appended to any
+#                        standard flags that are defined by the build process. They can be
+#                        applied for any modules or only those modules with the specific
 #                        module style (EDK or EDKII) specified in [Components] section.
 #
 ###################################################################################################
@@ -547,24 +547,24 @@
 !ifdef DISABLE_USB_CONTROLLERS_WHEN_BLOCKIO
   DEFINE DISABLE_USB_CONTROLLERS = 1
 !endif
-!endif  
+!endif
 
 !ifdef DISABLE_USB_CONTROLLERS
   DEFINE NOUSB_FLAG = -DDISABLE_USB_SUPPORT
-!endif  
+!endif
 
 !ifdef DISABLE_USB_SUPPORT
   DEFINE NOUSB_FLAG = -DDISABLE_USB_SUPPORT
-!endif  
+!endif
 
 !ifdef DISABLE_UDMA_SUPPORT
   DEFINE NOUDMA_FLAG = -DDISABLE_UDMA_SUPPORT
-!endif  
+!endif
 
 # Slice: I propose this flag always true
 #!ifdef AMD_SUPPORT
   DEFINE AMD_FLAG = -DAMD_SUPPORT
-#!endif  
+#!endif
 
 !ifdef ENABLE_SECURE_BOOT
   DEFINE SECURE_BOOT_FLAG = -DENABLE_SECURE_BOOT
@@ -592,14 +592,14 @@
 
 !ifdef DISABLE_LTO
 	DEFINE DISABLE_LTO_FLAG = -fno-lto
-!endif	
+!endif
 
   DEFINE BUILD_OPTIONS=-DMDEPKG_NDEBUG -DCLOVER_BUILD $(VBIOS_PATCH_CLOVEREFI_FLAG) $(ONLY_SATA_0_FLAG) $(BLOCKIO_FLAG) $(NOUSB_FLAG) $(AMD_FLAG) $(SECURE_BOOT_FLAG) $(LODEPNG_FLAG) $(ANDX86_FLAG) $(PS2MOUSE_LEGACYBOOT_FLAG) $(DEBUG_ON_SERIAL_PORT_FLAG) $(NOUDMA_FLAG) $(CHECKS)
 
   #MSFT:*_*_*_CC_FLAGS  = /FAcs /FR$(@R).SBR /wd4701 /wd4703 $(BUILD_OPTIONS)
   MSFT:*_*_*_CC_FLAGS  = /FAcs /FR$(@R).SBR $(BUILD_OPTIONS) -Dinline=__inline
-  
+
   XCODE:*_*_*_CC_FLAGS = -fno-unwind-tables -Os $(BUILD_OPTIONS) -Wno-msvc-include $(DISABLE_LTO_FLAG)
-  GCC:*_*_*_CC_FLAGS   = $(BUILD_OPTIONS) 
+  GCC:*_*_*_CC_FLAGS   = $(BUILD_OPTIONS)
   #-Wunused-but-set-variable
   # -Os -fno-omit-frame-pointer -maccumulate-outgoing-args

@@ -41,9 +41,6 @@
 /CloverPackage/CloverV2/EFI/CLOVER/tools/bdmesg-32.efi
 /CloverPackage/CloverV2/drivers-Off/
 
-/AppleHfsPlusBinPkg/HfsPlusDxe/Ia32/
-/AppleHfsPlusBinPkg/HfsPlusDxe/X64/
-
 /Version.h
 
 rEFIt_UEFI/rEFIt_proj/rEFIt_proj.xcodeproj/project.xcworkspace/
