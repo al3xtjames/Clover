@@ -1611,10 +1611,10 @@ EFI_STATUS PatchACPI(IN REFIT_VOLUME *Volume, CHAR8 *OSVersion)
     newFadt->Header.Revision = EFI_ACPI_4_0_FIXED_ACPI_DESCRIPTION_TABLE_REVISION;
     newFadt->Reserved0 = 0; //ACPIspec said it should be 0, while 1 is possible, but no more
 
-    if (gSettings.smartUPS==TRUE) {
+    if ((gSettings.smartUPS == TRUE) || (AsciiStrnCmp(gSettings.FamilyName, "MacPro", 6) == 0)) {
       newFadt->PreferredPmProfile = 3;
     } else {
-      newFadt->PreferredPmProfile = gMobile?2:1; //as calculated before
+      newFadt->PreferredPmProfile = gMobile ? 2:1; //as calculated before
     }
     if (gSettings.EnableC6 || gSettings.EnableISS) {
       newFadt->CstCnt = 0x85; //as in Mac
@@ -2433,4 +2433,3 @@ EFI_STATUS PatchACPI_OtherOS(CHAR16* OsSubdir, BOOLEAN DropSSDT)
   if (PathPatched) FreePool(PathPatched);
     return EFI_SUCCESS;
 }
-
