@@ -80,7 +80,6 @@
   CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
   UefiDecompressLib|MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
   UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
-  #UefiHiiServicesLib|Clover/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
   HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
   SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
   UefiBootManagerLib|MdeModulePkg/Library/UefiBootManagerLib/UefiBootManagerLib.inf
@@ -664,7 +663,7 @@
   #Clover/VBoxFsDxe/VBoxExt2.inf
   #Clover/VBoxFsDxe/VBoxExt4.inf
   #Clover/MsgLog/MsgLog.inf
-  
+
   #
   # ISA Support
   #
