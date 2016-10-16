@@ -1474,7 +1474,7 @@ VOID SetVariablesFromNvram()
 //    DeleteNvramVariable(L"boot-args", &gEfiAppleBootGuid);
     Size = AsciiStrLen(tmpString); // some EFI implementations include '\0' in Size, and others don't, so update Size to string length
     arg = AllocatePool(Size+1);
-    
+
 /*    if (AsciiStrStr(tmpString, "nvda_drv=1")) { //found substring
       gSettings.NvidiaWeb = TRUE;
     } */
@@ -1528,7 +1528,7 @@ VOID SetVariablesFromNvram()
   if (tmpString) {
     FreePool(tmpString);
   }
-  
+
   tmpString = GetNvramVariable(L"nvda_drv", &gEfiAppleBootGuid, NULL, NULL);
   if (tmpString && AsciiStrCmp(tmpString, "1") == 0) {
     gSettings.NvidiaWeb = TRUE;
@@ -1813,7 +1813,7 @@ RefitMain (IN EFI_HANDLE           ImageHandle,
       !gDriversFlags.EmuVariableLoaded) {
     GetSmcKeys(FALSE);  // later we can get here SMC information
   } */
-  
+
   Status = gBS->LocateProtocol (&gEmuVariableControlProtocolGuid, NULL, (VOID**)&gEmuVariableControl);
   if (EFI_ERROR(Status)) {
     gEmuVariableControl = NULL;
@@ -1869,7 +1869,7 @@ RefitMain (IN EFI_HANDLE           ImageHandle,
   ScanSPD();
   //DBG("ScanSPD() end\n");
 
-  SetPrivateVarProto();
+  InstallAppleProtocols();
 //  GetDefaultSettings();
   GetAcpiTablesList();
   DBG("Calibrated TSC frequency =%ld =%ldMHz\n", gCPUStructure.TSCCalibr, DivU64x32(gCPUStructure.TSCCalibr, Mega));
@@ -1974,7 +1974,7 @@ RefitMain (IN EFI_HANDLE           ImageHandle,
     }
 
     if (!GlobalConfig.FastBoot) {
-      
+
 #ifdef CHECK_FLAGS
       CHAR16 *TmpArgs;
 #endif
@@ -1991,7 +1991,7 @@ RefitMain (IN EFI_HANDLE           ImageHandle,
 //      DBG("initial boot-args=%a\n", gSettings.BootArgs);
       //now it is a time to set RtVariables
       SetVariablesFromNvram();
-      
+
 #ifdef CHECK_FLAGS
       TmpArgs = PoolPrint(L"%a ", gSettings.BootArgs);
       DBG("after NVRAM boot-args=%a\n", gSettings.BootArgs);

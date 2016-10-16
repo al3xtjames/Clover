@@ -2844,10 +2844,10 @@ GetListOfConfigs ()
   REFIT_DIR_ITER    DirIter;
   EFI_FILE_INFO     *DirEntry;
   INTN              NameLen;
-  
+
   ConfigsNum = 0;
   OldChosenConfig = 0;
-  
+
   DirIterOpen(SelfRootDir, OEMPath, &DirIter);
   DbgHeader("Found config plists");
   while (DirIterNext(&DirIter, 2, L"config*.plist", &DirEntry)) {
@@ -2855,7 +2855,7 @@ GetListOfConfigs ()
     if (DirEntry->FileName[0] == L'.') {
       continue;
     }
-    
+
     UnicodeSPrint(FullName, 512, L"%s\\%s", OEMPath, DirEntry->FileName);
     if (FileExists(SelfRootDir, FullName)) {
       if (StriCmp(DirEntry->FileName, L"config.plist") == 0) {
@@ -2867,7 +2867,7 @@ GetListOfConfigs ()
       DBG("- %s\n", DirEntry->FileName);
     }
   }
-  
+
   DirIterClose(&DirIter);
 }
 
@@ -5918,10 +5918,10 @@ GetDevices ()
         }
 
         else if ((Pci.Hdr.ClassCode[2] == PCI_CLASS_MEDIA) &&
-                 ((Pci.Hdr.ClassCode[1] == PCI_CLASS_MEDIA_HDA) ||
-                  (Pci.Hdr.ClassCode[1] == PCI_CLASS_MEDIA_AUDIO))) {
-          if (IsHDMIAudio(HandleArray[Index])) {
-            DBG(" - HDMI Audio: \n");
+                ((Pci.Hdr.ClassCode[1] == PCI_CLASS_MEDIA_HDA) ||
+                (Pci.Hdr.ClassCode[1] == PCI_CLASS_MEDIA_AUDIO))) {
+          MsgLog (" - HDA: %a", GetHdaControllerName (Pci.Hdr.VendorId, Pci.Hdr.DeviceId));
+#if 0
    //if ((Pci.Hdr.VendorId == 0x1002) || (Pci.Hdr.VendorId == 0x10DE)){
             SlotDevice = &SlotDevices[4];
             SlotDevice->SegmentGroupNum = (UINT16)Segment;
@@ -5931,7 +5931,7 @@ GetDevices ()
             AsciiSPrint (SlotDevice->SlotName, 31, "HDMI port");
             SlotDevice->SlotID          = 5;
             SlotDevice->SlotType        = SlotTypePciExpressX4;
-          }
+#endif
           if (gSettings.ResetHDA) {
             //Slice method from VoodooHDA
             UINT8 Value = 0;
@@ -6122,10 +6122,10 @@ SetDevices (
                  ((Pci.Hdr.ClassCode[1] == PCI_CLASS_MEDIA_HDA) ||
                   (Pci.Hdr.ClassCode[1] == PCI_CLASS_MEDIA_AUDIO))) {
           //no HDMI injection
-          if ((Pci.Hdr.VendorId != 0x1002) &&
-              (Pci.Hdr.VendorId != 0x10de)) {
-            TmpDirty    = set_hda_props (PciIo, &PCIdevice, Entry->OSVersion);
-            StringDirty |= TmpDirty;
+          if (IsHDMIAudio (HandleBuffer[i])) {
+            InjectHdaProperties (&Pci, DevicePathFromHandle (HandleBuffer[i]), TRUE);
+          } else {
+            InjectHdaProperties (&Pci, DevicePathFromHandle (HandleBuffer[i]), FALSE);
           }
         }
 

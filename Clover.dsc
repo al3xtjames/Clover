@@ -154,6 +154,11 @@
   MemLogLib|Clover/Library/MemLogLibDefault/MemLogLibDefault.inf
   VideoBiosPatchLib|Clover/Library/VideoBiosPatchLib/VideoBiosPatchLib.inf
 
+  #
+  # Apple
+  #
+  AppleProtocolLib|ApplePkg/Protocol/AppleProtocolLib.inf
+
 [LibraryClasses.common.DXE_CORE]
   HobLib|MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
@@ -427,9 +432,9 @@
   # Misc
   Clover/FSInject/FSInject.inf
   Clover/MsgLog/MsgLog.inf
-  Clover/SMCHelper/SMCHelper.inf
-!ifdef DEBUG_ON_SERIAL_PORT
+  Clover/SmcHelper/SmcHelper.inf
 
+!ifdef DEBUG_ON_SERIAL_PORT
   Clover/DumpUefiCalls/DumpUefiCalls.inf {
     <PcdsFixedAtBuild>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x07

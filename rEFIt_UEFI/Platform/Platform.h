@@ -12,6 +12,7 @@ Headers collection for procedures
 
 
 #include <Uefi.h>
+#include <AppleUefi.h>
 
 #include <Guid/Acpi.h>
 #include <Guid/EventGroup.h>
@@ -57,6 +58,7 @@ Headers collection for procedures
 #include <Protocol/VariableWrite.h>
 #include <Protocol/Variable.h>
 
+#include <Protocol/DevicePathPropertyDatabase.h>
 #include <Protocol/FSInjectProtocol.h>
 #include <Protocol/MsgLog.h>
 #include <Protocol/efiConsoleControl.h>
@@ -855,7 +857,7 @@ typedef struct {
   CHAR8                   Language[16];
   CHAR8                   BootArgs[256];
   CHAR16                  CustomUuid[40];
-  
+
   CHAR16                  *DefaultVolume;
 #if defined(MDE_CPU_IA32)
   UINT32                  align10;
@@ -864,13 +866,13 @@ typedef struct {
 #if defined(MDE_CPU_IA32)
   UINT32                  align11;
 #endif
-  
+
   BOOLEAN                 LastBootedVolume;
   UINT8                   Pad21[3];
-  
+
   UINT16                  VendorEDID;
   UINT16                  ProductEDID;
-  
+
   UINT16                  BacklightLevel;
   BOOLEAN                 BacklightLevelConfig;
   BOOLEAN                 IntelBacklight;
@@ -1485,11 +1487,11 @@ extern CHAR8                          *cDeviceProperties;
 extern INPUT_ITEM                     *InputItems;
 extern BOOLEAN SavePreBootLog;
 //extern EFI_GRAPHICS_OUTPUT_PROTOCOL *GraphicsOutput;
+extern EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL *gEfiDppDbProtocol;
 
 extern EFI_GUID	                      gEfiAppleBootGuid;
 extern EFI_GUID	                      gEfiAppleNvramGuid;
 extern EFI_GUID	                      AppleSystemInfoProducerName;
-extern EFI_GUID	                      AppleDevicePropertyProtocolGuid;
 extern EFI_GUID	                      gAppleScreenInfoProtocolGuid;
 extern EFI_GUID	                      gEfiAppleVendorGuid;
 extern EFI_GUID	                      gEfiPartTypeSystemPartGuid;
@@ -1834,8 +1836,21 @@ SetVariablesForOSX ();
 VOID
 SetupDataForOSX ();
 
+CHAR8 *
+GetHdaControllerName (
+  IN UINT32 VendorId,
+  IN UINT32 DeviceId
+  );
+
 EFI_STATUS
-SetPrivateVarProto ();
+InjectHdaProperties (
+  IN PCI_TYPE00               *HdaController,
+  IN EFI_DEVICE_PATH_PROTOCOL *DevicePath,
+  IN BOOLEAN                  IsHdmiAudio
+  );
+
+EFI_STATUS
+InstallAppleProtocols (VOID);
 
 VOID
 SetDevices (
@@ -2313,6 +2328,7 @@ BOOLEAN
 YesNoMessage (
   IN CHAR16 *Title,
   IN CHAR16 *Message);
+
 
 
 #endif

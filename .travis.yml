@@ -13,6 +13,7 @@ install:
  - cd $TRAVIS_BUILD_DIR/../
  - git clone https://github.com/tianocore/edk2
  - cd edk2
+ - git submodule add https://github.com/CupertinoNet/ApplePkg
  - make -C BaseTools -s
  - source edksetup.sh
  - cd $TRAVIS_BUILD_DIR
