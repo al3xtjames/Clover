@@ -148,10 +148,8 @@ InjectHdaProperties (
     //
     // Only inject properties with FLAG_HDMI_AUDIO flag for GPU HDMI/DP audio controllers.
     //
-    if (
-      ((IsHdmiAudio) && !(mHdaPropertyTable[Index].Flags & FLAG_HDMI_AUDIO)) ||
-      ((!IsHdmiAudio) && (mHdaPropertyTable[Index].Flags & FLAG_HDMI_AUDIO))
-      ) {
+    if (((IsHdmiAudio) && !(mHdaPropertyTable[Index].Flags & FLAG_HDMI_AUDIO)) ||
+      ((!IsHdmiAudio) && (mHdaPropertyTable[Index].Flags & FLAG_HDMI_AUDIO))) {
       continue;
     }
 
