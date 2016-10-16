@@ -137,11 +137,11 @@
 //
 #define CLEANER_LOG			1
 
-// 
+//
 // BOOT_LOADERS
 // specify here as shown below (in a CHAR16* array) all boot loaders for which overrides will start
 // array must be terminated by NULL
-//  
+//
 #define BOOT_LOADERS { L"boot.efi", L"bootmgfw.efi", L"grub.efi", L"grubx64.efi", L"bootx64.efi", NULL }
 
 
@@ -155,4 +155,3 @@
 #include "AppleProtocols.h"
 
 #endif // __DMP_COMMON_H__
-

@@ -338,7 +338,7 @@ MAP_EFI_GUID_STR EfiGuidStrMap[] = {
   {&mAppleFileVaultVariableGuid, L"gAppleFileVaultVariableGuid"},
   {&mApplePasswordUIEfiFileNameGuid, L"gApplePasswordUIEfiFileNameGuid"},
   {&mAppleRamDmgDevicePathGuid, L"gAppleRamDmgDevicePathGuid"},
-  {&mAppleSMCProtocolGuid, L"gAppleSMCProtocolGuid"},
+  {&mAppleSMCProtocolGuid, L"gAppleSmcIoProtocolGuid"},
   {&mAppleFireWireProtocolGuid, L"gAppleFireWireProtocolGuid"},
   {&mAppleDeviceControlProtocolGuid, L"gAppleDeviceControlProtocolGuid"},
   {&mAppleDiskIoProtocolGuid, L"gAppleDiskIoProtocolGuid"},

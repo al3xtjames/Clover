@@ -6,6 +6,7 @@
 
 **/
 
+#include <AppleUefi.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
@@ -58,7 +59,7 @@ OStartImage(
 	CHAR16					*FilePathText = NULL;
 //	CHAR16					*BootLoaders[] = BOOT_LOADERS;
 	UINTN					Index;
-	
+
 	PRINT("->StartImage(0x%lx, , )\n", ImageHandle);
 
 	//
@@ -76,7 +77,7 @@ OStartImage(
 		PRINT("ERROR: OStartImage: OpenProtocol(gEfiLoadedImageProtocolGuid) = %r\n", Status);
 		return EFI_INVALID_PARAMETER;
 	}
-	
+
 	//
 	// Extract file path from image device file path
 	//
@@ -87,12 +88,12 @@ OStartImage(
 	}
 	PRINT(" File: %s\n", FilePathText);
 	PRINT(" Image: %p - %x (%x)\n", Image->ImageBase, (UINTN)Image->ImageBase + Image->ImageSize, Image->ImageSize);
-	
+
 	Status = gBS->CloseProtocol(ImageHandle, &gEfiLoadedImageProtocolGuid, gImageHandle, NULL);
 	if (EFI_ERROR(Status)) {
 		PRINT("CloseProtocol error: %r\n", Status);
 	}
-	
+
 	//
 	// Check if this is some known boot manager/loader
 	//
@@ -104,16 +105,16 @@ OStartImage(
 		// and start our overrides
 		//
 		gBS->StartImage = OrgStartImage;
-		
+
 		StartOverrides();
 		PRINT("\nSTARTING: %s\n\n", FilePathText);
 	}
-	
+
 	//
 	// Start image by calling original StartImage
 	//
 	Status = OrgStartImage(ImageHandle, ExitDataSize, ExitData);
-	
+
 	FreePool(FilePathText);
 	return Status;
 }
@@ -134,6 +135,6 @@ DumpUefiCallsEntrypoint (
 	gBS->StartImage = OStartImage;
 	gBS->Hdr.CRC32 = 0;
 	gBS->CalculateCrc32(gBS, gBS->Hdr.HeaderSize, &gBS->Hdr.CRC32);
-	
+
 	return EFI_SUCCESS;
 }

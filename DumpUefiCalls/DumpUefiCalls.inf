@@ -53,6 +53,7 @@
   MdePkg/MdePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
   Clover/CloverPkg.dec
+  ApplePkg/ApplePkg.dec
 
 [LibraryClasses]
   UefiLib
@@ -64,7 +65,7 @@
   BaseLib
   DevicePathLib
   DebugLib
-  
+
 [Sources]
   DumpUefiCalls.c
   Lib.h
@@ -100,7 +101,7 @@
   gEfiSmbiosTableGuid
   gEfiSmbios3TableGuid
   gEfiPartTypeSystemPartGuid
-  
+
 
 [Protocols]
   gEfiLoadedImageProtocolGuid
@@ -112,13 +113,13 @@
   gEfiDiskIo2ProtocolGuid
   gEfiGraphicsOutputProtocolGuid
   gEfiDataHubProtocolGuid
-  gAppleSMCProtocolGuid
+  gAppleSmcIoProtocolGuid
   gAppleImageCodecProtocolGuid
   gAppleKeyStateProtocolGuid
 
 [Depex]
-  TRUE  
-  
+  TRUE
+
 [BuildOptions]
 #  MSFT:*_*_*_ASM_FLAGS = /Fl
   INTEL:DEBUG_*_*_CC_FLAGS   =

@@ -63,7 +63,7 @@ Headers collection for procedures
 #include <Protocol/MsgLog.h>
 #include <Protocol/efiConsoleControl.h>
 #include <Protocol/EmuVariableControl.h>
-#include <Protocol/AppleSMC.h>
+#include <Protocol/AppleSmcIo.h>
 
 #include "../refit/lib.h"
 #include "string.h"

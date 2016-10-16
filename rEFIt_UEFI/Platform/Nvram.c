@@ -19,7 +19,7 @@
 #define DBG(...) DebugLog (DEBUG_SET, __VA_ARGS__)
 #endif
 
-#define NON_APPLE_SMC_SIGNATURE SIGNATURE_64('S','M','C','H','E','L','P','E')
+#define SMC_HELPER_SIGNATURE SIGNATURE_64 ('S', 'M', 'C', 'H', 'E', 'L' ,'P', 'R')
 
 // for saving nvram.plist and it's data
 TagPtr                   gNvramDict;
@@ -43,7 +43,7 @@ CHAR16                   *gEfiBootLoaderPath;
 // contains GPT GUID from gEfiBootDeviceData or gBootCampHD (if exists)
 EFI_GUID                 *gEfiBootDeviceGuid;
 
-APPLE_SMC_PROTOCOL        *gAppleSmc = NULL;
+APPLE_SMC_IO_PROTOCOL    *gAppleSmc = NULL;
 
 /** returns given time as miliseconds.
  *  assumes 31 days per month, so it's not correct,
@@ -55,7 +55,7 @@ GetEfiTimeInMs (
   )
 {
     UINT64 TimeMs;
-    
+
     TimeMs = T->Year - 1900;
     // is 64bit multiply workign in 32 bit?
     TimeMs = MultU64x32 (TimeMs, 12)   + T->Month;
@@ -64,7 +64,7 @@ GetEfiTimeInMs (
     TimeMs = MultU64x32 (TimeMs, 60)   + T->Minute;
     TimeMs = MultU64x32 (TimeMs, 60)   + T->Second;
     TimeMs = MultU64x32 (TimeMs, 1000) + DivU64x32(T->Nanosecond, 1000000);
-    
+
     return TimeMs;
 }
 
@@ -82,7 +82,7 @@ VOID *GetNvramVariable (
   // Pass in a zero size buffer to find the required buffer size.
   //
   UINTN      IntDataSize = 0;
-  
+
   Status = gRT->GetVariable (VariableName,     VendorGuid, Attributes, &IntDataSize, NULL);
   if (IntDataSize == 0) {
     return NULL;
@@ -126,7 +126,7 @@ SetNvramVariable (
   VOID   *OldData;
   UINTN  OldDataSize = 0;
   UINT32 OldAttributes = 0;
-  
+
   //DBG ("SetNvramVariable (%s, guid, 0x%x, %d):", VariableName, Attributes, DataSize);
   OldData = GetNvramVariable (VariableName, VendorGuid, &OldAttributes, &OldDataSize);
   if (OldData != NULL) {
@@ -141,9 +141,9 @@ SetNvramVariable (
       return EFI_SUCCESS;
     }
     //DBG (", not equal");
-    
+
     FreePool (OldData);
-    
+
     // not the same - delete previous one if attributes are different
     if (OldAttributes != Attributes) {
 		  DeleteNvramVariable (VariableName, VendorGuid);
@@ -152,9 +152,9 @@ SetNvramVariable (
   }
 //  DBG (" -> writing new (%r)\n", Status);
 //  return Status;
- 
+
   return gRT->SetVariable (VariableName, VendorGuid, Attributes, DataSize, Data);
-  
+
 }
 
 /** Sets NVRAM variable. Does nothing if variable with the same name already exists. */
@@ -182,69 +182,83 @@ AddNvramVariable (
 	}
 }
 
-
 /** Deletes NVRAM variable. */
 EFI_STATUS
 DeleteNvramVariable (
-  IN  CHAR16 *VariableName,
-  IN  EFI_GUID *VendorGuid
+  IN CHAR16   *VariableName,
+  IN EFI_GUID *VendorGuid
   )
 {
   EFI_STATUS Status;
-    
+
   // Delete: attributes and data size = 0
   Status = gRT->SetVariable (VariableName, VendorGuid, 0, 0, NULL);
   //DBG ("DeleteNvramVariable (%s, guid = %r\n):", VariableName, Status);
-    
+
   return Status;
 }
 
 ///
 //  Print all fakesmc variables, i.e. SMC keys
 ///
-UINT32 KeyFromName(CHAR16 *Name)
+UINT32
+KeyFromName (
+  CHAR16 *Name
+  )
 {
   //fakesmc-key-CLKT-ui32: Size = 4, Data: 00 00 8C BE
   UINT32 Key;
+
   Key = ((Name[12] & 0xFF) << 24) + ((Name[13] & 0xFF) << 16) +
   ((Name[14] & 0xFF) << 8) + ((Name[15] & 0xFF) << 0);
+
   return Key;
 }
 
-UINT32 FourCharKey(CHAR8 *Name)
+UINT32
+FourCharKey (
+  CHAR8 *Name
+  )
 {
   return (Name[0] << 24) + (Name[1] << 16) + (Name[2] << 8) + Name[3]; //Big Endian
 }
 
-INT8 NKey[4] = {0, 0, 0, 0};
-INT8 SAdr[4] = {0, 0, 3, 0};
-INT8 SNum[1] = {1};
+UINT8 NKey[4] = {0, 0, 0, 0};
+UINT8 SAdr[4] = {0, 0, 3, 0};
+UINT8 SNum[1] = {1};
 
 VOID
-GetSmcKeys (BOOLEAN WriteToSMC)
+GetSmcKeys (
+  BOOLEAN WriteToSMC
+  )
 {
-  EFI_STATUS                  Status;
-  UINTN                       Index;
-  CHAR16                      *Name;
-  EFI_GUID                    Guid;
-  UINTN                       NameSize;
-  UINTN                       NewNameSize;
-  UINT8                       *Data;
-  UINTN                       DataSize;
-  INTN                        NumKey = 0;
-  
+  EFI_STATUS Status;
+  UINTN      Index;
+  CHAR16     *Name;
+  EFI_GUID   Guid;
+  UINTN      NameSize;
+  UINTN      NewNameSize;
+  UINT8      *Data;
+  UINTN      DataSize;
+  INTN       NumKey = 0;
 
   NameSize = sizeof (CHAR16);
   Name     = AllocateZeroPool (NameSize);
   if (Name == NULL) {
     return;
   }
-  DbgHeader("Dump SMC keys from NVRAM");
-  Status = gBS->LocateProtocol(&gAppleSMCProtocolGuid, NULL, (VOID**)&gAppleSmc);
-  if (!EFI_ERROR(Status)) {
-    DBG("found AppleSMC protocol\n");    
+
+  DbgHeader ("Dump SMC keys from NVRAM");
+  Status = gBS->LocateProtocol(
+                  &gAppleSmcIoProtocolGuid,
+                  NULL,
+                  (VOID ** )&gAppleSmc
+                  );
+
+  if (!EFI_ERROR (Status)) {
+    DBG ("Found APPLE_SMC_IO_PROTOCOL\n");
   } else {
-    DBG("no AppleSMC protocol\n");
+    DBG ("APPLE_SMC_IO_PROTOCOL not found\n");
     gAppleSmc = NULL;
   }
 
@@ -254,7 +268,7 @@ GetSmcKeys (BOOLEAN WriteToSMC)
     if (Status == EFI_BUFFER_TOO_SMALL) {
       Name = ReallocatePool (NameSize, NewNameSize, Name);
       if (Name == NULL) {
-        return; //if something wrong then just do nothing
+        return; // if something wrong then just do nothing
       }
 
       Status = gRT->GetNextVariableName (&NewNameSize, Name, &Guid);
@@ -265,35 +279,49 @@ GetSmcKeys (BOOLEAN WriteToSMC)
       break;  //no more variables
     }
 
-    if (!StrStr(Name, L"fakesmc")) {
+    if (!StrStr (Name, L"fakesmc")) {
       continue; //the variable is not interesting for us
     }
 
     Data = GetNvramVariable (Name, &Guid, NULL, &DataSize);
     if (Data) {
-      DBG("   %s:", Name);
+      DBG ("   %s:", Name);
       for (Index = 0; Index < DataSize; Index++) {
-        DBG("%02x ", *((UINT8*)Data + Index));
+        DBG ("%02x ", *((UINT8 *) Data + Index));
       }
-      DBG("\n");
+
+      DBG ("\n");
       if (gAppleSmc && WriteToSMC) {
-        Status = gAppleSmc->WriteData(gAppleSmc, KeyFromName(Name), DataSize, Data);
- //       DBG("Write to AppleSMC status=%r\n", Status);
+        Status = gAppleSmc->SmcWriteValue (
+                                      gAppleSmc,
+                                      KeyFromName (Name),
+                                      DataSize,
+                                      Data
+                                      );
+
+ //     DBG("Write to AppleSMC status=%r\n", Status);
         NumKey++;
       }
+
       FreePool (Data);
     }
   }
-  if (WriteToSMC && gAppleSmc && (gAppleSmc->Signature == NON_APPLE_SMC_SIGNATURE)) {
+  if (
+    WriteToSMC &&
+    gAppleSmc &&
+    (gAppleSmc->Revision == SMC_HELPER_SIGNATURE)
+    ) {
     NKey[3] = NumKey & 0xFF;
     NKey[2] = (NumKey >> 8) & 0xFF;
-    gAppleSmc->WriteData(gAppleSmc, FourCharKey("#KEY"), 4, &NKey);
-    gAppleSmc->WriteData(gAppleSmc, FourCharKey("$Adr"), 4, &SAdr);
-    gAppleSmc->WriteData(gAppleSmc, FourCharKey("$Num"), 1, &SNum);
+    gAppleSmc->SmcWriteValue(gAppleSmc, FourCharKey("#KEY"), 4, (SMC_DATA *)&NKey);
+    gAppleSmc->SmcWriteValue(gAppleSmc, FourCharKey("$Adr"), 4, (SMC_DATA *)&SAdr);
+    gAppleSmc->SmcWriteValue(gAppleSmc, FourCharKey("$Num"), 1, (SMC_DATA *)&SNum);
   }
+
   FreePool (Name);
 }
 
+#if 0
 VOID DumpSmcKeys()
 {
   if (!gAppleSmc || !gAppleSmc->DumpData) {
@@ -301,7 +329,7 @@ VOID DumpSmcKeys()
   }
   gAppleSmc->DumpData(gAppleSmc);
 }
-
+#endif
 
 /** Searches for GPT HDD dev path node and return pointer to partition GUID or NULL. */
 EFI_GUID
@@ -311,16 +339,16 @@ EFI_GUID
 {
   HARDDRIVE_DEVICE_PATH *HDDDevPath;
   EFI_GUID              *Guid = NULL;
-  
+
   if (DevicePath == NULL) {
     return NULL;
   }
-  
+
   while (!IsDevicePathEndType(DevicePath) &&
          !(DevicePathType(DevicePath) == MEDIA_DEVICE_PATH && DevicePathSubType (DevicePath) == MEDIA_HARDDRIVE_DP)) {
     DevicePath = NextDevicePathNode(DevicePath);
   }
-  
+
   if (DevicePathType(DevicePath) == MEDIA_DEVICE_PATH && DevicePathSubType (DevicePath) == MEDIA_HARDDRIVE_DP) {
     HDDDevPath = (HARDDRIVE_DEVICE_PATH*)DevicePath;
     if (HDDDevPath->SignatureType == SIGNATURE_TYPE_GUID) {
@@ -357,26 +385,26 @@ BootVolumeDevicePathEqual (
 
   DBG_DP ("   BootVolumeDevicePathEqual:\n    %s\n    %s\n", FileDevicePathToStr (DevicePath1), FileDevicePathToStr (DevicePath2));
   DBG_DP ("    N1: (Type, Subtype, Len) N2: (Type, Subtype, Len)\n");
-  
+
   Equal = FALSE;
   while (TRUE) {
     Type1    = DevicePathType (DevicePath1);
     SubType1 = DevicePathSubType (DevicePath1);
     Len1     = DevicePathNodeLength (DevicePath1);
-    
+
     Type2    = DevicePathType (DevicePath2);
     SubType2 = DevicePathSubType (DevicePath2);
     Len2     = DevicePathNodeLength (DevicePath2);
-    
+
     ForceEqualNodes = FALSE;
-    
+
     DBG_DP ("    N1: (%d, %d, %d)", Type1, SubType1, Len1);
     DBG_DP (" N2: (%d, %d, %d)", Type2, SubType2, Len2);
     /*
      DBG_DP ("%s\n", DevicePathToStr (DevicePath1));
      DBG_DP ("%s\n", DevicePathToStr (DevicePath2));
      */
-    
+
     //
     // Some eSata device can have path:
     //  PciRoot(0x0)/Pci(0x1C,0x5)/Pci(0x0,0x0)/VenHw(CF31FAC5-C24E-11D2-85F3-00A0C93EC93B,80)
@@ -386,7 +414,7 @@ BootVolumeDevicePathEqual (
     //
     if (Type1 == MESSAGING_DEVICE_PATH && SubType1 == MSG_SATA_DP) {
       if ((Type2 == HARDWARE_DEVICE_PATH && SubType2 == HW_VENDOR_DP)
-          || (Type2 == MESSAGING_DEVICE_PATH && SubType2 == MSG_VENDOR_DP)) { //no it is UART?               
+          || (Type2 == MESSAGING_DEVICE_PATH && SubType2 == MSG_VENDOR_DP)) { //no it is UART?
         ForceEqualNodes = TRUE;
       }
     } else if (Type2 == MESSAGING_DEVICE_PATH && SubType2 == MSG_SATA_DP &&
@@ -394,7 +422,7 @@ BootVolumeDevicePathEqual (
                 || (Type1 == MESSAGING_DEVICE_PATH && SubType1 == MSG_VENDOR_DP))) {
       ForceEqualNodes = TRUE;
     }
-    
+
     //
     // UEFI can see it as PcieRoot, while macOS could generate PciRoot
     // we'll assume Acpi dev path nodes to be equal to cover that
@@ -402,7 +430,7 @@ BootVolumeDevicePathEqual (
     if (Type1 == ACPI_DEVICE_PATH && Type2 == ACPI_DEVICE_PATH) {
       ForceEqualNodes = TRUE;
     }
-    
+
     if (ForceEqualNodes) {
       // assume equal nodes
       DBG_DP (" - forcing equal nodes\n");
@@ -410,13 +438,13 @@ BootVolumeDevicePathEqual (
       DevicePath2 = NextDevicePathNode (DevicePath2);
       continue;
     }
-    
+
     if (Type1 != Type2 || SubType1 != SubType2 || Len1 != Len2) {
       // Not equal
       DBG_DP (" - not equal\n");
       break;
     }
-    
+
     //
     // Same type/subtype/len ...
     //
@@ -426,13 +454,13 @@ BootVolumeDevicePathEqual (
       DBG_DP (" - END = equal\n");
       break;
     }
-    
+
     //
     // Do mem compare of nodes or special compare for selected types/subtypes
     //
     if (Type1 == MESSAGING_DEVICE_PATH && SubType1 == MSG_SATA_DP) {
       //
-      // Ignore 
+      // Ignore
       //
       SataNode1 = (SATA_DEVICE_PATH *)DevicePath1;
       SataNode2 = (SATA_DEVICE_PATH *)DevicePath2;
@@ -453,7 +481,7 @@ BootVolumeDevicePathEqual (
         DBG_DP (" - not equal\n");
         break;
     }
-    
+
     DBG_DP ("\n");
     //
     // Advance to next node
@@ -461,7 +489,7 @@ BootVolumeDevicePathEqual (
     DevicePath1 = NextDevicePathNode (DevicePath1);
     DevicePath2 = NextDevicePathNode (DevicePath2);
   }
-  
+
   return Equal;
 }
 
@@ -482,7 +510,7 @@ BootVolumeMediaDevicePathNodesEqual (
     if (DevicePath2 == NULL) {
         return FALSE;
     }
-    
+
     return (DevicePathNodeLength (DevicePath1) == DevicePathNodeLength (DevicePath1))
             && (CompareMem (DevicePath1, DevicePath2, DevicePathNodeLength (DevicePath1)) == 0);
 }
@@ -503,11 +531,11 @@ GetEfiBootDeviceFromNvram ()
   UINTN                Size = 0;
   EFI_GUID             *Guid;
   FILEPATH_DEVICE_PATH *FileDevPath;
-  
-  
+
+
   DbgHeader("GetEfiBootDeviceFromNvram");
 //  DBG ("GetEfiBootDeviceFromNvram:");
-  
+
   if (gEfiBootDeviceData != NULL) {
 //    DBG (" - [!] already parsed\n");
     return EFI_SUCCESS;
@@ -539,12 +567,12 @@ GetEfiBootDeviceFromNvram ()
 //    DBG (" - [!] efi-boot-device-data not found\n");
     return EFI_NOT_FOUND;
   }
-  
+
 //  DBG ("\n");
   DBG (" - efi-boot-device-data: %s\n", FileDevicePathToStr (gEfiBootDeviceData));
-  
+
   gEfiBootVolume = gEfiBootDeviceData;
-  
+
   //
   // if gEfiBootDeviceData starts with MemoryMapped node,
   // then Startup Disk sets BootCampHD to Win disk dev path.
@@ -567,7 +595,7 @@ GetEfiBootDeviceFromNvram ()
 
     DBG ("  - BootCampHD: %s\n", FileDevicePathToStr (gBootCampHD));
   }
-  
+
   //
   // if gEfiBootVolume contains FilePathNode, then split them into gEfiBootVolume dev path and gEfiBootLoaderPath
   //
@@ -584,7 +612,7 @@ GetEfiBootDeviceFromNvram ()
 
   DBG ("  - Volume: '%s'\n", FileDevicePathToStr (gEfiBootVolume));
   DBG ("  - LoaderPath: '%s'\n", gEfiBootLoaderPath);
-  
+
   //
   // if this is GPT disk, extract GUID
   // gEfiBootDeviceGuid can be used as a flag for GPT disk then
@@ -597,7 +625,7 @@ GetEfiBootDeviceFromNvram ()
       DBG ("  - Guid = %g\n", gEfiBootDeviceGuid);
     }
   }
-  
+
   return EFI_SUCCESS;
 }
 
@@ -612,15 +640,15 @@ LoadNvramPlist (
     EFI_STATUS Status;
     CHAR8      *NvramPtr;
     UINTN      Size;
-    
-    
+
+
     //
     // skip loading if already loaded
     //
     if (gNvramDict != NULL) {
         return EFI_SUCCESS;
     }
-    
+
     //
     // load nvram.plist
     //
@@ -631,19 +659,19 @@ LoadNvramPlist (
     }
 
     DBG (" loaded, size=%d\n", Size);
-    
+
     //
-    // parse it into gNvramDict 
+    // parse it into gNvramDict
     //
     Status = ParseXML ((const CHAR8*)NvramPtr, &gNvramDict,0);
 //    if(Status != EFI_SUCCESS) {
 //        DBG (" parsing error\n");
 //    }
-    
+
     FreePool (NvramPtr);
     // we will leave nvram.plist loaded and parsed for later processing
     //FreeTag(gNvramDict);
-    
+
     return Status;
 }
 
@@ -661,10 +689,10 @@ LoadLatestNvramPlist ()
   UINT64          LastModifTimeMs;
   UINT64          ModifTimeMs;
   REFIT_VOLUME    *VolumeWithLatestNvramPlist;
-  
+
 //there are debug messages not needed for users
 //  DBG ("Searching volumes for latest nvram.plist ...");
-  
+
   //
   // skip loading if already loaded
   //
@@ -673,42 +701,42 @@ LoadLatestNvramPlist ()
     return EFI_SUCCESS;
   }
 //  DBG ("\n");
-  
+
   //
   // find latest nvram.plist
   //
-  
+
   LastModifTimeMs = 0;
   VolumeWithLatestNvramPlist = NULL;
-  
+
   // search all volumes
   for (Index = 0; Index < VolumesCount; ++Index) {
     Volume = Volumes[Index];
-    
+
     if (!Volume->RootDir) {
       continue;
     }
-    
+
 /*    Guid = FindGPTPartitionGuidInDevicePath (Volume->DevicePath);
-    
+
     DBG (" %2d. Volume '%s', GUID = %g", Index, Volume->VolName, Guid);
     if (Guid == NULL) {
       // not a GUID partition
       DBG (" - not GPT");
     } */
-    
+
     // check if nvram.plist exists
     Status = Volume->RootDir->Open (Volume->RootDir, &FileHandle, L"nvram.plist", EFI_FILE_MODE_READ, 0);
     if (EFI_ERROR(Status)) {
 //      DBG (" - no nvram.plist - skipping!\n");
       continue;
     }
-    
+
     if (GlobalConfig.FastBoot) {
       VolumeWithLatestNvramPlist = Volume;
       break;
     }
-    
+
     // get nvram.plist modification date
     FileInfo = EfiLibFileInfo(FileHandle);
     if (FileInfo == NULL) {
@@ -716,7 +744,7 @@ LoadLatestNvramPlist ()
       FileHandle->Close(FileHandle);
       continue;
     }
-    
+
 //    DBG (" Modified = ");
     ModifTimeMs = GetEfiTimeInMs (&FileInfo->ModificationTime);
 /*    DBG ("%d-%d-%d %d:%d:%d (%ld ms)",
@@ -725,7 +753,7 @@ LoadLatestNvramPlist ()
         ModifTimeMs); */
     FreePool (FileInfo);
     FileHandle->Close(FileHandle);
-    
+
     // check if newer
     if (LastModifTimeMs < ModifTimeMs) {
 //      DBG (" - newer - will use this one\n");
@@ -735,20 +763,20 @@ LoadLatestNvramPlist ()
 //      DBG (" - older - skipping!\n");
     }
   }
-  
+
   Status = EFI_NOT_FOUND;
-  
+
   //
   // if we have nvram.plist - load it
   //
   if (VolumeWithLatestNvramPlist != NULL) {
     DBG ("Loading nvram.plist from Vol '%s' -", VolumeWithLatestNvramPlist->VolName);
     Status = LoadNvramPlist (VolumeWithLatestNvramPlist->RootDir, L"nvram.plist");
-    
+
   } else {
  //   DBG (" nvram.plist not found!\n");
   }
-  
+
   return Status;
 }
 
@@ -765,7 +793,7 @@ PutNvramPlistToRtVars ()
   INTN       Size, i;
   CHAR16     KeyBuf[128];
   VOID       *Value;
-  
+
   if (gNvramDict == NULL) {
     Status = LoadLatestNvramPlist ();
     if (gNvramDict == NULL) {
@@ -773,21 +801,21 @@ PutNvramPlistToRtVars ()
       return;
     }
   }
-  
+
   DbgHeader("PutNvramPlistToRtVars");
 //  DBG ("PutNvramPlistToRtVars ...\n");
   // iterate over dict elements
   for (Tag = gNvramDict->tag; Tag != NULL; Tag = Tag->tagNext) {
-    
+
     Value  = NULL;
     ValTag = (TagPtr)Tag->tag;
-    
+
     // process only valid <key> tags
     if (Tag->type != kTagTypeKey || ValTag == NULL) {
       DBG (" ERROR: Tag is not <key>, type = %d\n", Tag->type);
       continue;
     }
-    
+
     // skip OsxAptioFixDrv-RelocBase - appears and causes trouble
     // in kernel and kext patcher when mixing UEFI and CloverEFI boot
     if (AsciiStrCmp (Tag->string, "OsxAptioFixDrv-RelocBase") == 0) {
@@ -812,18 +840,18 @@ PutNvramPlistToRtVars ()
       DBG (" Adding Key: %s: ", KeyBuf);
     }
     // process value tag
-    
+
     if (ValTag->type == kTagTypeString) {
-      
+
       // <string> element
       Value = ValTag->string;
       Size  = AsciiStrLen (Value);
       if (!GlobalConfig.DebugLog) {
         DBG ("String: Size = %d, Val = '%a'", Size, Value);
       }
-      
+
     } else if (ValTag->type == kTagTypeData) {
-      
+
       // <data> element
       Size  = ValTag->dataLen;
       Value = ValTag->data;
@@ -837,11 +865,11 @@ PutNvramPlistToRtVars ()
       DBG ("ERROR: Unsupported tag type: %d\n", ValTag->type);
       continue;
     }
-    
+
     if (Size == 0 || !Value) {
       continue;
     }
-    
+
     // set RT var: all vars visible in nvram.plist are gEfiAppleBootGuid
 /*   Status = gRS->SetVariable (
                     KeyBuf,
@@ -882,11 +910,11 @@ FindStartupDiskVolume (
   BOOLEAN      IsPartitionVolume;
   CHAR16       *LoaderPath;
   CHAR16       *EfiBootVolumeStr;
-  
-  
+
+
 //  DBG ("FindStartupDiskVolume ...\n");
-  
-  
+
+
   //
   // search RT vars for efi-boot-device-data
   // and try to find that volume
@@ -896,17 +924,17 @@ FindStartupDiskVolume (
 //    DBG (" - [!] EfiBootVolume not found\n");
     return -1;
   }
-  
+
   DbgHeader("FindStartupDiskVolume");
 //  DBG ("FindStartupDiskVolume searching ...\n");
-  
+
   //
   // Check if gEfiBootVolume is disk or partition volume
   //
   EfiBootVolumeStr  = FileDevicePathToStr (gEfiBootVolume);
   IsPartitionVolume = NULL != FindDevicePathNodeWithType (gEfiBootVolume, MEDIA_DEVICE_PATH, 0);
   DBG ("  - Volume: %s = %s\n", IsPartitionVolume ? L"partition" : L"disk", EfiBootVolumeStr);
-  
+
   //
   // 1. gEfiBootVolume + gEfiBootLoaderPath
   // PciRoot(0x0)/.../Sata(...)/HD(...)/\EFI\BOOT\XXX.EFI - set by Clover
@@ -955,7 +983,7 @@ FindStartupDiskVolume (
     }
     DBG ("    - [!] not found\n");
   }
-  
+
   //
   // 2. gEfiBootVolume - partition volume
   // PciRoot(0x0)/.../Sata(...)/HD(...) - set by Clover or macOS
@@ -998,7 +1026,7 @@ FindStartupDiskVolume (
     DBG ("    - [!] not found\n");
     return -1;
   }
-  
+
   //
   // 3. gEfiBootVolume - disk volume
   // PciRoot(0x0)/.../Sata(...) - set by macOS for Win boot
@@ -1020,7 +1048,7 @@ FindStartupDiskVolume (
     DBG ("    - [!] not found\n");
     return -1;
   }
-  
+
   //
   // 3.2 DiskVolume
   // search for first entry with win loader or win partition on that disk
@@ -1059,7 +1087,7 @@ FindStartupDiskVolume (
     }
   }
   DBG ("    - [!] not found\n");
-  
+
   //
   // 3.3 DiskVolume, but no Win entry
   // PciRoot(0x0)/.../Sata(...)
@@ -1087,7 +1115,7 @@ FindStartupDiskVolume (
       }
     }
   }
-  
+
   DBG ("    - [!] not found\n");
   return -1;
 }
@@ -1107,12 +1135,12 @@ EFI_STATUS SetStartupDiskVolume (
   CHAR8                    *EfiBootDeviceTmpl;
   UINTN                    Size;
   UINT32                   Attributes;
-  
-  
+
+
   DBG ("SetStartupDiskVolume:\n");
   DBG ("  * Volume: '%s'\n",     Volume->VolName);
   DBG ("  * LoaderPath: '%s'\n", LoaderPath);
-  
+
   //
   // construct dev path for Volume/LoaderPath
   //
@@ -1122,10 +1150,10 @@ EFI_STATUS SetStartupDiskVolume (
     DevPath     = AppendDevicePathNode (DevPath, FileDevPath);
   }
   DBG ("  * DevPath: %s\n", Volume->VolName, FileDevicePathToStr (DevPath));
-  
+
   Guid = FindGPTPartitionGuidInDevicePath (Volume->DevicePath);
   DBG ("  * GUID = %g\n", Guid);
-  
+
   //
   // let's save it without EFI_VARIABLE_NON_VOLATILE in CloverEFI like other vars so far
   //
@@ -1134,7 +1162,7 @@ EFI_STATUS SetStartupDiskVolume (
   } else {
     Attributes = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS;
   }
-  
+
   //
   // set efi-boot-device-data to volume dev path
   //
@@ -1143,7 +1171,7 @@ EFI_STATUS SetStartupDiskVolume (
   if (EFI_ERROR(Status)) {
     return Status;
   }
-  
+
   //
   // set efi-boot-device to XML string
   // (probably not needed at all)
@@ -1164,12 +1192,12 @@ EFI_STATUS SetStartupDiskVolume (
     AsciiSPrint (EfiBootDevice, Size, EfiBootDeviceTmpl, Guid);
     Size          = AsciiStrLen (EfiBootDevice);
     DBG ("  * efi-boot-device: %a\n", EfiBootDevice);
-    
+
     Status        = SetNvramVariable (L"efi-boot-device", &gEfiAppleBootGuid, Attributes, Size, EfiBootDevice);
 
     FreePool (EfiBootDevice);
   }
-  
+
   return Status;
 }
 
@@ -1179,15 +1207,15 @@ VOID
 RemoveStartupDiskVolume ()
 {
 //    EFI_STATUS Status;
-    
+
 //    DBG ("RemoveStartupDiskVolume:\n");
-    
+
     /*Status =*/ DeleteNvramVariable (L"efi-boot-device", &gEfiAppleBootGuid);
 //    DBG ("  * efi-boot-device = %r\n", Status);
-    
+
     /*Status =*/ DeleteNvramVariable (L"efi-boot-device-data", &gEfiAppleBootGuid);
 //    DBG ("  * efi-boot-device-data = %r\n", Status);
-    
+
     /*Status =*/ DeleteNvramVariable (L"BootCampHD", &gEfiAppleBootGuid);
 //    DBG ("  * BootCampHD = %r\n", Status);
 //    DBG ("Removed efi-boot-device-data variable: %r\n", Status);

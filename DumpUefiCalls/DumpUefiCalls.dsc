@@ -45,7 +45,6 @@
 [Components]
   Clover/DumpUefiCalls/DumpUefiCalls.inf
 
-
 [PcdsFixedAtBuild]
 
   #
@@ -78,26 +77,26 @@
   # DEBUG_INFO      0x00000040  Informational debug messages
   # DEBUG_DISPATCH  0x00000080  PEI/DXE/SMM Dispatchers
   # DEBUG_VARIABLE  0x00000100  Variable
-  #                 0x00000200  
+  #                 0x00000200
   # DEBUG_BM        0x00000400  Boot Manager
-  #                 0x00000800  
+  #                 0x00000800
   # DEBUG_BLKIO     0x00001000  BlkIo Driver
-  #                 0x00002000  
+  #                 0x00002000
   # DEBUG_NET       0x00004000  SNI Driver
-  #                 0x00008000  
+  #                 0x00008000
   # DEBUG_UNDI      0x00010000  UNDI Driver
   # DEBUG_LOADFILE  0x00020000  UNDI Driver
-  #                 0x00040000  
+  #                 0x00040000
   # DEBUG_EVENT     0x00080000  Event messages
   # DEBUG_GCD       0x00100000  Global Coherency Database changes
   # DEBUG_CACHE     0x00200000  Memory range cachability changes
   # DEBUG_VERBOSE   0x00400000  Detailed debug messages that may significantly impact boot performance
-  #                 0x01000000  
-  #                 0x02000000  
-  #                 0x04000000  
-  #                 0x10000000  
-  #                 0x20000000  
-  #                 0x40000000  
+  #                 0x01000000
+  #                 0x02000000
+  #                 0x04000000
+  #                 0x10000000
+  #                 0x20000000
+  #                 0x40000000
   # DEBUG_ERROR     0x80000000  Error
 
   !if $(TARGET) == DEBUG
@@ -109,7 +108,7 @@
 [BuildOptions]
   INTEL:DEBUG_*_*_CC_FLAGS   =
   INTEL:RELEASE_*_*_CC_FLAGS = /D MDEPKG_NDEBUG
-  GCC:DEBUG_*_*_CC_FLAGS     = 
+  GCC:DEBUG_*_*_CC_FLAGS     =
   GCC:RELEASE_*_*_CC_FLAGS   = -DMDEPKG_NDEBUG
   MSFT:DEBUG_*_*_CC_FLAGS    =
   MSFT:RELEASE_*_*_CC_FLAGS  = /D MDEPKG_NDEBUG
