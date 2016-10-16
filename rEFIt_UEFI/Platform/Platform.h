@@ -1850,7 +1850,9 @@ InjectHdaProperties (
   );
 
 EFI_STATUS
-InstallAppleProtocols (VOID);
+InstallAppleProtocols (
+  VOID
+  );
 
 VOID
 SetDevices (

@@ -5920,7 +5920,7 @@ GetDevices ()
         else if ((Pci.Hdr.ClassCode[2] == PCI_CLASS_MEDIA) &&
                 ((Pci.Hdr.ClassCode[1] == PCI_CLASS_MEDIA_HDA) ||
                 (Pci.Hdr.ClassCode[1] == PCI_CLASS_MEDIA_AUDIO))) {
-          MsgLog (" - HDA: %a", GetHdaControllerName (Pci.Hdr.VendorId, Pci.Hdr.DeviceId));
+          MsgLog (" - HDA: %a\n", GetHdaControllerName (Pci.Hdr.VendorId, Pci.Hdr.DeviceId));
 #if 0
    //if ((Pci.Hdr.VendorId == 0x1002) || (Pci.Hdr.VendorId == 0x10DE)){
             SlotDevice = &SlotDevices[4];

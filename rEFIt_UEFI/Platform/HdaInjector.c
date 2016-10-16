@@ -78,7 +78,7 @@ STATIC HDA_PROPERTY mHdaPropertyTable[] = {
   @return                           The name of the HDA controller is returned.
   @return "Unknown HDA Controller"  A matching name for the HDA controller could not
                                     be found.
-  **/
+**/
 CHAR8 *
 GetHdaControllerName (
   IN UINT32 VendorId,
@@ -111,7 +111,7 @@ GetHdaControllerName (
   @retval EFI_OUT_OF_RESOURCES  The memory necessary to complete the operation
                                 could not be allocated.
   @retval EFI_SUCCESS           The operation completed successfully.
-  **/
+**/
 EFI_STATUS
 InjectHdaProperties (
   IN PCI_TYPE00               *HdaController,

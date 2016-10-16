@@ -171,7 +171,7 @@ STATIC APPLE_SMC_IO_PROTOCOL mSmcHelper = {
 
   @retval EFI_SUCCESS          The operation completed successfully.
   @retval EFI_ALREADY_STARTED  The protocol has already been installed.
-  **/
+**/
 EFI_STATUS
 EFIAPI
 SmcHelperEntryPoint (

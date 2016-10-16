@@ -73,7 +73,7 @@
   Platform/Events.c
   Platform/gma.c
   Platform/guid.c
-  Platform/DeviceProperty.c
+  Platform/AppleProtocols.c
   Platform/HdaInjector.c
   Platform/LegacyBiosThunk.c
   Platform/LegacyBoot.c

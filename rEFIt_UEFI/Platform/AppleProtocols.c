@@ -1,7 +1,11 @@
+/** @file
+  Apple UEFI protocols.
+**/
+
 #include "Platform.h"
 
 //
-// Legacy vars for Settings.c
+// Legacy device property variables for Settings.c.
 //
 UINT32 mPropSize = 0;
 UINT8  *mProperties = NULL;
@@ -16,8 +20,14 @@ CHAR8  *cDeviceProperties = NULL;
 //
 EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL *gEfiDppDbProtocol = NULL;
 
+/** Installs the Apple UEFI protocols.
+
+  @retval EFI_SUCCESS  The operation completed successfully.
+**/
 EFI_STATUS
-InstallAppleProtocols (VOID)
+InstallAppleProtocols (
+  VOID
+  )
 {
   EFI_STATUS Status;
 
@@ -28,8 +38,9 @@ InstallAppleProtocols (VOID)
                   );
 
   if (EFI_ERROR (Status)) {
+    MsgLog ("Installing EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL");
     // TODO: Install the AppleModulePkg implementation for the protocol
-    MsgLog ("EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL not found");
+    // EfiDevicePathPropertyDatabaseMain ();
   }
 
   // TODO: Do the same for the other protocols
