@@ -135,7 +135,6 @@
   VideoBiosPatchLib
   OpensslLib
   NetLib
-  AppleProtocolLib
 
 [Guids]
   gEfiAcpiTableGuid
@@ -222,6 +221,7 @@
   gEfiPlatformDriverOverrideProtocolGuid
   gEmuVariableControlProtocolGuid
 
+  gEfiDevicePathPropertyDatabaseProtocolGuid
   gAppleSmcIoProtocolGuid
 
 [FeaturePcd]

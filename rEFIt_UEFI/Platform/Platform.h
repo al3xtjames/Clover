@@ -10,8 +10,6 @@ Headers collection for procedures
 // Comment to use source debug options
 //#define DEBUG_ALL 2
 
-
-#include <Uefi.h>
 #include <AppleUefi.h>
 
 #include <Guid/Acpi.h>

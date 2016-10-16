@@ -17,7 +17,7 @@
 ##
 [Defines]
   PLATFORM_NAME                  = Clover
-  PLATFORM_GUID                  = 199E24E0-0989-42aa-87F2-611A8C397E72
+  PLATFORM_GUID                  = 199E24E0-0989-42AA-87F2-611A8C397E72
   PLATFORM_VERSION               = 0.92
   DSC_SPECIFICATION              = 0x00010006
   OUTPUT_DIRECTORY               = Build/Clover
@@ -152,11 +152,6 @@
   #
   MemLogLib|Clover/Library/MemLogLibDefault/MemLogLibDefault.inf
   VideoBiosPatchLib|Clover/Library/VideoBiosPatchLib/VideoBiosPatchLib.inf
-
-  #
-  # Apple
-  #
-  AppleProtocolLib|ApplePkg/Protocol/AppleProtocolLib.inf
 
 [LibraryClasses.common.DXE_CORE]
   HobLib|MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
