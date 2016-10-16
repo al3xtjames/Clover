@@ -269,12 +269,10 @@ SetVariablesForOSX()
   if (gSettings.BooterConfig != 0) {
     SetNvramVariable(L"bootercfg", &gEfiAppleBootGuid, Attributes, sizeof(gSettings.BooterConfig), &gSettings.BooterConfig);
   }
-  
+
   if (gSettings.NvidiaWeb) {
     NvidiaWebValue = "1";
-    SetNvramVariable(L"nvda_drv", &gEfiAppleBootGuid, Attributes, 2, (VOID*)NvidiaWebValue);
-  } else {
-    DeleteNvramVariable(L"nvda_drv", &gEfiAppleBootGuid);
+    SetNvramVariable(L"nvda_drv", &gEfiAppleBootGuid, Attributes, 2, (VOID *)NvidiaWebValue);
   }
 
   return EFI_SUCCESS;
