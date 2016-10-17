@@ -116,6 +116,7 @@
   gAppleSmcIoProtocolGuid
   gAppleImageCodecProtocolGuid
   gAppleKeyStateProtocolGuid
+  gEfiOSInfoProtocolGuid
 
 [Depex]
   TRUE

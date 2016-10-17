@@ -195,6 +195,7 @@ EFI_GUID mAppleSMCProtocolGuid            = {0x17407E5A, 0xAF6C, 0x4EE8, {0x98, 
 EFI_GUID mAppleFireWireProtocolGuid       = {0x67708AA8, 0x2079, 0x4E4F, {0xB1, 0x58, 0xB1, 0x5B, 0x1F, 0x6A, 0x6C, 0x92}};
 EFI_GUID mAppleDeviceControlProtocolGuid	= {0x8ECE08D8, 0xA6D4, 0x430B, {0xA7, 0xB0, 0x2D, 0xF3, 0x18, 0xE7, 0x88, 0x4A}};
 EFI_GUID mAppleDiskIoProtocolGuid         = {0x5B27263B, 0x9083, 0x415E, {0x88, 0x9E, 0x64, 0x32, 0xCA, 0xA9, 0xB8, 0x13}};
+EFI_GUID mEfiOSInfoProtocolGuid           = {0xC5C5DA95, 0x7D5C, 0x45E6, { 0xB2, 0xF1, 0x3F, 0xD5, 0x2B, 0xB1, 0x00, 0x77}};
 
 // Shell guids
 EFI_GUID ShellInt           = {0x47C7B223, 0xC42A, 0x11D2, {0x8E, 0x57, 0x0, 0xA0, 0xC9, 0x69, 0x72, 0x3B}};
@@ -342,6 +343,7 @@ MAP_EFI_GUID_STR EfiGuidStrMap[] = {
   {&mAppleFireWireProtocolGuid, L"gAppleFireWireProtocolGuid"},
   {&mAppleDeviceControlProtocolGuid, L"gAppleDeviceControlProtocolGuid"},
   {&mAppleDiskIoProtocolGuid, L"gAppleDiskIoProtocolGuid"},
+  {&mEfiOSInfoProtocolGuid, L"mEfiOSInfoProtocolGuid"},
 
   {&ShellInt, L"ShellInt"},
   {&SEnv, L"SEnv"},
@@ -380,7 +382,7 @@ GuidStr(IN EFI_GUID *Guid)
 {
 	UINTN	i;
 	CHAR16	*Str = NULL;
-	
+
 	if (GuidPrintBuffer == NULL) {
 		GuidPrintBuffer = AllocateRuntimePool(GUID_PRINT_BUFFER_SIZE);
 	}
@@ -405,19 +407,19 @@ EFIAPI
 PrintBytesRow(IN CHAR8 *Bytes, IN UINTN Number, IN UINTN MaxNumber)
 {
 	UINTN	Index;
-	
+
 	// print hex vals
 	for (Index = 0; Index < Number; Index++) {
 		PRINT("%02x ", (UINT8)Bytes[Index]);
 	}
-	
+
 	// pad to MaxNumber if needed
 	for (; Index < MaxNumber; Index++) {
 		PRINT("   ");
 	}
-	
+
 	PRINT("| ");
-	
+
 	// print ASCII
 	for (Index = 0; Index < Number; Index++) {
 		if (Bytes[Index] >= 0x20 && Bytes[Index] <= 0x7e) {
@@ -426,7 +428,7 @@ PrintBytesRow(IN CHAR8 *Bytes, IN UINTN Number, IN UINTN MaxNumber)
 			PRINT("%c", L'.');
 		}
 	}
-	
+
 	PRINT("\n");
 }
 
@@ -436,7 +438,7 @@ EFIAPI
 PrintBytes(IN CHAR8 *Bytes, IN UINTN Number)
 {
 	UINTN	Index;
-	
+
 	for (Index = 0; Index < Number; Index += 16) {
 		PrintBytesRow(Bytes + Index, (Index + 16 < Number ? 16 : Number - Index), 16);
 	}
@@ -448,11 +450,11 @@ EFIAPI
 GetStrLastChar(IN CHAR16 *String)
 {
 	CHAR16	*Pos;
-	
+
 	if (String == NULL || *String == L'\0') {
 		return NULL;
 	}
-	
+
 	// go to end
 	Pos = String;
 	while (*Pos != L'\0') {
@@ -468,11 +470,11 @@ EFIAPI
 GetStrLastCharOccurence(IN CHAR16 *String, IN CHAR16 Char)
 {
 	CHAR16	*Pos;
-	
+
 	if (String == NULL || *String == L'\0') {
 		return NULL;
 	}
-	
+
 	// go to end
 	Pos = String;
 	while (*Pos != L'\0') {
@@ -491,7 +493,7 @@ EFIAPI
 ToUpperChar(IN CHAR16 Chr)
 {
 	CHAR8	C;
-	
+
 	if (Chr > 0xFF) return Chr;
 	C = (CHAR8)Chr;
 	return ((C >= 'a' && C <= 'z') ? C - ('a' - 'A') : C);
@@ -505,7 +507,7 @@ StrCmpiBasic(IN CHAR16 *String1, IN CHAR16 *String2)
 {
 	CHAR16	Chr1;
 	CHAR16	Chr2;
-	
+
 	if (String1 == NULL || String2 == NULL) {
 		return 1;
 	}
@@ -515,7 +517,7 @@ StrCmpiBasic(IN CHAR16 *String1, IN CHAR16 *String2)
 	if (*String1 == L'\0' || *String2 == L'\0') {
 		return 1;
 	}
-	
+
 	Chr1 = ToUpperChar(*String1);
 	Chr2 = ToUpperChar(*String2);
 	while ((*String1 != L'\0') && (Chr1 == Chr2)) {
@@ -524,7 +526,7 @@ StrCmpiBasic(IN CHAR16 *String1, IN CHAR16 *String2)
 		Chr1 = ToUpperChar(*String1);
 		Chr2 = ToUpperChar(*String2);
 	}
-	
+
 	return Chr1 - Chr2;
 }
 
@@ -551,14 +553,14 @@ StrStriBasic(
 	while (*String != L'\0') {
 		SearchStringTmp = SearchString;
 		FirstMatch = String;
-	
-		while ((ToUpperChar(*String) == ToUpperChar(*SearchStringTmp)) 
+
+		while ((ToUpperChar(*String) == ToUpperChar(*SearchStringTmp))
 			&& (*String != L'\0'))
 		{
 			String++;
 			SearchStringTmp++;
-		} 
-	
+		}
+
 		if (*SearchStringTmp == L'\0') {
 			return (CHAR16 *) FirstMatch;
 		}
@@ -581,7 +583,7 @@ StriStartsWithBasic(IN CHAR16 *String1, IN CHAR16 *String2)
 	CHAR16	Chr1;
 	CHAR16	Chr2;
 	BOOLEAN Result;
-	
+
 	if (String1 == NULL || String2 == NULL) {
 		return FALSE;
 	}
@@ -591,7 +593,7 @@ StriStartsWithBasic(IN CHAR16 *String1, IN CHAR16 *String2)
 	if (*String1 == L'\0' || *String2 == L'\0') {
 		return FALSE;
 	}
-	
+
 	Chr1 = ToUpperChar(*String1);
 	Chr2 = ToUpperChar(*String2);
 	while ((Chr1 != L'\0') && (Chr2 != L'\0') && (Chr1 == Chr2)) {
@@ -600,10 +602,10 @@ StriStartsWithBasic(IN CHAR16 *String1, IN CHAR16 *String2)
 		Chr1 = ToUpperChar(*String1);
 		Chr2 = ToUpperChar(*String2);
 	}
-	
+
 	Result = ((Chr1 == L'\0') && (Chr2 == L'\0'))
 	|| ((Chr1 != L'\0') && (Chr2 == L'\0'));
-	
+
 	return Result;
 }
 
@@ -621,7 +623,7 @@ ShrinkMemMap(
 	EFI_MEMORY_DESCRIPTOR		*Desc;
 	BOOLEAN				CanBeJoined;
 	BOOLEAN				HasEntriesToRemove;
-	
+
 	PrevDesc = MemoryMap;
 	Desc = NEXT_MEMORY_DESCRIPTOR(PrevDesc, DescriptorSize);
 	SizeFromDescToEnd = *MemoryMapSize - DescriptorSize;
@@ -646,7 +648,7 @@ ShrinkMemMap(
 					;
 			}
 		}
-		
+
 		if (CanBeJoined) {
 			// two entries are the same/similar - join them
 			PrevDesc->NumberOfPages += Desc->NumberOfPages;
@@ -681,7 +683,7 @@ PrintMemMap(
 	UINTN				Index;
 	UINT64				Bytes;
 	EFI_MEMORY_DESCRIPTOR		*Desc;
-	
+
 	Desc = MemoryMap;
 	NumEntries = MemoryMapSize / DescriptorSize;
 	PRINT("MEMMAP: Size=%d, Addr=%p, DescSize=%d, DescVersion: 0x%x\n", MemoryMapSize, MemoryMap, DescriptorSize, DescriptorVersion);
@@ -708,7 +710,7 @@ VOID EFIAPI
 PrintSystemTable(IN EFI_SYSTEM_TABLE  *ST)
 {
 	UINTN			Index;
-	
+
 	PRINT("SysTable: %p\n", ST);
 	PRINT("- FirmwareVendor: %p, %s\n", ST->FirmwareVendor, ST->FirmwareVendor);
 	PRINT("- FirmwareRevision: %x\n", ST->FirmwareRevision);
@@ -720,7 +722,7 @@ PrintSystemTable(IN EFI_SYSTEM_TABLE  *ST)
 	for(Index = 0; Index < ST->NumberOfTableEntries; Index++) {
 		PRINT("  %p - %s\n", ST->ConfigurationTable[Index].VendorTable, GuidStr(&ST->ConfigurationTable[Index].VendorGuid));
 	}
-	
+
 	// print RT services table
 	PRINT("- RuntimeServices: %p\n", ST->RuntimeServices);
 	PRINT("    GetTime: %p\n", ST->RuntimeServices->GetTime);
@@ -761,7 +763,7 @@ WaitForKeyPress(CHAR16 *Message)
 	EFI_STATUS			Status;
 	UINTN				index;
 	EFI_INPUT_KEY			key;
-	
+
 	Print(Message);
 	do {
 		Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &key);
@@ -784,7 +786,7 @@ FileDevicePathToText(EFI_DEVICE_PATH_PROTOCOL *FilePathProto)
 	UINTN				Size;
 	UINTN				SizeAll;
 	UINTN				i;
-	
+
 	FilePathText[0] = L'\0';
 	i = 4;
 	SizeAll = 0;
@@ -806,7 +808,7 @@ FileDevicePathToText(EFI_DEVICE_PATH_PROTOCOL *FilePathProto)
 		i--;
 		//PRINT("FilePathText: %s\n", FilePathText);
 	}
-	
+
 	OutFilePathText = NULL;
 	Size = StrSize(FilePathText);
 	if (Size > 2) {
@@ -818,7 +820,7 @@ FileDevicePathToText(EFI_DEVICE_PATH_PROTOCOL *FilePathProto)
 			OutFilePathText = NULL;
 		}
 	}
-	
+
 	return OutFilePathText;
 }
 
@@ -835,7 +837,7 @@ GetMemoryMapAlloc (
 )
 {
 	EFI_STATUS			Status;
-	
+
 	*MemoryMapSize = 0;
 	*MemoryMap = NULL;
 	Status = GetMemoryMapFunction(MemoryMapSize, *MemoryMap, MapKey, DescriptorSize, DescriptorVersion);
@@ -849,7 +851,7 @@ GetMemoryMapAlloc (
 			FreePool(*MemoryMap);
 		}
 	}
-	
+
 	return Status;
 }
 
@@ -870,16 +872,16 @@ AllocatePagesFromTop(
 	UINT32				DescriptorVersion;
 	EFI_MEMORY_DESCRIPTOR		*MemoryMapEnd;
 	EFI_MEMORY_DESCRIPTOR		*Desc;
-	
-	
+
+
 	Status = GetMemoryMapAlloc(gBS->GetMemoryMap, &MemoryMapSize, &MemoryMap, &MapKey, &DescriptorSize, &DescriptorVersion);
-	
+
 	if (EFI_ERROR(Status)) {
 		return Status;
 	}
-	
+
 	Status = EFI_NOT_FOUND;
-	
+
 	//PRINT("Search for Pages=%x, TopAddr=%lx\n", Pages, *Memory);
 	//PRINT("MEMMAP: Size=%d, Addr=%p, DescSize=%d, DescVersion: 0x%x\n", MemoryMapSize, MemoryMap, DescriptorSize, DescriptorVersion);
 	//PRINT("Type       Start            End       VStart               # Pages          Attributes\n");
@@ -919,10 +921,10 @@ AllocatePagesFromTop(
 			break;
 		}
 	}
-	
+
 	// release mem
 	FreePool(MemoryMap);
-	
+
 	return Status;
 }
 
@@ -943,7 +945,7 @@ PrintRTVariables(
 	UINTN			VariableDataSize;
 	EFI_GUID		VendorGuid;
 	BOOLEAN			IsDataPrintDisabled;
-	
+
 	//
 	// Print storage info
 	//
@@ -969,7 +971,7 @@ PrintRTVariables(
 		PRINT("%ld, %ld, %ld\n", MaximumVariableStorageSize, RemainingVariableStorageSize, MaximumVariableSize);
 	}
 	*/
-	
+
 	//
 	// Print all vars
 	//
@@ -991,11 +993,11 @@ PrintRTVariables(
 	}
 	// first call to GetNextVariableName must be with empty string
 	gVariableNameBuffer[0] = L'\0';
-	
+
 	while (TRUE) {
 		VariableNameSize = VariableNameBufferSize;
 		Status = RT->GetNextVariableName(&VariableNameSize, gVariableNameBuffer, &VendorGuid);
-		
+
 		if (Status == EFI_BUFFER_TOO_SMALL) {
 			// we will not handle this to avoid problems during calling in runtime
 			PRINT("ERROR: gVariableNameBuffer too small\n");
@@ -1010,7 +1012,7 @@ PrintRTVariables(
 			PRINT("ERROR: GetNextVariableName: %r\n", Status);
 			return;
 		}
-		
+
 		// prepare for var data if needed
 		if (gVariableDataBuffer == NULL) {
 			if (InBootServices) {
@@ -1021,23 +1023,23 @@ PrintRTVariables(
 				return;
 			}
 		}
-		
+
 		IsDataPrintDisabled = FALSE;
-		
+
 		#if PRINT_SHELL_VARS == 0
 		{
 			BOOLEAN			IsShellVar;
-			
-			IsShellVar = CompareGuid(&VendorGuid, &ShellInt) 
-				|| CompareGuid(&VendorGuid, &SEnv) 
-				|| CompareGuid(&VendorGuid, &ShellDevPathMap) 
-				|| CompareGuid(&VendorGuid, &ShellProtId) 
+
+			IsShellVar = CompareGuid(&VendorGuid, &ShellInt)
+				|| CompareGuid(&VendorGuid, &SEnv)
+				|| CompareGuid(&VendorGuid, &ShellDevPathMap)
+				|| CompareGuid(&VendorGuid, &ShellProtId)
 				|| CompareGuid(&VendorGuid, &ShellAlias);
-			
+
 			IsDataPrintDisabled = IsShellVar;
 		}
 		#endif
-		
+
 		// get and print this var
 		VariableDataSize = VARIABLE_DATA_BUFFER_SIZE;
 		Status = RT->GetVariable(gVariableNameBuffer, &VendorGuid, &Attributes, &VariableDataSize, gVariableDataBuffer);
