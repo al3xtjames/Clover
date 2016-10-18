@@ -424,10 +424,11 @@
   Clover/LegacyBios/Region2Dxe/LegacyRegion2Dxe.inf
 
   # Misc
-  Clover/FSInject/FSInject.inf
-  Clover/MsgLog/MsgLog.inf
-  Clover/SmcHelper/SmcHelper.inf
-  Clover/OSInfo/OSInfo.inf
+  Clover/Protocol/AppleImageCodec/AppleImageCodec.inf
+  Clover/Protocol/FSInject/FSInject.inf
+  Clover/Protocol/MsgLog/MsgLog.inf
+  Clover/Protocol/OSInfo/OSInfo.inf
+  Clover/Protocol/SmcHelper/SmcHelper.inf
 
 !ifdef DEBUG_ON_SERIAL_PORT
   Clover/DumpUefiCalls/DumpUefiCalls.inf {
@@ -464,7 +465,6 @@
       gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize|0x0000
   }
 
-  Clover/AppleImageCodec/AppleImageCodec.inf
   #
   # Sample Application
   #

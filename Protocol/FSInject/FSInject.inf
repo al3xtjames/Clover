@@ -23,7 +23,7 @@
   ENTRY_POINT                    = FSInjectEntrypoint
 
 [Packages]
-  Clover/FSInject/FSInject.dec
+  Clover/Protocol/FSInject/FSInject.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
@@ -38,7 +38,7 @@
   DebugLib
   PrintLib
   MemLogLib
-  
+
 [Sources]
   FSInject.h
   FSInject.c
@@ -57,4 +57,3 @@
 
 [BuildOptions]
 #  MSFT:*_*_*_ASM_FLAGS = /Fl
-

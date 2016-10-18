@@ -64,7 +64,7 @@ READ_LOCK_STATUS   = TRUE
 APRIORI DXE {
   INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
   INF  PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
-  INF  Clover/MsgLog/MsgLog.inf
+  INF  Clover/Protocol/MsgLog/MsgLog.inf
 }
 
 INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
@@ -257,7 +257,7 @@ INF  Clover/OsxAcpiTableDxe/AcpiTableDxe.inf
 #INF  UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf
 
     # Misc
-INF  Clover/MsgLog/MsgLog.inf
+INF  Clover/Protocol/MsgLog/MsgLog.inf
 
     # FAT Filesystem Driver
 INF  FatPkg/EnhancedFatDxe/Fat.inf
