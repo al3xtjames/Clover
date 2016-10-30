@@ -14,32 +14,26 @@
 ##
 
 [Defines]
-  BASE_NAME   = OSInfo
-  FILE_GUID   = 2ECED69B-2793-4388-BA3C-823040EBCCD2
-  MODULE_TYPE = UEFI_DRIVER
-  ENTRY_POINT = OSInfoEntrypoint
-  INF_VERSION = 0x00010005
-  VERSION_STRING                 = 1.0
+  BASE_NAME      = OSInfo
+  FILE_GUID      = 2ECED69B-2793-4388-BA3C-823040EBCCD2
+  MODULE_TYPE    = UEFI_DRIVER
+  ENTRY_POINT    = OSInfoEntryPoint
+  INF_VERSION    = 0x00010005
+  VERSION_STRING = 1.0
 
 [Packages]
+  ApplePkg/ApplePkg.dec
   Clover/CloverPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  ApplePkg/ApplePkg.dec
 
 [Protocols]
   gEfiOSInfoProtocolGuid  ## PRODUCES
 
 [LibraryClasses]
   BaseLib
-  UefiLib
-  UefiDriverEntryPoint
   UefiBootServicesTableLib
-  UefiRuntimeServicesTableLib
-  BaseMemoryLib
-  MemoryAllocationLib
-  DebugLib
-  PrintLib
+  UefiDriverEntryPoint
 
 [Sources]
   OSInfo.c

@@ -1,92 +1,86 @@
-//
-//  OSInfo.c
-//  Clover
-//
-//  Created by Slice on 17.10.16.
-//
+/** @file
+  Implementation of EFI_OS_INFO_PROTOCOL.
 
+  Copyright (C) 2005 - 2015, Apple Inc. All rights reserved.<BR>
+
+  This program and the accompanying materials have not been licensed.
+  Neither is its usage, its redistribution, in source or binary form,
+  licensed, nor implicitely or explicitely permitted, except when
+  required by applicable law.
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+  OR CONDITIONS OF ANY KIND, either express or implied.
+**/
+
+#include <AppleCommon.h>
+
+#include APPLE_PROTOCOL_PRODUCER (OSInfo)
 
 #include <Library/BaseLib.h>
-#include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/DebugLib.h>
-#include <Library/PrintLib.h>
-#include <Library/MemLogLib.h>
 
-#include <Protocol/OSInfo.h>
+#define EFI_OS_INFO_PROTOCOL_REVISION 0x01
+#define OS_INFO_VENDOR_NAME           "Apple Inc."
 
-EFI_HANDLE              mHandle = NULL;
-
-#define EFI_OS_INFO_PROTOCOL_REVISION  0x01
-
-// OS_INFO_VENDOR_NAME
-#define OS_INFO_VENDOR_NAME  "Apple Inc."
-
-// OSInfoOSNameImpl
 VOID
 EFIAPI
 OSInfoOSNameImpl (
-                  OUT CHAR8 *OSName
-                  )
+  IN CHAR8 *OSName
+  )
 {
-
+  return;
 }
 
-// OSInfoOSVendorImpl
 VOID
 EFIAPI
 OSInfoOSVendorImpl (
-                    IN CHAR8 *OSVendor
-                    )
+  IN CHAR8 *OSVendor
+  )
 {
   INTN Result;
+
   if (!OSVendor) {
     return;
   }
+
   Result = AsciiStrCmp (OSVendor, OS_INFO_VENDOR_NAME);
 
   if (Result == 0) {
- //   EfiLibNamedEventSignal (&gAppleOsLoadedNamedEventGuid);
+    // TODO: Fix this
+    // EfiLibNamedEventSignal (&gAppleOsLoadedNamedEventGuid);
   }
-
 }
 
-// mEfiOSInfo
 EFI_OS_INFO_PROTOCOL mEfiOSInfo = {
   EFI_OS_INFO_PROTOCOL_REVISION,
   OSInfoOSNameImpl,
   OSInfoOSVendorImpl
 };
 
+/** Entry point for EFI_OS_INFO_PROTOCOL implementation.
 
-/****************************************************************
- * Entry point
- ***************************************************************/
+  @param[in] ImageHandle  The firmware allocated handle for the EFI image.
+  @param[in] SystemTable  A pointer to the EFI System Table.
 
-/**
- * SMCHelper entry point. Installs AppleOSInfoProtocol.
- */
+  @retval EFI_SUCCESS          The operation completed successfully.
+  @retval EFI_ALREADY_STARTED  The protocol has already been installed.
+**/
 EFI_STATUS
 EFIAPI
-OSInfoEntrypoint (
-                     IN EFI_HANDLE           ImageHandle,
-                     IN EFI_SYSTEM_TABLE		*SystemTable
-                     )
+OSInfoEntryPoint (
+  IN EFI_HANDLE       ImageHandle,
+  IN EFI_SYSTEM_TABLE *SystemTable
+  )
 {
-  EFI_STATUS					Status; // = EFI_SUCCESS;
-  EFI_BOOT_SERVICES*			gBS;
-
-  gBS				= SystemTable->BootServices;
+  EFI_STATUS Status;
 
   Status = gBS->InstallMultipleProtocolInterfaces (
-                                                   &mHandle,
-                                                   &gEfiOSInfoProtocolGuid,
-                                                   &mEfiOSInfo,
-                                                   NULL
-                                                   );
+                  &ImageHandle,
+                  &gEfiOSInfoProtocolGuid,
+                  &mEfiOSInfo,
+                  NULL
+                  );
 
   return Status;
 }
