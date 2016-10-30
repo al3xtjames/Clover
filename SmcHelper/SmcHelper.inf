@@ -19,32 +19,19 @@
   ENTRY_POINT    = SmcHelperEntryPoint
 
 [Packages]
+  ApplePkg/ApplePkg.dec
   Clover/CloverPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  ApplePkg/ApplePkg.dec
 
 [LibraryClasses]
-  BaseLib
-  UefiLib
-  UefiDriverEntryPoint
-  UefiBootServicesTableLib
-  UefiRuntimeServicesTableLib
-  BaseMemoryLib
-  MemoryAllocationLib
-  DebugLib
-  PrintLib
   MemLogLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
 
 [Sources]
   SmcHelper.c
 
-[Guids]
-
 [Protocols]
-  gAppleSmcIoProtocolGuid ## PRODUCES and CONSUMES
-
-[BuildOptions]
-# MSFT:*_*_*_ASM_FLAGS = /Fl
-  XCODE:*_*_*_CC_FLAGS = -Os
-  GCC:*_*_*_CC_FLAGS = -O0
+  gAppleSmcIoProtocolGuid ## PRODUCES
