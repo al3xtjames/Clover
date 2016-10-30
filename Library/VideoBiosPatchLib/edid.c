@@ -1,10 +1,10 @@
 /*
  *  edid.c
- *  
+ *
  *
  *  Created by Evan Lojewski on 12/1/09.
  *  Copyright 2009. All rights reserved.
- *  
+ *
  *	Slice 2010, based on Joblo works
  */
 
@@ -19,7 +19,6 @@
 
 #define FBMON_FIX_HEADER 1
 #define FBMON_FIX_INPUT  2
-#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
 #define DEFAULT_SCREEN_WIDTH 1024
 #define DEFAULT_SCREEN_HEIGHT 600
@@ -57,7 +56,7 @@ INT32 edid_compare(UINT8 *edid1, UINT8 *edid2)
 	manufacturer1[1] = ((block[0] & 0x03) << 3) + ((block[1] & 0xe0) >> 5) + '@';
 	manufacturer1[2] = (block[1] & 0x1f) + '@';
 	manufacturer1[3] = 0;
-	
+
 	block = edid2 + ID_MANUFACTURER_NAME;
 	manufacturer2[0] = ((block[0] & 0x7c) >> 2) + '@';
 	manufacturer2[1] = ((block[0] & 0x03) << 3) + ((block[1] & 0xe0) >> 5) + '@';
@@ -68,7 +67,7 @@ INT32 edid_compare(UINT8 *edid1, UINT8 *edid2)
 		if(manufacturer1[x] == manufacturer2[x])
 			result++;
 	}
-	
+
 	return result;
 }
  */
@@ -79,14 +78,14 @@ INT32 check_edid(UINT8 *edid)
 	//UINT8 *b;
 	UINT32 model;
 	//INT32 i, fix = 0, ret = 0;
-	
+
 	manufacturer[0] = ((block[0] & 0x7c) >> 2) + '@';
 	manufacturer[1] = ((block[0] & 0x03) << 3) +
 	((block[1] & 0xe0) >> 5) + '@';
 	manufacturer[2] = (block[1] & 0x1f) + '@';
 	manufacturer[3] = 0;
 	model = block[2] + (block[3] << 8);
-//	
+//
 	for (i = 0; i < (int)ARRAY_SIZE(brokendb); i++) {
 		if (!strncmp((const CHAR8 *)manufacturer, brokendb[i].manufacturer, 4) &&
 			brokendb[i].model == model) {
@@ -97,7 +96,7 @@ INT32 check_edid(UINT8 *edid)
 			break;
 		}
 	}
-	
+
 	switch (fix) {
 		case FBMON_FIX_HEADER:
 			for (i = 0; i < 8; i++) {
@@ -113,7 +112,7 @@ INT32 check_edid(UINT8 *edid)
 				ret = fix;
 			break;
 	}
-//	
+//
 	return 0; //ret;
 }
 */
@@ -122,7 +121,7 @@ INT32 check_edid(UINT8 *edid)
 static VOID fix_edid(UINT8 *edid, INT32 fix)
 {
 	UINT8 *b;
-	
+
 	switch (fix) {
 		case FBMON_FIX_HEADER:
 			DBG(" EDID: trying a header reconstruct\n");
@@ -142,19 +141,19 @@ INT32 edid_checksum(UINT8 *edid)
 {
 	UINT8 i, csum = 0, all_null = 0;
 	INT32 err = 0;
-	
+
 	for (i = 0; i < EDID_LENGTH; i++) {
 		csum += edid[i];
 		all_null |= edid[i];
 	}
-	
+
 	if (csum == 0x00 && all_null) {
 		/* checksum passed, everything's good */
 		err = 1;
 	} else {
 		DBG(" edid_checksum error ");
 	}
-	
+
 	return err;
 }
 
@@ -163,22 +162,22 @@ INT32 edid_checksum(UINT8 *edid)
 static INT32 edid_check_header(UINT8 *edid)
 {
 	INT32 i, err = 1;
-	
+
 	for (i = 0; i < 8; i++) {
 		if (edid[i] != edid_v1_header[i])
 			err = 0;
 	}
-	
+
 	if (err == 0) {
 		DBG(" edid_check_header error ");
 	}
-	
+
 	return err;
 }
 //------------------------------------------------------------------------
 BOOLEAN verifyEDID(UINT8 *edid)
 {
-	if (edid == NULL || !edid_checksum(edid) ||	!edid_check_header(edid)) 
+	if (edid == NULL || !edid_checksum(edid) ||	!edid_check_header(edid))
 	{
 		return FALSE;
 	}
@@ -199,15 +198,15 @@ INT32 fb_parse_edid(struct EDID *edid, edid_mode* var)  //(struct EDID *edid, UI
 {
 	INT32 i;
 	UINT8 *block;
-	
+
 	DBG(" Parse Edid:");
 	if(!verifyEDID((UINT8 *)edid)) {
 		DBG(" error\n");
 		return 0;
 	}
-	
+
 	block = (UINT8 *)edid + DETAILED_TIMING_DESCRIPTIONS_START; //54
-	
+
 	for (i = 0; i < 4; i++, block += DETAILED_TIMING_DESCRIPTION_SIZE) {
 		if (edid_is_timing_block(block)) {
 			DBG(" descriptor block %d is timing descriptor ", i);
@@ -239,7 +238,7 @@ INT32 fb_parse_edid(struct EDID *edid, edid_mode* var)  //(struct EDID *edid, UI
 			var->pixclock = PIXEL_CLOCK;
 			var->pixclock /= 1000;
 			var->pixclock = KHZ2PICOS(var->pixclock);
-			
+
 			if (HSYNC_POSITIVE)
 				var->sync |= FB_SYNC_HOR_HIGH_ACT;
 			if (VSYNC_POSITIVE)
@@ -260,22 +259,22 @@ VOID getResolution(UINT32* x, UINT32* y, UINT32* bp)
 	{
 		xResolution = val;
 	}
-	
+
 	if(getIntForKey(kScreenHeight, &val, &bootInfo->chameleonConfig))
 	{
 		yResolution = val;
 	}
 */
-	
+
 			edid_mode mode;
 		CHAR8* edidInfo = readEDID();
-		
+
 		if(!edidInfo) return;
 		// TODO: check *all* resolutions reported and either use the highest, or the native resolution (if there is a flag for that)
-		//xResolution =  edidInfo[56] | ((edidInfo[58] & 0xF0) << 4);  
-		//yResolution = edidInfo[59] | ((edidInfo[61] & 0xF0) << 4); 
+		//xResolution =  edidInfo[56] | ((edidInfo[58] & 0xF0) << 4);
+		//yResolution = edidInfo[59] | ((edidInfo[61] & 0xF0) << 4);
 		//Slice - done here
-		
+
 		if(fb_parse_edid((struct EDID *)edidInfo, &mode) == 0)
 		{
 			xResolution = DEFAULT_SCREEN_WIDTH;
@@ -289,25 +288,25 @@ VOID getResolution(UINT32* x, UINT32* y, UINT32* bp)
 		/*
 		 0x00 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF 0x00 0x32 0x0C
 		 0x00 0xDF 0x00 0x00 0x00 0x00 0xFF 0xFF 0xFF 0x00
-		 0x0C 0xDF 0x00 0x00 0x12 0x03 0x21 0x78 0xE9 0x99 
-		 0x53 0x28 0xFF 0xFF 0x32 0xDF 0x00 0x12 0x80 0x78 
-		 0xD5 0x53 0x26 0x00 0x01 0x01 0x01 0x01 0xFF 0x00 
-		 0xDF 0x00 0x03 0x78 0x99 0x28 0x00 0x01 0x01 0x01 
-		 0x01 0x21 0x84 0x20 0xFF 0x0C 0x00 0x03 0x0A 0x53 
+		 0x0C 0xDF 0x00 0x00 0x12 0x03 0x21 0x78 0xE9 0x99
+		 0x53 0x28 0xFF 0xFF 0x32 0xDF 0x00 0x12 0x80 0x78
+		 0xD5 0x53 0x26 0x00 0x01 0x01 0x01 0x01 0xFF 0x00
+		 0xDF 0x00 0x03 0x78 0x99 0x28 0x00 0x01 0x01 0x01
+		 0x01 0x21 0x84 0x20 0xFF 0x0C 0x00 0x03 0x0A 0x53
 		 0x54 0x01 0x01 0x01 0xDE 0x84 0x56 0x00 0xA0 0x30
-		 0xFF 0xDF 0x12 0x78 0x53 0x00 0x01 0x01 0x01 0x84 
+		 0xFF 0xDF 0x12 0x78 0x53 0x00 0x01 0x01 0x01 0x84
 		 0x00 0x18 0x84 0x00 0x00 0x57 0xFF 0x00 0x80 0x99
 		 0x54 0x01 0x01 0x21 0x20 0x00 0x50 0x00 0x00 0x35
 		 0x57 0xFE 0x00 0x00 0x78 0x28 0x01 0x01 0x21 0x20
-		 0x18 0x30 0x00 0x57 0x34 0xFE 0xAA 0x9A 
+		 0x18 0x30 0x00 0x57 0x34 0xFE 0xAA 0x9A
 
 		 */
-		
+
 		//DBG("H Active = %d ", edidInfo[56] | ((edidInfo[58] & 0xF0) << 4) );
 		//DBG("V Active = %d \n", edidInfo[59] | ((edidInfo[61] & 0xF0) << 4) );
-		
+
 		FreePool( edidInfo );
-		
+
 		//if(!xResolution) xResolution = DEFAULT_SCREEN_WIDTH;
 		//if(!yResolution) yResolution = DEFAULT_SCREEN_HEIGHT;
 
@@ -316,7 +315,7 @@ VOID getResolution(UINT32* x, UINT32* y, UINT32* bp)
 	*x  = xResolution;
 	*y  = yResolution;
 	*bp = bpResolution;
-  
+
   DBG("Best mode: %dx%dx%d\n", *x, *y, *bp);
 }
 
