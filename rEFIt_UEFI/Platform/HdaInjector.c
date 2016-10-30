@@ -58,7 +58,7 @@ STATIC CONST HDA_CONTROLLER mHdaControllerTable[] = {
   { 0x8086, 0x8D20, "Intel C610 Series/X99 Chipset Family HDA Controller" },
   { 0x8086, 0x8D21, "Intel C610 Series/X99 Chipset Family HDA Controller" },
   { 0x8086, 0xA170, "Intel 100 Series/C230 Series Chipset Family HDA Controller" },
-  { 0 }
+  { 0, 0, NULL }
 };
 
 STATIC HDA_PROPERTY mHdaPropertyTable[] = {
@@ -67,7 +67,7 @@ STATIC HDA_PROPERTY mHdaPropertyTable[] = {
   { L"MaximumBootBeepVolume", 0, 1 },
   { L"PinConfigurations",     0, 1 },
   { L"platformFamily",        0, 1 },
-  { 0 }
+  { NULL, 0, 0 }
 };
 
 /** Retrieves the name of a High Definition Audio (HDA) controller.
@@ -138,18 +138,22 @@ InjectHdaProperties (
     FileDevicePathToStr (DevicePath)
     );
 
+  FreePool (HdaControllerName);
+
   if (IsHdmiAudio) {
     ++HdmiControllerCount;
     AsciiSPrint (HdaGfxString, 10, "onboard-%d", HdmiControllerCount);
     AsciiStrCpyS (mHdaPropertyTable[0].Value, 10, HdaGfxString);
   }
 
-  for (Index = 0; mHdaPropertyTable[Index].Name != 0; ++Index) {
+  FreePool (HdaGfxString);
+
+  for (Index = 0; mHdaPropertyTable[Index].Name != NULL; ++Index) {
     //
     // Only inject properties with FLAG_HDMI_AUDIO flag for GPU HDMI/DP audio controllers.
     //
     if (((IsHdmiAudio) && !(mHdaPropertyTable[Index].Flags & FLAG_HDMI_AUDIO)) ||
-      ((!IsHdmiAudio) && (mHdaPropertyTable[Index].Flags & FLAG_HDMI_AUDIO))) {
+     ((!IsHdmiAudio) && (mHdaPropertyTable[Index].Flags & FLAG_HDMI_AUDIO))) {
       continue;
     }
 
