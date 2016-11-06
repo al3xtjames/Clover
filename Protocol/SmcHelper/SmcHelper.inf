@@ -22,9 +22,9 @@
   ApplePkg/ApplePkg.dec
   Clover/CloverPkg.dec
   MdePkg/MdePkg.dec
-  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
+  BaseMemoryLib
   MemLogLib
   MemoryAllocationLib
   UefiBootServicesTableLib
