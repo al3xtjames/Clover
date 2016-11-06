@@ -14,7 +14,7 @@
 
 #include <Protocol/UgaDraw.h>
 #include <Protocol/AppleSmcIo.h>
-#include <Protocol/AppleImageCodecProtocol.h>
+#include <Protocol/AppleImageCodec.h>
 #include <Protocol/AppleKeyState.h>
 #include <Protocol/OSInfo.h>
 //#include <Protocol/AppleEvent.h>
@@ -97,23 +97,25 @@ APPLE_IMAGE_CODEC_PROTOCOL *gAppleImageCodec;
 
 EFI_STATUS
 EFIAPI
-OvrRecognizeImageData (
-  IN APPLE_IMAGE_CODEC_PROTOCOL* This,
+OvrRecognizeImageData (//IN APPLE_IMAGE_CODEC_PROTOCOL* This,
                     VOID         *ImageBuffer,
-                    UINTN         ImageSize
+                    UINTN         ImageSize,
+                    OUT VOID    **OutBuffer
                     )
 {
   EFI_STATUS				Status;
 
-  Status = gOrgAppleImageCodec.RecognizeImageData(This, ImageBuffer, ImageSize);
-  PRINT("->RecognizeImageData(%p, 0x%x), sign=%4x, status=%r\n", ImageBuffer, ImageSize,
-        ImageBuffer?(*(UINT32*)ImageBuffer):0, Status);
+  Status = gOrgAppleImageCodec.RecognizeImageData(ImageBuffer, ImageSize, OutBuffer);
+  if (EFI_ERROR(Status)) {
+    PRINT("->AppleImageCodec.RecognizeImageData(%p, 0x%x, %p), sign=%4x, status=%r\n", ImageBuffer, ImageSize, OutBuffer,
+          ImageBuffer?(*(UINT32*)ImageBuffer):0, Status);
+  }
   return Status;
 }
 
 EFI_STATUS
 EFIAPI
-OvrGetImageDims (IN APPLE_IMAGE_CODEC_PROTOCOL* This,
+OvrGetImageDimensions (//IN APPLE_IMAGE_CODEC_PROTOCOL* This,
               VOID          *ImageBuffer,
               UINTN         ImageSize,
               UINT32         *ImageWidth,
@@ -122,44 +124,57 @@ OvrGetImageDims (IN APPLE_IMAGE_CODEC_PROTOCOL* This,
 {
   EFI_STATUS				Status;
 
-  Status = gOrgAppleImageCodec.GetImageDims(This, ImageBuffer, ImageSize, ImageWidth, ImageHeight);
-  PRINT("->GetImageDims(%p, 0x%x, %p, %p), status=%r\n", ImageBuffer, ImageSize, ImageWidth, ImageHeight, Status);
-  if (!EFI_ERROR(Status)) {
-    PRINT("--> ImageWidth=%d, ImageHeight=%d\n", ImageWidth?*ImageWidth:0, ImageHeight?*ImageHeight:0);
+  Status = gOrgAppleImageCodec.GetImageDimensions(ImageBuffer, ImageSize, ImageWidth, ImageHeight);
+  if (EFI_ERROR(Status)) {
+    PRINT("->AppleImageCodec.GetImageDimensions(%p, 0x%x, %p, %p), status=%r\n",
+          ImageBuffer, ImageSize, ImageWidth, ImageHeight, Status);
+//    PRINT("--> ImageWidth=%d, ImageHeight=%d\n", ImageWidth?*ImageWidth:0, ImageHeight?*ImageHeight:0);
   }
   return Status;
 }
 
 EFI_STATUS
 EFIAPI
-OvrDecodeImageData (IN APPLE_IMAGE_CODEC_PROTOCOL* This,
+OvrDecodeImageData (//IN APPLE_IMAGE_CODEC_PROTOCOL* This,
                  VOID          *ImageBuffer,
                  UINTN         ImageSize,
                  EFI_UGA_PIXEL **RawImageData,
-                 UINTN         *RawImageDataSize
+                 UINT64         *RawImageDataSize
                  )
 {
   EFI_STATUS				Status;
 
-  Status = gOrgAppleImageCodec.DecodeImageData(This, ImageBuffer, ImageSize, RawImageData, RawImageDataSize);
-  PRINT("->DecodeImageData(%p, 0x%x, %p, %p), status=%r\n", ImageBuffer, ImageSize, RawImageData, RawImageDataSize, Status);
-  if (!EFI_ERROR(Status)) {
-    PRINT("--> RawImageDataSize=%d\n", RawImageDataSize?*RawImageDataSize:0);
+  Status = gOrgAppleImageCodec.DecodeImageData(ImageBuffer, ImageSize, RawImageData, RawImageDataSize);
+  if (EFI_ERROR(Status)) {
+    PRINT("->AppleImageCodec.DecodeImageData(%p, 0x%x, %p, %p), status=%r\n",
+          ImageBuffer, ImageSize, RawImageData, RawImageDataSize, Status);
+ // if (!EFI_ERROR(Status)) {
+ //   PRINT("--> RawImageDataSize=%d\n", RawImageDataSize?*RawImageDataSize:0);
   }
   return Status;
 }
 
 EFI_STATUS
 EFIAPI
-OvrUnknown (IN APPLE_IMAGE_CODEC_PROTOCOL* This,
-                       VOID         *ImageBuffer,
-                       UINTN         ImageSize
-                       )
+OvrAICUnknown1 (VOID* ImageBuffer, UINTN Param1, UINTN Param2, UINTN Param3)
+
 {
   EFI_STATUS				Status;
 
-  Status = gOrgAppleImageCodec.Unknown(This, ImageBuffer, ImageSize);
-  PRINT("->UnknownCall(%p, 0x%x), status=%r\n", ImageBuffer, ImageSize, Status);
+  Status = gOrgAppleImageCodec.Unknown1(ImageBuffer, Param1, Param2, Param3);
+  PRINT("->AppleImageCodec.Unknown1(%p, 0x%x, 0x%x, 0x%x), status=%r\n", ImageBuffer, Param1, Param2, Param3);
+  return Status;
+}
+
+EFI_STATUS
+EFIAPI
+OvrAICUnknown2 (VOID* ImageBuffer, UINTN Param1, UINTN Param2, UINTN Param3)
+
+{
+  EFI_STATUS				Status;
+
+  Status = gOrgAppleImageCodec.Unknown2(ImageBuffer, Param1, Param2, Param3);
+  PRINT("->AppleImageCodec.Unknown2(%p, 0x%x, 0x%x, 0x%x), status=%r\n", ImageBuffer, Param1, Param2, Param3);
   return Status;
 }
 
@@ -169,7 +184,7 @@ OvrAppleImageCodec(VOID)
 {
 	EFI_STATUS				Status;
 
-	PRINT("Overriding AppleImageCodec ...\n");
+//	PRINT("Overriding AppleImageCodec ...\n");
 
 	// Locate AppleSMC protocol
 	Status = gBS->LocateProtocol(&gAppleImageCodecProtocolGuid, NULL, (VOID **) &gAppleImageCodec);
@@ -183,9 +198,10 @@ OvrAppleImageCodec(VOID)
 
 	// Override with our implementation
 	gAppleImageCodec->RecognizeImageData = OvrRecognizeImageData;
-	gAppleImageCodec->GetImageDims = OvrGetImageDims;
+	gAppleImageCodec->GetImageDimensions = OvrGetImageDimensions;
 	gAppleImageCodec->DecodeImageData = OvrDecodeImageData;
-  gAppleImageCodec->Unknown = OvrUnknown;
+  gAppleImageCodec->Unknown1 = OvrAICUnknown1;
+  gAppleImageCodec->Unknown2 = OvrAICUnknown2;
 
 	PRINT("AppleImageCodec overriden!\n");
 	return EFI_SUCCESS;
