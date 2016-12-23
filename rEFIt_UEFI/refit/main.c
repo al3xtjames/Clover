@@ -2002,10 +2002,10 @@ RefitMain (IN EFI_HANDLE           ImageHandle,
       Now.Day, Now.Month, Now.Year, Now.Hour, Now.Minute, Now.Second, Now.TimeZone);
   }
   //MsgLog("Starting Clover rev %s on %s EFI\n", FIRMWARE_REVISION, gST->FirmwareVendor);
-  MsgLog("Starting %a on %s EFI\n", REVISION_STR, gST->FirmwareVendor);
+  MsgLog("Starting %a on %s UEFI\n", REVISION_STR, gST->FirmwareVendor);
 
   #ifdef BUILDINFOS_STR
-    DBG("Build with: [%a]\n", BUILDINFOS_STR);
+    DBG("Built with: %a\n", BUILDINFOS_STR);
   #endif // BUILDINFOS_STR
 
   Status = InitRefitLib(gImageHandle);
