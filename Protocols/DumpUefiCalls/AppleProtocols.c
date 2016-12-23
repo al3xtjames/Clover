@@ -17,7 +17,7 @@
 //#include <EfiImageFormat.h>
 #include <Protocol/UgaDraw.h>
 #include <Protocol/AppleSMC.h>
-#include <Protocol/AppleImageCodecProtocol.h>
+#include <Protocol/AppleImageCodec.h>
 #include <Protocol/AppleKeyState.h>
 #include <Protocol/OSInfo.h>
 #include <Protocol/AppleGraphConfig.h>
@@ -292,7 +292,7 @@ OvrRecognizeImageData (//IN APPLE_IMAGE_CODEC_PROTOCOL* This,
 
 EFI_STATUS
 EFIAPI
-OvrGetImageDims (//IN APPLE_IMAGE_CODEC_PROTOCOL* This,
+OvrGetImageDimensions (//IN APPLE_IMAGE_CODEC_PROTOCOL* This,
               VOID          *ImageBuffer,
               UINTN         ImageSize,
               UINT32         *ImageWidth,
@@ -301,9 +301,9 @@ OvrGetImageDims (//IN APPLE_IMAGE_CODEC_PROTOCOL* This,
 {
   EFI_STATUS				Status;
   
-  Status = gOrgAppleImageCodec.GetImageDims(ImageBuffer, ImageSize, ImageWidth, ImageHeight);
+  Status = gOrgAppleImageCodec.GetImageDimensions(ImageBuffer, ImageSize, ImageWidth, ImageHeight);
   if (EFI_ERROR(Status)) {
-    PRINT("->AppleImageCodec.GetImageDims(%p, 0x%x, %p, %p), status=%r\n",
+    PRINT("->AppleImageCodec.GetImageDimensions(%p, 0x%x, %p, %p), status=%r\n",
           ImageBuffer, ImageSize, ImageWidth, ImageHeight, Status);
 //    PRINT("--> ImageWidth=%d, ImageHeight=%d\n", ImageWidth?*ImageWidth:0, ImageHeight?*ImageHeight:0);
   }
@@ -316,7 +316,7 @@ OvrDecodeImageData (//IN APPLE_IMAGE_CODEC_PROTOCOL* This,
                  VOID          *ImageBuffer,
                  UINTN         ImageSize,
                  EFI_UGA_PIXEL **RawImageData,
-                 UINT32         *RawImageDataSize
+                 UINT64         *RawImageDataSize
                  )
 {
   EFI_STATUS				Status;
@@ -375,7 +375,7 @@ OvrAppleImageCodec(VOID)
 	
 	// Override with our implementation
 	gAppleImageCodec->RecognizeImageData = OvrRecognizeImageData;
-	gAppleImageCodec->GetImageDims = OvrGetImageDims;
+	gAppleImageCodec->GetImageDimensions = OvrGetImageDimensions;
 	gAppleImageCodec->DecodeImageData = OvrDecodeImageData;
   gAppleImageCodec->Unknown1 = OvrAICUnknown1;
   gAppleImageCodec->Unknown2 = OvrAICUnknown2;

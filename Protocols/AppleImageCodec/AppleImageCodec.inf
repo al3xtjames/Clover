@@ -1,57 +1,45 @@
 ## @file
+# Implementation of APPLE_IMAGE_CODEC_PROTOCOL.
 #
-# Apple image codec for png files.
+# Copyright (C) 2005 - 2016, Apple Inc. All rights reserved
+# Portions copyright (C) 2012 Tiamo. All rights reserved.<BR>
+# Portions copyright (C) 2014 Damir Mazar. All rights reserved.<BR>
+# Portions copyright (C) 2016 Sergey Slice. All rights reserved.<BR>
+#
+# This program and the accompanying materials have not been licensed.
+# Neither is its usage, its redistribution, in source or binary form,
+# licensed, nor implicitly or explicitly permitted, except when
+# required by applicable law.
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+# OR CONDITIONS OF ANY KIND, either express or implied.
+#
 #
 ##
 
 [Defines]
-  INF_VERSION                    = 0x00010005
-  BASE_NAME                      = AppleImageCodec
-  FILE_GUID                      = 259739d0-6c81-43d6-bf5e-e32a659c34f9
-  MODULE_TYPE                    = UEFI_DRIVER
-  VERSION_STRING                 = 1.0
-  ENTRY_POINT                    = AppleImageCodecEntrypoint
-#
-# The following information is for reference only and not required by the build tools.
-#
-#  VALID_ARCHITECTURES           = X64|IA32
-#
+  INF_VERSION    = 0x00010005
+  BASE_NAME      = AppleImageCodec
+  FILE_GUID      = 259739D0-6C81-43D6-BF5E-E32A659C34F9
+  MODULE_TYPE    = UEFI_DRIVER
+  VERSION_STRING = 1.0
+  ENTRY_POINT    = AppleImageCodecMain
 
 [Packages]
-  MdePkg/MdePkg.dec
   Clover/CloverPkg.dec
+  MdePkg/MdePkg.dec
 
 [LibraryClasses]
-  BaseLib
-  UefiLib
-  BaseMemoryLib
   MemoryAllocationLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
-  DebugLib
-  
+
+[Protocols]
+  gAppleImageCodecProtocolGuid  ## PRODUCES
+
 [Sources]
   AppleImageCodec.c
-  picopng.h
   picopng.c
   load_bmp.c
   load_icns.c
-
-
-[Guids]
-
-
-[Protocols]
-  gAppleImageCodecProtocolGuid
-
-
-[BuildOptions]
-#  MSFT:*_*_*_ASM_FLAGS = /Fl
-  INTEL:DEBUG_*_*_CC_FLAGS   =
-  INTEL:RELEASE_*_*_CC_FLAGS = /D MDEPKG_NDEBUG
-  GCC:DEBUG_*_*_CC_FLAGS     =
-  GCC:RELEASE_*_*_CC_FLAGS   = -DMDEPKG_NDEBUG
-  MSFT:DEBUG_*_*_CC_FLAGS    =
-  MSFT:RELEASE_*_*_CC_FLAGS  = /D MDEPKG_NDEBUG
-  XCODE:DEBUG_*_*_CC_FLAGS   =
-  XCODE:RELEASE_*_*_CC_FLAGS = -DMDEPKG_NDEBUG
