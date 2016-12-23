@@ -2065,7 +2065,7 @@ EFI_STATUS PatchACPI(IN REFIT_VOLUME *Volume, CHAR8 *OSVersion)
     //should correct headers if needed and if asked
     PatchTableHeader((EFI_ACPI_DESCRIPTION_HEADER*)newFadt);
 
-    if (gSettings.smartUPS==TRUE) {
+    if (gSettings.smartUPS) {
       newFadt->PreferredPmProfile = 3;
     } else {
       newFadt->PreferredPmProfile = gMobile?2:1; //as calculated before
