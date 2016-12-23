@@ -320,8 +320,6 @@ SetVariablesForOSX(LOADER_ENTRY *Entry)
   if (gSettings.NvidiaWeb) {
     NvidiaWebValue = "1";
     SetNvramVariable(L"nvda_drv", &gEfiAppleBootGuid, Attributes, 2, (VOID*)NvidiaWebValue);
-  } else {
-    DeleteNvramVariable(L"nvda_drv", &gEfiAppleBootGuid);
   }
   
   if (!gDriversFlags.AptioMemFixLoaded) {
