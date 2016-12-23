@@ -129,8 +129,8 @@ INF  Clover/FileSystems/GrubFS/src/EXFAT.inf
 #INF  Clover/FileSystems/VBoxFsDxe/VBoxExt2.inf
 #INF  Clover/FileSystems/VBoxFsDxe/VBoxExt4.inf
 #INF  Clover/FileSystems/VBoxFsDxe/VBoxReiserFS.inf
-!if $(USE_APPLE_HFSPLUS_DRIVER) AND ( $(ARCH) == X64 )
-INF  RuleOverride=BINARY Clover/FileSystems/HFSPlus/HFSPlus.inf
+!if $(USE_APPLE_HFSPLUS_DRIVER)
+INF  RuleOverride=BINARY Clover/AppleHfsPlusBinPkg/HfsPlusDxe/HfsPlus.inf
 !else
 INF  Clover/FileSystems/VBoxFsDxe/VBoxHfs.inf
 !endif

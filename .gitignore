@@ -35,10 +35,6 @@
 /CloverPackage/CloverV2/drivers-Off/drivers64/
 /CloverPackage/CloverV2/drivers-Off/drivers64UEFI/
 
-# /FileSystems/HFSPlus/
-/FileSystems/HFSPlus/Ia32/
-/FileSystems/HFSPlus/X64/
-
 # /
 /Version.h
 /vers.txt
@@ -65,4 +61,3 @@ CloverUpdater.strings
 CloverPackage/CloverUpdater/src/*.lproj
 CloverPrefpane.strings
 CloverPackage/CloverPrefpane/src/*.lproj
-
