@@ -260,9 +260,8 @@ INF  Clover/CloverEFI/OsxAcpiTableDxe/AcpiTableDxe.inf
     # Misc
 INF  Clover/Protocols/MsgLog/MsgLog.inf
 
-    # Binary INF file to support toggle among different CPU architectures.
-#INF  RuleOverride=BINARY FatBinPkg/EnhancedFatDxe/Fat.inf
-INF  Clover/FileSystems/FatPkg/EnhancedFatDxe/Fat.inf
+    # FAT Filesystem Driver
+INF  FatPkg/EnhancedFatDxe/Fat.inf
 
 FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
 	SECTION RAW = Clover/Logo/Logo.bmp
