@@ -64,7 +64,6 @@ Headers collection for procedures
 #include <Protocol/efiConsoleControl.h>
 #include <Protocol/EmuVariableControl.h>
 #include <Protocol/AppleSMC.h>
-#include <Protocol/AppleImageCodecProtocol.h>
 
 #include "../refit/lib.h"
 #include "string.h"
