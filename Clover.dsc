@@ -441,7 +441,7 @@
   Clover/LegacyBios/Region2Dxe/LegacyRegion2Dxe.inf
 
   # Misc
-  Clover/FSInject/FSInject.inf
+  Clover/Protocols/FSInject/FSInject.inf
   Clover/Protocols/MsgLog/MsgLog.inf
   Clover/Protocols/SMCHelper/SMCHelper.inf
   Clover/Protocols/FirmwareVolume/FirmwareVolume.inf

@@ -59,7 +59,7 @@ Headers collection for procedures
 #include <Protocol/Variable.h>
 #include <Protocol/UgaDraw.h>
 
-#include <Protocol/FSInjectProtocol.h>
+#include <Protocol/FSInject.h>
 #include <Protocol/MsgLog.h>
 #include <Protocol/efiConsoleControl.h>
 #include <Protocol/EmuVariableControl.h>

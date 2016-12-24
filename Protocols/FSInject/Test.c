@@ -3,7 +3,7 @@
 Module Name:
 
   Test.c
-  
+
   For testing FSInject driver from shell.
 
   initial version - dmazar
@@ -16,7 +16,7 @@ Module Name:
 #include <Library/DebugLib.h>
 
 #include <Protocol/SimpleFileSystem.h>
-#include <Protocol/FSInjectProtocol.h>
+#include <Protocol/FSInject.h>
 
 #include "Test.h"
 
@@ -32,7 +32,7 @@ GetVolumeHandleWithDir(CHAR16 *SearchDir, OUT EFI_HANDLE *Handle)
 	EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *FS = NULL;
 	EFI_FILE_PROTOCOL				*FP = NULL;
 	EFI_FILE_PROTOCOL				*FP2 = NULL;
-	
+
 	// get all handles with EFI_SIMPLE_FILE_SYSTEM_PROTOCOL
 	Status = gBS->LocateHandleBuffer(ByProtocol, &gEfiSimpleFileSystemProtocolGuid, NULL, &HandlesSize, &Handles);
 	if (EFI_ERROR(Status)) {
@@ -40,8 +40,8 @@ GetVolumeHandleWithDir(CHAR16 *SearchDir, OUT EFI_HANDLE *Handle)
 		return Status;
 	}
 	Print(L"LocateHandleBuffer: %r, got %d handles\n", Status, HandlesSize);
-	
-	// find handle that contains SearchDir 
+
+	// find handle that contains SearchDir
 	for (Idx = 0; Idx < HandlesSize; Idx++) {
 		// get EFI_SIMPLE_FILE_SYSTEM_PROTOCOL first
 		Print(L"Trying handle: %p\n", Handles[Idx]);
@@ -83,16 +83,16 @@ InstallTestFSinjection(CHAR16 *TargetDir, CHAR16 *InjectionDir, IN FSI_STRING_LI
 	FSINJECTION_PROTOCOL		*FSInjection;
 	EFI_HANDLE					TargetHandle;
 	EFI_HANDLE					InjectionHandle;
-	
+
 	Print(L"InstallTestFSinjection ...\n");
-	
+
 	// first get FSINJECTION_PROTOCOL
 	Status = gBS->LocateProtocol(&gFSInjectProtocolGuid, NULL, (void **)&FSInjection);
 	if (EFI_ERROR(Status)) {
 		Print(L"- No FSINJECTION_PROTOCOL, Status = %r\n", Status);
 		return Status;
 	}
-	
+
 	// find our target volume
 	Status = GetVolumeHandleWithDir(TargetDir, &TargetHandle);
 	Print(L"GetVolumeHandleWithDir(%s): %p, Status = %r\n", TargetDir, TargetHandle, Status);
@@ -107,7 +107,7 @@ InstallTestFSinjection(CHAR16 *TargetDir, CHAR16 *InjectionDir, IN FSI_STRING_LI
 		Print(L"- No injection volume, Status = %r\n", Status);
 		return Status;
 	}
-	
+
 	// install FSInjection
 	Print(L"- FSInjection->Install(%X, %s, %X, %s) ...\n", TargetHandle, TargetDir, InjectionHandle, InjectionDir);
 	Status = FSInjection->Install(TargetHandle, TargetDir, InjectionHandle, InjectionDir, Blacklist, ForceLoadKexts);
@@ -115,7 +115,7 @@ InstallTestFSinjection(CHAR16 *TargetDir, CHAR16 *InjectionDir, IN FSI_STRING_LI
 		Print(L"- error FSInjection->Install(), Status = %r\n", Status);
 	}
 	return Status;
-	
+
 	/*
 	// let's try to uninstall FS protocol from target
 	Status = gBS->OpenProtocol(TargetHandle, &gEfiSimpleFileSystemProtocolGuid, &FS, gImageHandle, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
@@ -128,7 +128,7 @@ InstallTestFSinjection(CHAR16 *TargetDir, CHAR16 *InjectionDir, IN FSI_STRING_LI
 		Print(L"- error UninstallMultipleProtocolInterfaces for gEfiSimpleFileSystemProtocolGuid, Status = %r\n", Status);
 		return Status;
 	}
-	
+
 	return EFI_SUCCESS;
 	*/
 }
