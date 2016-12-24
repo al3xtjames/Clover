@@ -134,6 +134,23 @@
 	Platform/Hibernate.c
   Platform/Net.c
 
+  Platform/AppleProtocols.c
+
+  # Include/Driver/AppleGraphicsConfiguration.h
+  ../Protocols/AppleGraphicsConfiguration/AppleGraphicsConfiguration.c
+
+  # Include/Driver/EfiOSInfo.h
+  ../Protocols/EfiOSInfo/EfiOSInfo.c
+
+  # Include/Driver/FvInject.h
+  ../Protocols/FvInject/FvInject.c
+
+  # Include/Driver/SmcHelper.h
+  ../Protocols/SmcHelper/SmcHelper.c
+
+  # Include/Driver/UserInterfaceThemeDriver.h
+  ../Protocols/UserInterfaceThemeDriver/UserInterfaceThemeDriver.c
+
 [Packages]
 	Clover/CloverPkg.dec
     MdePkg/MdePkg.dec
@@ -191,10 +208,18 @@
   gEfiCertRsa2048Sha256Guid
   gEfiCertTypeRsa2048Sha256Guid
 
+  # Include/Driver/AppleFirmwareVolume.h
+  gAppleArrowCursorImageGuid
+
+  # Include/Driver/AppleFirmwareVolume.h
+  gAppleArrowCursor2xImageGuid
+
+  # Include/Driver/AppleFirmwareVolume.h
+  gAppleImageListGuid
+
+  # Include/Driver/EfiOSInfo.h
   gAppleOsLoadedNamedEventGuid
 
-
-[Ppis]
 
 [Protocols]
   gEfiComponentName2ProtocolGuid                          # ALWAYS_CONSUMED
@@ -243,25 +268,39 @@
   AppleDevicePropertyProtocolGuid
   gAppleScreenInfoProtocolGuid
   gEfiConsoleControlProtocolGuid
-  gAppleGraphConfigProtocolGuid
   gEfiLegacyBiosProtocolGuid
   gEfiTimerArchProtocolGuid
-  gAppleImageCodecProtocolGuid
   gAppleEventProtocolGuid
-  gEfiOSInfoProtocolGuid
   gEfiKeyboardInfoProtocolGuid
 
-  gFSInjectProtocolGuid
   gMsgLogProtocolGuid
   gEfiPlatformDriverOverrideProtocolGuid
   gEmuVariableControlProtocolGuid
 
+  # Include/Driver/AppleGraphicsConfiguration.h
+  gAppleGraphicsConfigurationProtocolGuid
+
+  # Include/Driver/AppleImageCodec.h
+  # gAppleImageCodecProtocolGuid
+
+  # Include/Driver/SmcHelper.h
   gAppleSmcIoProtocolGuid
+
+  # Include/Driver/UserInterfaceThemeDriver.h
+  gAppleUserInterfaceThemeProtocolGuid
+
+  # Include/Driver/FvInject.h
+  gEfiFirmwareVolumeProtocolGuid
+
+  # Include/Driver/EfiOSInfo.h
+  gEfiOSInfoProtocolGuid
+
+  # Include/Driver/FSInject.h
+  gFSInjectProtocolGuid
+
 
 [FeaturePcd]
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
-
-[Pcd]
 
 [BuildOptions]
 #  XCODE:*_*_*_CC_FLAGS = -fsigned-char -O2 -fno-common

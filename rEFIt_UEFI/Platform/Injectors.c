@@ -18,7 +18,6 @@
  *   Header Files                                                               *
  *******************************************************************************/
 #include "Platform.h"
-#include <Protocol/OSInfo.h>
 #include <Protocol/KeyboardInfo.h>
 
 EFI_GUID gDevicePropertiesGuid = {
@@ -30,9 +29,6 @@ EFI_GUID gAppleScreenInfoProtocolGuid = {
 }; */
 // gEfiKeyboardInfoProtocolGuid
 // {0xE82A0A1E, 0x0E4D, 0x45AC, {0xA6, 0xDC, 0x2A, 0xE0, 0x58, 0x00, 0xD3, 0x11}}
-
-// C5C5DA95-7D5C-45E6-B2F1-3FD52BB10077 - EfiOSInfo
-// 03622D6D-362A-4E47-9710-C238B23755C1 - GraphConfig
 
 extern EFI_GUID gAppleScreenInfoProtocolGuid;
 
@@ -233,53 +229,6 @@ EFI_INTERFACE_SCREEN_INFO mScreenInfo=
 	GetScreenInfo
 };
 
-#define EFI_OS_INFO_PROTOCOL_REVISION  0x01
-
-// OS_INFO_VENDOR_NAME
-#define OS_INFO_VENDOR_NAME  "Apple Inc."
-
-extern EFI_GUID gAppleOsLoadedNamedEventGuid;
-// OSInfoOSNameImpl
-VOID
-EFIAPI
-OSInfoOSNameImpl (
-                  OUT CHAR8 *OSName
-                  )
-{
-  // for future developers
-  // this variable can be used at OnExitBoootServices,
-  // as it will be set by boot.efi
-  BootOSName = AllocateCopyPool(AsciiStrLen(OSName) + 1, (VOID*)OSName);
-
-  EfiNamedEventSignal (&gAppleOsLoadedNamedEventGuid);
-}
-
-// OSInfoOSVendorImpl
-VOID
-EFIAPI
-OSInfoOSVendorImpl (
-                    IN CHAR8 *OSVendor
-                    )
-{
-  // never used as never called
-  INTN Result;
-  if (!OSVendor) {
-    return;
-  }
-  Result = AsciiStrCmp (OSVendor, OS_INFO_VENDOR_NAME);
-  
-  if (Result == 0) {
-    //   EfiLibNamedEventSignal (&gAppleOsLoadedNamedEventGuid);
-  }
-}
-
-EFI_OS_INFO_PROTOCOL mEfiOSInfo = {
-  EFI_OS_INFO_PROTOCOL_REVISION,
-  OSInfoOSNameImpl,
-  OSInfoOSVendorImpl,
-  NULL
-};
-
 EFI_STATUS
 EFIAPI
 UsbKbGetKeyboardDeviceInfo (
@@ -314,8 +263,6 @@ SetPrivateVarProto(VOID)
   /*Status = */gBS->InstallMultipleProtocolInterfaces (&gImageHandle,
                                                        &gAppleScreenInfoProtocolGuid,
                                                        &mScreenInfo, 
-                                                       &gEfiOSInfoProtocolGuid,
-                                                       &mEfiOSInfo,
                                                        &gEfiKeyboardInfoProtocolGuid,
                                                        &mKeyboardInfo,
                                                        NULL

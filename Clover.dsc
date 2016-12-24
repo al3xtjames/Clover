@@ -445,6 +445,7 @@
   Clover/Protocols/AppleImageCodec/AppleImageCodec.inf
   Clover/Protocols/AppleKeyAggregator/AppleKeyAggregator.inf
   Clover/Protocols/AppleKeyFeeder/AppleKeyFeeder.inf
+  Clover/Protocols/EfiOSInfo/EfiOSInfo.inf
   Clover/Protocols/FSInject/FSInject.inf
   Clover/Protocols/FvInject/FvInject.inf
   Clover/Protocols/HashServiceFix/HashServiceFix.inf
