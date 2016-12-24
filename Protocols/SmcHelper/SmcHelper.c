@@ -404,16 +404,27 @@ SmcHelperMain (
   IN EFI_SYSTEM_TABLE *SystemTable
   )
 {
+  VOID       *Interface;
   EFI_STATUS Status;
 
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &ImageHandle,
+  Status = gBS->LocateProtocol (
                   &gAppleSmcIoProtocolGuid,
-                  &mSmcHelper,
-                  NULL
+                  NULL,
+                  &Interface
                   );
 
-  DBG ("Installed APPLE_SMC_IO_PROTOCOL, Status = %r\n", Status);
+  if (EFI_ERROR (Status)) {
+    Status = gBS->InstallProtocolInterface (
+                    &ImageHandle,
+                    &gAppleSmcIoProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    (VOID **)&mSmcHelper
+                    );
+
+    DBG ("Installed APPLE_SMC_IO_PROTOCOL, Status = %r\n", Status);
+  } else {
+    Status = EFI_ALREADY_STARTED;
+  }
 
   return Status;
 }

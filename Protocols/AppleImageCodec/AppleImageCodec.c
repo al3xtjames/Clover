@@ -243,18 +243,29 @@ AppleImageCodecMain (
   IN EFI_SYSTEM_TABLE *SystemTable
 )
 {
+  VOID       *Interface;
   EFI_STATUS Status;
 
   //
   // Install instance of Apple image codec protocol for
   // PNG files
   //
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &ImageHandle,
+  Status = gBS->LocateProtocol (
                   &gAppleImageCodecProtocolGuid,
-                  &mAppleImageCodec,
-                  NULL
+                  NULL,
+                  &Interface
                   );
+
+  if (EFI_ERROR (Status)) {
+    Status = gBS->InstallProtocolInterface (
+                    &ImageHandle,
+                    &gAppleImageCodecProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    (VOID **)&mAppleImageCodec
+                    );
+  } else {
+    Status = EFI_ALREADY_STARTED;
+  }
 
   if (EFI_ERROR (Status)) {
     DBG ("AppleImageCodec: error installing protocol, Status = %r\n", Status);
