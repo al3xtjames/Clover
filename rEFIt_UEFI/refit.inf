@@ -169,7 +169,6 @@
   gEfiAcpi20TableGuid
   gEfiAppleBootGuid
   gEfiAppleNvramGuid
-  gEfiAppleVendorGuid
   gEfiDxeServicesTableGuid
   gEfiEventReadyToBootGuid
   gEfiEventVirtualAddressChangeGuid
