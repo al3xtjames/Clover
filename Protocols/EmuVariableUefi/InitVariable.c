@@ -29,7 +29,7 @@ EFI_RUNTIME_SERVICES gOrgRT;
 extern EFI_RUNTIME_SERVICES *gRT;
 
 /** Apple Boot Guid - cars with this GUID are visible in OSX with nvram */
-extern EFI_GUID gEfiAppleBootGuid;
+extern EFI_GUID gAppleBootVariableGuid;
 
 EFI_GUID DellEventGuid = {0xFF2E9FC7, 0xD16F, 0x434A, {0xA2, 0x4E, 0xC9, 0x95, 0x19, 0xB7, 0xEB, 0x93}};
 
@@ -459,7 +459,7 @@ EmuVariableControlProtocolInstallEmulation (
   // that this driver is used.
   //
   Status = gRT->SetVariable (L"EmuVariableUefiPresent",
-                             &gEfiAppleBootGuid,
+                             &gAppleBootVariableGuid,
                              EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
                              3,
                              "Yes"

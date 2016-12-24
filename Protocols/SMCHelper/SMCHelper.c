@@ -43,7 +43,7 @@
 EFI_HANDLE              mHandle = NULL;
 //EFI_BOOT_SERVICES*			gBS;
 
-extern EFI_GUID gEfiAppleBootGuid;
+extern EFI_GUID gAppleBootVariableGuid;
 
 typedef struct _SMC_STACK SMC_STACK;
 
@@ -203,7 +203,7 @@ EFI_STATUS EFIAPI SetNvramForTheKey(
     Name[20] = 0;
   }
     
-  Status = gRT->SetVariable(Name, &gEfiAppleBootGuid,
+  Status = gRT->SetVariable(Name, &gAppleBootVariableGuid,
                             EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
                             Size, (UINT8 *)Value);
   DBG("NVRAM Variable %s set\n", Name);

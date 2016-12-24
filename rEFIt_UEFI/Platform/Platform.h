@@ -1059,7 +1059,7 @@ typedef struct {
   BOOLEAN                 HighCurrent;
   BOOLEAN                 NameEH00;
   BOOLEAN                 NameXH00;
-  
+
   BOOLEAN                 LANInjection;
   BOOLEAN                 HDMIInjection;
 
@@ -1612,12 +1612,9 @@ extern CHAR8                          *BootOSName;
 //extern EFI_GRAPHICS_OUTPUT_PROTOCOL *GraphicsOutput;
 extern UINT64                    machineSignature;
 
-extern EFI_GUID                        gEfiAppleBootGuid;
-extern EFI_GUID                        gEfiAppleNvramGuid;
 extern EFI_GUID                        AppleSystemInfoProducerName;
 extern EFI_GUID                        AppleDevicePropertyProtocolGuid;
 extern EFI_GUID                        gAppleScreenInfoProtocolGuid;
-extern EFI_GUID                        gEfiAppleVendorGuid;
 extern EFI_GUID                        gEfiPartTypeSystemPartGuid;
 extern EFI_GUID                        gMsgLogProtocolGuid;
 extern EFI_GUID                        gEfiLegacy8259ProtocolGuid;

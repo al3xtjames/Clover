@@ -885,11 +885,11 @@ static VOID StartLoader(IN LOADER_ENTRY *Entry)
       SavePreBootLog = FALSE;
     } else {
       // delete boot-switch-vars if exists
-      Status = gRT->SetVariable(L"boot-switch-vars", &gEfiAppleBootGuid,
+      Status = gRT->SetVariable(L"boot-switch-vars", &gAppleBootVariableGuid,
                                 EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
                                 0, NULL);
-      DeleteNvramVariable(L"IOHibernateRTCVariables", &gEfiAppleBootGuid);
-      DeleteNvramVariable(L"boot-image",              &gEfiAppleBootGuid);
+      DeleteNvramVariable(L"IOHibernateRTCVariables", &gAppleBootVariableGuid);
+      DeleteNvramVariable(L"boot-image",              &gAppleBootVariableGuid);
 
     }
     SetupBooterLog(!DoHibernateWake);
@@ -1642,11 +1642,11 @@ VOID SetVariablesFromNvram()
 
 //  DbgHeader("SetVariablesFromNvram");
 
-  tmpString = GetNvramVariable(L"boot-args", &gEfiAppleBootGuid, NULL, &Size);
+  tmpString = GetNvramVariable(L"boot-args", &gAppleBootVariableGuid, NULL, &Size);
   if (tmpString && (Size <= 0x1000) && (Size > 0)) {
     DBG("found boot-args in NVRAM:%a, size=%d\n", tmpString, Size);
     // use and forget old one
-//    DeleteNvramVariable(L"boot-args", &gEfiAppleBootGuid);
+//    DeleteNvramVariable(L"boot-args", &gAppleBootVariableGuid);
     Size = AsciiStrLen(tmpString); // some EFI implementations include '\0' in Size, and others don't, so update Size to string length
     arg = AllocatePool(Size+1);
     
@@ -1704,7 +1704,7 @@ VOID SetVariablesFromNvram()
     FreePool(tmpString);
   }
   
-  tmpString = GetNvramVariable(L"nvda_drv", &gEfiAppleBootGuid, NULL, NULL);
+  tmpString = GetNvramVariable(L"nvda_drv", &gAppleBootVariableGuid, NULL, NULL);
   if (tmpString && AsciiStrCmp(tmpString, "1") == 0) {
     gSettings.NvidiaWeb = TRUE;
   }
@@ -2151,10 +2151,10 @@ RefitMain (IN EFI_HANDLE           ImageHandle,
     }
 /*------------------------------------------------------
     //DoHibernateWake = DumpVariable(L"Boot0082", &gEfiGlobalVariableGuid, 8);
-    DumpVariable(L"boot-switch-vars", &gEfiAppleBootGuid, -1);
-    DumpVariable(L"boot-signature",   &gEfiAppleBootGuid, -1);
-    DumpVariable(L"boot-image-key",   &gEfiAppleBootGuid, -1);
-    DumpVariable(L"boot-image",       &gEfiAppleBootGuid, 0);
+    DumpVariable(L"boot-switch-vars", &gAppleBootVariableGuid, -1);
+    DumpVariable(L"boot-signature",   &gAppleBootVariableGuid, -1);
+    DumpVariable(L"boot-image-key",   &gAppleBootVariableGuid, -1);
+    DumpVariable(L"boot-image",       &gAppleBootVariableGuid, 0);
 //-----------------------------------------------------------
  */
   }

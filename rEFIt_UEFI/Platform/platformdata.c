@@ -1236,7 +1236,7 @@ VOID GetDefaultSettings()
   gSettings.BooterConfig         = 0;
 //  MemSet(gSettings.BooterCfgStr, 64, 0);
 //  AsciiStrCpyS(gSettings.BooterCfgStr, 64, "log=0");
-  CHAR8 *OldCfgStr = GetNvramVariable (L"bootercfg", &gEfiAppleBootGuid, NULL, NULL);
+  CHAR8 *OldCfgStr = GetNvramVariable (L"bootercfg", &gAppleBootVariableGuid, NULL, NULL);
   if (OldCfgStr) {
     AsciiStrCpyS(gSettings.BooterCfgStr, 64, OldCfgStr);
     FreePool(OldCfgStr);

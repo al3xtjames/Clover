@@ -30,7 +30,7 @@
   gAppleUserInterfaceThemeProtocolGuid  ## PRODUCES
   
 [Guids]
-  gEfiAppleNvramGuid
+  gAppleVendorVariableGuid
 
 [LibraryClasses]
   BaseLib

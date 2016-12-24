@@ -694,7 +694,7 @@ extern BOOLEAN          gBootChanged;
 extern BOOLEAN          gThemeOptionsChanged;
 //extern POINTERS         gPointer;
 extern REFIT_MENU_SCREEN OptionMenu;
-//extern EFI_GUID gEfiAppleBootGuid;
+//extern EFI_GUID gAppleBootVariableGuid;
 
 
 EFI_STATUS  InitRefitLib(IN EFI_HANDLE ImageHandle);

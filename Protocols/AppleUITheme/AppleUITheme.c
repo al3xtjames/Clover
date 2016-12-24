@@ -10,7 +10,7 @@
 STATIC UINT32           mCurrentColor;
 STATIC EFI_HANDLE       Handle = NULL;
 
-extern EFI_GUID gEfiAppleNvramGuid;
+extern EFI_GUID gAppleVendorVariableGuid;
 
 #define BLACK_COLOR  0x000000
 
@@ -71,7 +71,7 @@ UserInterfaceThemeEntryPoint (
 
 
   DataSize = 0;
-  Status = gRT->GetVariable(L"DefaultBackgroundColor", &gEfiAppleNvramGuid, 0, &DataSize, &Color);
+  Status = gRT->GetVariable(L"DefaultBackgroundColor", &gAppleVendorVariableGuid, 0, &DataSize, &Color);
   if (!EFI_ERROR(Status)) {
     mCurrentColor = Color;
   }
