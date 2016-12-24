@@ -238,7 +238,7 @@ OvrAppleSMC(VOID)
 //	PRINT("Overriding AppleSMC ...\n");
 	
 	// Locate AppleSMC protocol
-	Status = gBS->LocateProtocol(&gAppleSMCProtocolGuid, NULL, (VOID **) &gAppleSMC);
+	Status = gBS->LocateProtocol(&gAppleSmcIoProtocolGuid, NULL, (VOID **) &gAppleSMC);
 	if (EFI_ERROR(Status)) {
 		PRINT("Error Overriding AppleSMC: %r\n", Status);
 		return Status;

@@ -472,11 +472,11 @@ GetSmcKeys (BOOLEAN WriteToSMC)
     return;
   }
   DbgHeader("Dump SMC keys from NVRAM");
-  Status = gBS->LocateProtocol(&gAppleSMCProtocolGuid, NULL, (VOID**)&gAppleSmc);
+  Status = gBS->LocateProtocol(&gAppleSmcIoProtocolGuid, NULL, (VOID**)&gAppleSmc);
   if (!EFI_ERROR(Status)) {
-    DBG("found AppleSMC protocol\n");
+    DBG("Found APPLE_SMC_IO_PROTOCOL\n");
   } else {
-    DBG("no AppleSMC protocol\n");
+    DBG("No APPLE_SMC_IO_PROTOCOL found\n");
     gAppleSmc = NULL;
   }
 
@@ -520,7 +520,7 @@ GetSmcKeys (BOOLEAN WriteToSMC)
       FreePool (Data);
     }
   }
-  if (WriteToSMC && gAppleSmc  && (gAppleSmc->Signature == NON_APPLE_SMC_SIGNATURE)) {
+  if (WriteToSMC && gAppleSmc  && (gAppleSmc->Revision == SMC_HELPER_SIGNATURE)) {
     CHAR8 Mode = SMC_MODE_APPCODE;
     NKey[3] = NumKey & 0xFF;
     NKey[2] = (NumKey >> 8) & 0xFF; //key, size, type, attr
@@ -537,7 +537,7 @@ GetSmcKeys (BOOLEAN WriteToSMC)
     if (!EFI_ERROR(Status)) {
       Status = gAppleSmc->SmcWriteValue(gAppleSmc, FourCharKey("$Num"), 1, (SMC_DATA *)&SNum);
     }
-    Status = gAppleSmc->SmcAddKey(gAppleSmc, FourCharKey("RMde"), 1, SmcKeyTypeChar,  0xC0);
+    Status = gAppleSmc->SmcAddKey(gAppleSmc, FourCharKey("RMde"), 1, SmcKeyTypeCh8,   0xC0);
     if (!EFI_ERROR(Status)) {
       Status = gAppleSmc->SmcWriteValue(gAppleSmc, FourCharKey("RMde"), 1, (SMC_DATA *)&Mode);
     }

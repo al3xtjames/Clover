@@ -63,7 +63,7 @@ Headers collection for procedures
 #include <Protocol/MsgLog.h>
 #include <Protocol/efiConsoleControl.h>
 #include <Protocol/EmuVariableControl.h>
-#include <Protocol/AppleSMC.h>
+#include <Protocol/AppleSmcIo.h>
 
 #include "../refit/lib.h"
 #include "string.h"
@@ -74,8 +74,8 @@ Headers collection for procedures
 #include "kext_inject.h"
 //#include "entry_scan.h"
 
-#define CLOVER_SIGN             SIGNATURE_32('C','l','v','r')
-#define NON_APPLE_SMC_SIGNATURE SIGNATURE_64('S','M','C','H','E','L','P','E')
+#define CLOVER_SIGNATURE      SIGNATURE_32 ('C', 'l', 'v', 'r')
+#define SMC_HELPER_SIGNATURE  SIGNATURE_64 ('E', 'm', 'u', 'l', 'a', 't', 'o', 'r')
 
 
 /* XML Tags */

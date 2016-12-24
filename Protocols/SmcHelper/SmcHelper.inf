@@ -1,0 +1,36 @@
+## @file
+#
+# SMC helper driver that installs APPLE_SMC_IO_PROTOCOL for storing
+# and retrieving SMC keys without the presence of a physical SMC.
+#
+# Copyright (C) 2016 Sergey Slice. All rights reserved.<BR>
+#
+# Have no idea about licenses. Keep copyright and use with any modifications.
+#
+#
+##
+
+[Defines]
+  INF_VERSION    = 0x00010005
+  BASE_NAME      = SmcHelper
+  FILE_GUID      = 511CE5CF-F27F-16EF-866C-FACE519550B7
+  MODULE_TYPE    = UEFI_DRIVER
+  VERSION_STRING = 1.0
+  ENTRY_POINT    = SmcHelperMain
+
+[Packages]
+  Clover/CloverPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  MemLogLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gAppleSmcIoProtocolGuid  ## PRODUCES
+
+[Sources]
+  SmcHelper.c

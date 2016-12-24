@@ -355,7 +355,7 @@ SetVariablesForOSX(LOADER_ENTRY *Entry)
 VOID
 AddSMCkey(SMC_KEY Key, SMC_DATA_SIZE Size, SMC_KEY_TYPE Type, SMC_DATA *Data)
 {
-  if (gAppleSmc && (gAppleSmc->Signature == NON_APPLE_SMC_SIGNATURE)) {
+  if (gAppleSmc && (gAppleSmc->Revision == SMC_HELPER_SIGNATURE)) {
     gAppleSmc->SmcAddKey(gAppleSmc,     Key, Size, Type, 0xC0);
     gAppleSmc->SmcWriteValue(gAppleSmc, Key, Size, Data);
   }

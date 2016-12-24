@@ -2078,7 +2078,7 @@ RefitMain (IN EFI_HANDLE           ImageHandle,
   DBG("Clover load options size = %d bytes\n", SelfLoadedImage->LoadOptionsSize);
   if ((SelfLoadedImage->LoadOptions != NULL) &&
       (SelfLoadedImage->LoadOptionsSize != 0)){
-    if (*(UINT32*)SelfLoadedImage->LoadOptions == CLOVER_SIGN) {
+    if (*(UINT32*)SelfLoadedImage->LoadOptions == CLOVER_SIGNATURE) {
       GetBootFromOption();
     } else {
       ParseLoadOptions(&ConfName, &gConfigDict[1]);

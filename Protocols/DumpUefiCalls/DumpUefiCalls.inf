@@ -113,7 +113,7 @@
   gEfiGraphicsOutputProtocolGuid
   gEfiDataHubProtocolGuid
   gEfiFirmwareVolumeProtocolGuid
-  gAppleSMCProtocolGuid
+  gAppleSmcIoProtocolGuid
   gAppleImageCodecProtocolGuid
   gAppleKeyStateProtocolGuid
   gEfiOSInfoProtocolGuid
