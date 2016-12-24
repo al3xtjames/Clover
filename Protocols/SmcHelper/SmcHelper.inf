@@ -24,7 +24,7 @@
 
 [LibraryClasses]
   BaseMemoryLib
-  MemLogLib
+#  MemLogLib
   MemoryAllocationLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint

@@ -8,13 +8,14 @@
 **/
 
 #include <Library/BaseMemoryLib.h>
-#include <Library/MemLogLib.h>
+//#include <Library/MemLogLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
 #include <Protocol/AppleSmcIo.h>
 
-#define DBG(...) MemLog (FALSE, 0, __VA_ARGS__)
+//#define DBG(...) MemLog (FALSE, 0, __VA_ARGS__)
+#define DBG(...)
 
 #define SMC_HELPER_SIGNATURE SIGNATURE_64 ('E', 'm', 'u', 'l', 'a', 't', 'o', 'r')
 
