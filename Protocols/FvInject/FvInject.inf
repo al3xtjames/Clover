@@ -1,0 +1,52 @@
+## @file
+# Firmware volume driver that overrides the EFI_FIRMWARE_VOLUME_PROTOCOL
+# and injects images for boot.efi/FileVault 2.
+#
+# Copyright (C) 2016 Sergey Slice. All rights reserved.<BR>
+# Portions copyright (C) 2005-2016, Apple Inc. All rights reserved.<BR>
+# Portions copyright (C) 2006-2014 Intel Corporation. All rights reserved.<BR>
+# Portions copyright (C) 2016 Alex James. All rights reserved.<BR>
+#
+# This program and the accompanying materials are licensed and made
+# available under the terms and conditions of the BSD License which
+# accompanies this distribution. The full text of the license may be
+# found at http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS"
+# BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER
+# EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  BASE_NAME      = FvInject
+  FILE_GUID      = 511CE682-2892-4397-BB31-813243E4CAD3
+  MODULE_TYPE    = UEFI_DRIVER
+  ENTRY_POINT    = FvInjectMain
+  INF_VERSION    = 0x00010005
+  VERSION_STRING = 1.0
+
+[Packages]
+  Clover/CloverPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  IntelFrameworkPkg/IntelFrameworkPkg.dec
+
+[Guids]
+  gAppleImageListGuid           ## CONSUMES
+  gAppleArrowCursorImageGuid    ## CONSUMES
+  gAppleArrowCursor2xImageGuid  ## CONSUMES
+
+[Protocols]
+  gEfiFirmwareVolumeProtocolGuid  ## PRODUCES
+
+[LibraryClasses]
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Sources]
+  FvInject.c
