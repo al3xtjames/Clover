@@ -27,8 +27,8 @@ typedef
 EFI_STATUS
 (EFIAPI *GRAPHICS_CONFIG_RESTORE_CONFIGURATION)(
   IN APPLE_GRAPHICS_CONFIGURATION_PROTOCOL *This,
-  IN UINT32                                 Ukn1,
-  IN UINT32                                 Ukn2,
+  IN UINT32                                Ukn1,
+  IN UINT32                                Ukn2,
   IN VOID                                  *Ukn3,
   IN VOID                                  *Ukn4,
   IN VOID                                  *Ukn5
