@@ -446,7 +446,7 @@
   Clover/Protocols/SmcHelper/SmcHelper.inf
   Clover/Protocols/FvInject/FvInject.inf
   Clover/Protocols/AppleImageCodec/AppleImageCodec.inf
-  Clover/Protocols/AppleUITheme/AppleUITheme.inf
+  Clover/Protocols/UserInterfaceThemeDriver/UserInterfaceThemeDriver.inf
   Clover/Protocols/HashServiceFix/HashServiceFix.inf
   Clover/Protocols/AppleKeyAggregator/AppleKeyAggregator.inf
   Clover/Protocols/AppleKeyFeeder/AppleKeyFeeder.inf
