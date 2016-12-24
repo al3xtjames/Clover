@@ -19,7 +19,6 @@
  *******************************************************************************/
 #include "Platform.h"
 #include <Protocol/OSInfo.h>
-#include <Protocol/AppleGraphConfig.h>
 #include <Protocol/KeyboardInfo.h>
 
 EFI_GUID gDevicePropertiesGuid = {
@@ -281,30 +280,6 @@ EFI_OS_INFO_PROTOCOL mEfiOSInfo = {
   NULL
 };
 
-//Usage
-/*RestoreConfig(This, 2, 400, R, G, B)
-->LocateProtocol(gAppleGraphConfigProtocolGuid, 0, 78000000438/1F7DAEC8) = Success
- call sub_30150
-  ->GetVariable(boot-gamma, gAppleBootVariableGuid, 0/50, 0, 0) = Not Found
- mRestored = TRUE;
-->GraphConfig.RestoreConfig(2, 400, 1FFCE8B0, 1FFCE0B0, 1FFCD8B0) status=Success
-*/
-
-EFI_STATUS
-EFIAPI
-RestoreConfig (APPLE_GRAPH_CONFIG_PROTOCOL* This,
-               UINT32 Param1, UINT32 Param2, VOID* Param3, VOID* Param4, VOID* Param5
-               )
-{
-  return EFI_SUCCESS;
-}
-
-
-APPLE_GRAPH_CONFIG_PROTOCOL mGraphConfig = {
-  1,
-  RestoreConfig,
-};
-
 EFI_STATUS
 EFIAPI
 UsbKbGetKeyboardDeviceInfo (
@@ -341,8 +316,6 @@ SetPrivateVarProto(VOID)
                                                        &mScreenInfo, 
                                                        &gEfiOSInfoProtocolGuid,
                                                        &mEfiOSInfo,
-                                                       &gAppleGraphConfigProtocolGuid,
-                                                       &mGraphConfig,
                                                        &gEfiKeyboardInfoProtocolGuid,
                                                        &mKeyboardInfo,
                                                        NULL

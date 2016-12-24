@@ -354,7 +354,7 @@ MAP_EFI_GUID_STR EfiGuidStrMap[] = {
   {&mAppleDeviceControlProtocolGuid, L"gAppleDeviceControlProtocolGuid"},
   {&mAppleDiskIoProtocolGuid, L"gAppleDiskIoProtocolGuid"},
   {&mEfiOSInfoProtocolGuid, L"gEfiOSInfoProtocolGuid"},
-  {&mAppleGraphConfigProtocolGuid, L"gAppleGraphConfigProtocolGuid"},
+  {&gAppleGraphicsConfigurationProtocolGuid, L"gAppleGraphicsConfigurationProtocolGuid"},
   {&mAppleEventProtocolGuid, L"gAppleEventProtocolGuid"},
 
   {&ShellInt, L"ShellInt"},

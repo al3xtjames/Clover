@@ -156,7 +156,7 @@
   #
   MemLogLib|Clover/Library/MemLogLibDefault/MemLogLibDefault.inf
   VideoBiosPatchLib|Clover/Library/VideoBiosPatchLib/VideoBiosPatchLib.inf
-    
+
 !ifndef NO_CLOVER_SHELL
   #Shell
   ShellLib|Clover/ShellPkg/Library/UefiShellLib/UefiShellLib.inf
@@ -441,16 +441,16 @@
   Clover/LegacyBios/Region2Dxe/LegacyRegion2Dxe.inf
 
   # Misc
-  Clover/Protocols/FSInject/FSInject.inf
-  Clover/Protocols/MsgLog/MsgLog.inf
-  Clover/Protocols/SmcHelper/SmcHelper.inf
-  Clover/Protocols/FvInject/FvInject.inf
+  Clover/Protocols/AppleGraphicsConfiguration/AppleGraphicsConfiguration.inf
   Clover/Protocols/AppleImageCodec/AppleImageCodec.inf
-  Clover/Protocols/UserInterfaceThemeDriver/UserInterfaceThemeDriver.inf
-  Clover/Protocols/HashServiceFix/HashServiceFix.inf
   Clover/Protocols/AppleKeyAggregator/AppleKeyAggregator.inf
   Clover/Protocols/AppleKeyFeeder/AppleKeyFeeder.inf
-  
+  Clover/Protocols/FSInject/FSInject.inf
+  Clover/Protocols/FvInject/FvInject.inf
+  Clover/Protocols/HashServiceFix/HashServiceFix.inf
+  Clover/Protocols/MsgLog/MsgLog.inf
+  Clover/Protocols/SmcHelper/SmcHelper.inf
+  Clover/Protocols/UserInterfaceThemeDriver/UserInterfaceThemeDriver.inf
 
 !ifdef DEBUG_ON_SERIAL_PORT
 
@@ -495,12 +495,12 @@
   #Clover/Sample/Application/Sample.inf
   #Clover/gptsync/gptsync.inf
   Clover/bdmesg_efi/bdmesg.inf
-  
+
 !ifndef NO_CLOVER_SHELL
   Clover/ShellPkg/Library/UefiShellNetwork1CommandsLib/UefiShellNetwork1CommandsLib.inf
   Clover/ShellPkg/Library/UefiShellNetwork2CommandsLib/UefiShellNetwork2CommandsLib.inf
 
-  
+
   Clover/ShellPkg/Application/Shell/Shell.inf {
     <PcdsFixedAtBuild>
 	  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0xFF

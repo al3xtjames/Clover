@@ -554,7 +554,7 @@ OvrGraphConfig(VOID)
 //  PRINT("Overriding GraphConfig ...\n");
   
   // Locate AppleGraphConfig protocol
-  Status = gBS->LocateProtocol(&gAppleGraphConfigProtocolGuid, NULL, (VOID **) &gGraphConfig);
+  Status = gBS->LocateProtocol(&gAppleGraphicsConfigurationProtocolGuid, NULL, (VOID **) &gGraphConfig);
   if (EFI_ERROR(Status)) {
     PRINT("Error Overriding GraphConfig: %r\n", Status);
     return Status;

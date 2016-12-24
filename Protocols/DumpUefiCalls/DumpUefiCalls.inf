@@ -117,7 +117,7 @@
   gAppleImageCodecProtocolGuid
   gAppleKeyStateProtocolGuid
   gEfiOSInfoProtocolGuid
-  gAppleGraphConfigProtocolGuid
+  gAppleGraphicsConfigurationProtocolGuid
   gEfiKeyboardInfoProtocolGuid
   gAppleKeyMapDatabaseProtocolGuid
   gEfiSimplePointerProtocolGuid
