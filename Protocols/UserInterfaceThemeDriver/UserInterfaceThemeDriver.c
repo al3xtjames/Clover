@@ -32,7 +32,7 @@ EFI_STATUS
 EFIAPI
 UserInterfaceThemeGetColor (
   IN OUT UINT32  *Color
-  )
+  ) // sub_386
 {
   if (Color == NULL) {
     return EFI_INVALID_PARAMETER;
