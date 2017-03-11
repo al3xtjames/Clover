@@ -32,7 +32,7 @@ EFI_GUID gAppleFsbFrequencyPropertyGuid   = {0xD1A04D55, 0x75B9, 0x41A3, {0x90, 
 EFI_GUID gAppleDevicePathsSupportedGuid   = {0x5BB91CF7, 0xD816, 0x404B, {0x86, 0x72, 0x68, 0xF2, 0x7F, 0x78, 0x31, 0xDC}};
 
 EFI_GUID gAppleCursorImageGuid            = {0x1A10742F, 0xFA80, 0x4B79, {0x9D, 0xA6, 0x35, 0x70, 0x58, 0xCC, 0x39, 0x7B}};
-             
+
 //all these codes are still under the question
 EFI_GUID GPT_MSDOS_PARTITION = \
 { 0xEBD0A0A2, 0xB9E5, 0x4433,{ 0x87, 0xC0, 0x68, 0xB6, 0xB7, 0x26, 0x99, 0xC7 }};  //ExFAT
@@ -74,14 +74,14 @@ EFI_GUID GPT_EMPTY_PARTITION = \
  * Copyright (c) 2007 Apple Inc. All rights reserved.
  *
  * @APPLE_LICENSE_HEADER_START@
- * 
+ *
  * This file contains Original Code and/or Modifications of Original Code
  * as defined in and that are subject to the Apple Public Source License
  * Version 2.0 (the 'License'). You may not use this file except in
  * compliance with the License. Please obtain a copy of the License at
  * http://www.opensource.apple.com/apsl/ and read it before using this
  * file.
- * 
+ *
  * The Original Code and all software distributed under the License are
  * distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
  * EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
@@ -89,7 +89,7 @@ EFI_GUID GPT_EMPTY_PARTITION = \
  * FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR NON-INFRINGEMENT.
  * Please see the License for the specific language governing rights and
  * limitations under the License.
- * 
+ *
  * @APPLE_LICENSE_HEADER_END@
  */
 
@@ -105,7 +105,7 @@ string_to_uuid(
 			   UINT8 *uuid)
 {
     UINT8 count;
-	
+
 	/*
 	 * scanned bytewise to ensure correct endianness of fields
 	 */
@@ -115,7 +115,7 @@ string_to_uuid(
 					&uuid[7], &uuid[6],
 					&uuid[8], &uuid[9], &uuid[10], &uuid[11],
 					&uuid[12], &uuid[13], &uuid[14], &uuid[15]);
-	
+
 	if (count != 16) {
 	    fatal ("invalid UUID specified for -u option");
 	}
@@ -126,11 +126,11 @@ string_to_uuid(
 BOOLEAN IsValidGuidAsciiString(IN CHAR8 *Str)
 {
   UINTN   Index;
-  
+
   if (Str == NULL || AsciiStrLen(Str) != 36) {
     return FALSE;
   }
-  
+
   for (Index = 0; Index < 36; Index++, Str++) {
     if (Index == 8 || Index == 13 || Index == 18 || Index == 23) {
       if (*Str != '-') {
@@ -148,38 +148,38 @@ BOOLEAN IsValidGuidAsciiString(IN CHAR8 *Str)
       }
     }
   }
-  
+
   return TRUE;
 }
 
 #if 1
 // it is in edk2/MdePkg/Library/UefiDevicePathLib/DevicePathFromText.c
 /**
- Copyed from DevicePathFromText.c 
+ Copyed from DevicePathFromText.c
  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
- 
+
  Converts a string to GUID value.
  Guid Format is xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
- 
+
  @param Str              The registry format GUID string that contains the GUID value.
  @param Guid             A pointer to the converted GUID value.
- 
+
  @retval EFI_SUCCESS     The GUID string was successfully converted to the GUID value.
  @retval EFI_UNSUPPORTED The input string is not in registry format.
  @return others          Some error occurred when converting part of GUID value.
- 
+
  **/
 //#define IS_HYPHEN(a)               ((a) == L'-')
 //#define IS_NULL(a)                 ((a) == L'\0')
 /**
  Converts a list of string to a specified buffer.
- 
+
  @param Buf             The output buffer that contains the string.
  @param BufferLength    The length of the buffer
  @param Str             The input string that contains the hex number
- 
+
  @retval EFI_SUCCESS    The string was successfully converted to the buffer.
- 
+
  **/
 static EFI_STATUS
 StrHToBuf (
@@ -192,16 +192,16 @@ StrHToBuf (
   UINTN       StrLength;
   UINT8       Digit;
   UINT8       Byte;
-  
+
   Digit = 0;
-  
+
   //
   // Two hex char make up one byte
   //
   StrLength = BufferLength * sizeof (CHAR16);
-  
+
   for(Index = 0; Index < StrLength; Index++, Str++) {
-    
+
     if ((*Str >= L'a') && (*Str <= L'f')) {
       Digit = (UINT8) (*Str - L'a' + 0x0A);
     } else if ((*Str >= L'A') && (*Str <= L'F')) {
@@ -211,7 +211,7 @@ StrHToBuf (
     } else {
       return EFI_INVALID_PARAMETER;
     }
-    
+
     //
     // For odd characters, write the upper nibble for each buffer byte,
     // and for even characters, the lower nibble.
@@ -223,24 +223,24 @@ StrHToBuf (
       Byte &= 0xF0;
       Byte = (UINT8) (Byte | Digit);
     }
-    
+
     Buf[Index / 2] = Byte;
   }
-  
+
   return EFI_SUCCESS;
 }
 #endif
 /**
  Converts a string to GUID value.
  Guid Format is xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
- 
+
  @param Str              The registry format GUID string that contains the GUID value.
  @param Guid             A pointer to the converted GUID value.
- 
+
  @retval EFI_SUCCESS     The GUID string was successfully converted to the GUID value.
  @retval EFI_UNSUPPORTED The input string is not in registry format.
  @return others          Some error occurred when converting part of GUID value.
- 
+
  **/
 
 EFI_STATUS
@@ -254,29 +254,29 @@ StrToGuidLE (
 	while (!IS_HYPHEN (*Str) && !IS_NULL (*Str)) {
 		Str ++;
 	}
-	
+
 	if (IS_HYPHEN (*Str)) {
 		Str++;
 	} else {
 		return EFI_UNSUPPORTED;
 	}
-	
+
   StrHToBuf (&GuidLE[4], 2, Str);
 	while (!IS_HYPHEN (*Str) && !IS_NULL (*Str)) {
 		Str ++;
 	}
-	
+
 	if (IS_HYPHEN (*Str)) {
 		Str++;
 	} else {
 		return EFI_UNSUPPORTED;
 	}
-	
+
   StrHToBuf (&GuidLE[6], 2, Str);
 	while (!IS_HYPHEN (*Str) && !IS_NULL (*Str)) {
 		Str ++;
 	}
-	
+
 	if (IS_HYPHEN (*Str)) {
 		Str++;
 	} else {
@@ -287,19 +287,19 @@ StrToGuidLE (
 	while (!IS_HYPHEN (*Str) && !IS_NULL (*Str)) {
 		Str ++;
 	}
-	
+
 	if (IS_HYPHEN (*Str)) {
 		Str++;
 	} else {
 		return EFI_UNSUPPORTED;
 	}
-  
+
   StrHToBuf (&GuidLE[10], 6, Str);
 
   if (Guid) {
     CopyMem((UINT8*)Guid, &GuidLE[0], sizeof(EFI_GUID));
   }
-  
+
   return EFI_SUCCESS;
 }
 
@@ -307,7 +307,7 @@ StrToGuidLE (
 CHAR16 * GuidBeToStr(EFI_GUID *Guid)
 {
   UINT8 *GuidData = (UINT8 *)Guid;
-  CHAR16 *Str = PoolPrint(L"%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",                          
+  CHAR16 *Str = PoolPrint(L"%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
                           GuidData[3], GuidData[2], GuidData[1], GuidData[0],
                           GuidData[5], GuidData[4],
                           GuidData[7], GuidData[6],
@@ -321,7 +321,7 @@ CHAR16 * GuidBeToStr(EFI_GUID *Guid)
 CHAR16 * GuidLEToStr(EFI_GUID *Guid)
 {
   CHAR16 *Str = PoolPrint(L"%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
-  Guid->Data1, Guid->Data2, Guid->Data3, Guid->Data4[0], Guid->Data4[1], 
+  Guid->Data1, Guid->Data2, Guid->Data3, Guid->Data4[0], Guid->Data4[1],
   Guid->Data4[2], Guid->Data4[3], Guid->Data4[4], Guid->Data4[5], Guid->Data4[6], Guid->Data4[7]);
   return Str;
 }
@@ -340,13 +340,13 @@ StrToGuid2 (
 	while (!IS_HYPHEN (*Str) && !IS_NULL (*Str)) {
 		Str ++;
 	}
-	
+
 	if (IS_HYPHEN (*Str)) {
 		Str++;
 	} else {
 		return EFI_UNSUPPORTED;
 	}
-	
+
 	//
 	// Get the second UINT16 data
 	//
@@ -354,13 +354,13 @@ StrToGuid2 (
 	while (!IS_HYPHEN (*Str) && !IS_NULL (*Str)) {
 		Str ++;
 	}
-	
+
 	if (IS_HYPHEN (*Str)) {
 		Str++;
 	} else {
 		return EFI_UNSUPPORTED;
 	}
-	
+
 	//
 	// Get the third UINT16 data
 	//
@@ -368,29 +368,29 @@ StrToGuid2 (
 	while (!IS_HYPHEN (*Str) && !IS_NULL (*Str)) {
 		Str ++;
 	}
-	
+
 	if (IS_HYPHEN (*Str)) {
 		Str++;
 	} else {
 		return EFI_UNSUPPORTED;
 	}
-	
+
 	//
 	// Get the following 8 bytes data
-	//  
+	//
 	StrHToBuf (&Guid->Data4[0], 2, Str);
 	//
 	// Skip 2 byte hex chars
 	//
 	Str += 2 * 2;
-	
+
 	if (IS_HYPHEN (*Str)) {
 		Str++;
 	} else {
 		return EFI_UNSUPPORTED;
 	}
 	StrHToBuf (&Guid->Data4[2], 6, Str);
-	
+
 	return EFI_SUCCESS;
 }
 #endif

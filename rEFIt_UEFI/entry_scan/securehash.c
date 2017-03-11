@@ -362,7 +362,7 @@ STATIC EFI_STATUS RemoveSignatureFromDatabase(IN OUT VOID     **Database,
   UINTN  OldDatabaseSize;
   UINTN  NewDatabaseSize = 0;
   // Check parameters
-  if ((Database == NULL) || (DatabaseSize == NULL) || (SignatureType == NULL) || 
+  if ((Database == NULL) || (DatabaseSize == NULL) || (SignatureType == NULL) ||
       (Signature == NULL) || (SignatureSize <= sizeof(EFI_SIGNATURE_LIST))) {
     return EFI_INVALID_PARAMETER;
   }

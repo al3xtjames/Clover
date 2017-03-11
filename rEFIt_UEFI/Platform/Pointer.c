@@ -1,6 +1,6 @@
 //
 //  Pointer.c
-//  
+//
 //
 //  Created by Slice on 23.09.12.
 //
@@ -9,12 +9,12 @@
 // my sources are quite different while Mouse/Events interfaces comes from Tiano,
 // for example ConSplitterDxe or BdsDxe/FrontPage
 // anyway thanks for good tutorial how to do and how not to do
-// 
+//
 // Any usage for SMBIOS here?
 /// Built-in Pointing Device (Type 21).
 
 //#include "Platform.h"
-#include "libegint.h"   //this includes platform.h 
+#include "libegint.h"   //this includes platform.h
 
 #ifndef DEBUG_ALL
 #define DEBUG_MOUSE 1
@@ -45,7 +45,7 @@ VOID HidePointer()
 {
   if (gPointer.SimplePointerProtocol) {
     egDrawImageArea(gPointer.oldImage, 0, 0, 0, 0, gPointer.oldPlace.XPos, gPointer.oldPlace.YPos);
-  }  
+  }
 }
 
 VOID DrawPointer()
@@ -53,25 +53,25 @@ VOID DrawPointer()
   // thanks lllevelll for the patch, I move it to egTakeImage and egDrawImageArea
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*  UINTN  PointerHCrop = POINTER_HEIGHT;
-  UINTN  PointerWCrop = POINTER_WIDTH;  
+  UINTN  PointerWCrop = POINTER_WIDTH;
   UINTN  Var = 0;
-  
+
   PointerHCrop = POINTER_HEIGHT;
   PointerWCrop = POINTER_WIDTH;
-  
-  Var = UGAWidth - gPointer.newPlace.XPos;      
-  
+
+  Var = UGAWidth - gPointer.newPlace.XPos;
+
   If (Var < POINTER_WIDTH) {
     PointerWCrop = Var;
   }
-  
-  Var = UGAHeight - gPointer.newPlace.YPos;     
-  
+
+  Var = UGAHeight - gPointer.newPlace.YPos;
+
   If Var < (POINTER_HEIGHT) {
     PointerHCrop = Var;
   }
   //////////////////////////////////////////////////////////////////////////////////////////////////////////
-*/  
+*/
   // take background image
   egTakeImage(gPointer.oldImage, gPointer.newPlace.XPos, gPointer.newPlace.YPos,
               POINTER_WIDTH, POINTER_HEIGHT);
@@ -81,7 +81,7 @@ VOID DrawPointer()
   egDrawImageArea(gPointer.newImage, 0, 0,
                   POINTER_WIDTH, POINTER_HEIGHT,
                   gPointer.oldPlace.XPos, gPointer.oldPlace.YPos);
-  
+
 }
 
 VOID RedrawPointer()
@@ -99,11 +99,11 @@ EFI_STATUS MouseBirth()
   EFI_STATUS Status = EFI_UNSUPPORTED;
 //  EFI_SIMPLE_POINTER_MODE  *CurrentMode;
 //  EG_PIXEL pi;
-  
+
   if (!gSettings.PointerEnabled) {
     return EFI_UNSUPPORTED;
   }
-  
+
   if (gPointer.SimplePointerProtocol) { //do not double
 //    DBG("DrawPointer\n");
     DrawPointer();
@@ -139,10 +139,10 @@ EFI_STATUS MouseBirth()
   //CurrentMode->ResolutionX = gSettings.PointerSpeed;
   //CurrentMode->ResolutionY = gSettings.PointerSpeed;
   //CurrentMode->ResolutionZ = 0;
-  
+
   //there may be also trackpad protocol but afaik it is not properly work and
   // trackpad is usually controlled by simple mouse driver
-  
+
   gPointer.Pointer = BuiltinIcon(BUILTIN_ICON_POINTER);
 	if(!gPointer.Pointer) {
     //this is impossible after BuiltinIcon
@@ -156,7 +156,7 @@ EFI_STATUS MouseBirth()
   gPointer.oldPlace.Width = POINTER_WIDTH;
   gPointer.oldPlace.Height = POINTER_HEIGHT;
   CopyMem(&gPointer.newPlace, &gPointer.oldPlace, sizeof(EG_RECT));
-  
+
   gPointer.oldImage = egCreateImage(POINTER_WIDTH, POINTER_HEIGHT, FALSE);
   gPointer.newImage = egCreateFilledImage(POINTER_WIDTH, POINTER_HEIGHT, FALSE, &MenuBackgroundPixel);
 //  egTakeImage(gPointer.oldImage, gPointer.oldPlace.XPos, gPointer.oldPlace.YPos,
@@ -176,7 +176,7 @@ VOID KillMouse()
 //  DBG("Mouse death\n");
 //  DBG(" Blue=%x Green=%x Red=%x Alfa=%x\n\n", pi.b, pi.g, pi.r, pi.a);
 
-  
+
   egFreeImage(gPointer.newImage); gPointer.newImage = NULL;
   egFreeImage(gPointer.oldImage); gPointer.oldImage = NULL;
 
@@ -193,7 +193,7 @@ VOID KillMouse()
 // input - tsc
 // output - milliseconds
 // the caller is responsible for t1 > t0
-UINT64 TimeDiff(UINT64 t0, UINT64 t1) 
+UINT64 TimeDiff(UINT64 t0, UINT64 t1)
 {
   return DivU64x64Remainder((t1 - t0), DivU64x32(gCPUStructure.TSCFrequency, 1000), 0);
 }
@@ -211,7 +211,7 @@ VOID PrintPointerVars(
 {
   EFI_SIMPLE_POINTER_MODE  *CurrentMode;
 //  UINT64   Now;
-  
+
   CurrentMode = gPointer.SimplePointerProtocol->Mode;
 //  Now = AsmReadTsc();
   gST->ConOut->SetCursorPosition (gST->ConOut, 0, 0);
@@ -239,7 +239,7 @@ VOID UpdatePointer()
 //  INTN                      YPosPrev;
   INTN                      ScreenRelX;
   INTN                      ScreenRelY;
-  
+
 //  Now = gRS->GetTime(&Now, NULL);
   Now = AsmReadTsc();
   Status = gPointer.SimplePointerProtocol->GetState(gPointer.SimplePointerProtocol, &tmpState);
@@ -266,10 +266,10 @@ VOID UpdatePointer()
       gPointer.MouseEvent = MouseMove;
     else
       gPointer.MouseEvent = NoEvents;
-    
+
     CopyMem(&gPointer.State, &tmpState, sizeof(EFI_SIMPLE_POINTER_STATE));
     CurrentMode = gPointer.SimplePointerProtocol->Mode;
-    
+
 //    XPosPrev = gPointer.newPlace.XPos;
     ScreenRelX = ((UGAWidth * gPointer.State.RelativeMovementX / (INTN)CurrentMode->ResolutionX) * gSettings.PointerSpeed) >> 10;
     if (gSettings.PointerMirror) {
@@ -279,7 +279,7 @@ VOID UpdatePointer()
     }
     if (gPointer.newPlace.XPos < 0) gPointer.newPlace.XPos = 0;
     if (gPointer.newPlace.XPos > UGAWidth - 1) gPointer.newPlace.XPos = UGAWidth - 1;
-    
+
 //    YPosPrev = gPointer.newPlace.YPos;
     ScreenRelY = ((UGAHeight * gPointer.State.RelativeMovementY / (INTN)CurrentMode->ResolutionY) * gSettings.PointerSpeed) >> 10;
     gPointer.newPlace.YPos += ScreenRelY;
@@ -296,10 +296,10 @@ VOID UpdatePointer()
                        gPointer.newPlace.XPos,
                        gPointer.newPlace.YPos
                        );
-      
+
       PrintCount++;
     }
- */   
+ */
     RedrawPointer();
   }
 //  return Status;
@@ -317,13 +317,13 @@ EFI_STATUS CheckMouseEvent(REFIT_MENU_SCREEN *Screen)
 {
   EFI_STATUS Status = EFI_TIMEOUT;
   INTN EntryId;
-  
+
   gAction = ActionNone;
-  
+
   if (!Screen) {
     return EFI_TIMEOUT;
   }
-  
+
   if (!IsDragging && gPointer.MouseEvent == MouseMove)
     gPointer.MouseEvent = NoEvents;
 
@@ -426,10 +426,10 @@ EFI_STATUS WaitForInputEventPoll(REFIT_MENU_SCREEN *Screen, UINTN TimeoutDefault
   EFI_STATUS Status = EFI_SUCCESS;
   UINTN TimeoutRemain = TimeoutDefault * 100;
   while (TimeoutRemain != 0) {
-    
+
 //    Status = WaitForSingleEvent (gST->ConIn->WaitForKey, ONE_MSECOND * 10);
     Status = WaitFor2EventWithTsc (gST->ConIn->WaitForKey, NULL, 10);
-    
+
     if (Status != EFI_TIMEOUT) {
       break;
     }
@@ -448,4 +448,3 @@ EFI_STATUS WaitForInputEventPoll(REFIT_MENU_SCREEN *Screen, UINTN TimeoutDefault
   }
   return Status;
 }
-

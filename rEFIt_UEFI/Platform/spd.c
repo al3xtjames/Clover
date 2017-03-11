@@ -695,7 +695,7 @@ STATIC VOID read_smb(EFI_PCI_IO_PROTOCOL *PciIo, UINT16	vid, UINT16	did)
       smbPage = 0xFF; // force page to be set
       READ_SPD(spdbuf, base, i, SPD_MEMORY_TYPE);
     }
-    
+
     // Copy spd data into buffer
     DBG("SPD[%d]: Type %d @0x%x\n", i, spdbuf[SPD_MEMORY_TYPE], 0x50 + i);
     switch (spdbuf[SPD_MEMORY_TYPE])  {
@@ -872,7 +872,7 @@ VOID ScanSPD()
   PCI_TYPE00            gPci;
 
   DbgHeader("ScanSPD");
-  
+
   // Scan PCI handles
   Status = gBS->LocateHandleBuffer (
                                     ByProtocol,
@@ -881,7 +881,7 @@ VOID ScanSPD()
                                     &HandleCount,
                                     &HandleBuffer
                                     );
-  
+
   if (!EFI_ERROR (Status)) {
     for (Index = 0; Index < HandleCount; ++Index) {
       Status = gBS->HandleProtocol(HandleBuffer[Index], &gEfiPciIoProtocolGuid, (VOID **)&PciIo);
@@ -913,7 +913,7 @@ VOID ScanSPD()
   }
 
 
-  // Scan PCI BUS For SmBus controller 
+  // Scan PCI BUS For SmBus controller
 /*  Status = gBS->LocateHandleBuffer(AllHandles,NULL,NULL,&HandleCount,&HandleBuffer);
   if (!EFI_ERROR(Status)) {
     for (HandleIndex = 0; HandleIndex < HandleCount; HandleIndex++) {
@@ -922,9 +922,9 @@ VOID ScanSPD()
         for (ProtocolIndex = 0; ProtocolIndex < ArrayCount; ProtocolIndex++) {
           if (CompareGuid(&gEfiPciIoProtocolGuid, ProtocolGuidArray[ProtocolIndex])) {
             Status = gBS->OpenProtocol(HandleBuffer[HandleIndex],&gEfiPciIoProtocolGuid,(VOID **)&PciIo,gImageHandle,NULL,EFI_OPEN_PROTOCOL_GET_PROTOCOL);
-            
+
             if (!EFI_ERROR(Status)) {
-              // Read PCI BUS 
+              // Read PCI BUS
               Status = PciIo->Pci.Read (
                                         PciIo,
                                         EfiPciIoWidthUint32,
@@ -932,9 +932,9 @@ VOID ScanSPD()
                                         sizeof (gPci) / sizeof (UINT32),
                                         &gPci
                                         );
-              
+
               //SmBus controller has class = 0x0c0500
-              if ((gPci.Hdr.ClassCode[2] == 0x0c) && (gPci.Hdr.ClassCode[1] == 5) 
+              if ((gPci.Hdr.ClassCode[2] == 0x0c) && (gPci.Hdr.ClassCode[1] == 5)
                   && (gPci.Hdr.ClassCode[0] == 0) && (gPci.Hdr.VendorId == 0x8086 || gPci.Hdr.VendorId == 0x10DE)) {
                 read_smb(PciIo);
               }

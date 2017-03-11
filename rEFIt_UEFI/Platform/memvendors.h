@@ -1,5 +1,5 @@
 /*
- * Memory module vendors as published by JEDEC 106AA 
+ * Memory module vendors as published by JEDEC 106AA
  *
  * Special thanks to iNDi, memtest and THeKiNG for the table
  *
@@ -7,7 +7,7 @@
 #ifndef __MEMVEN_H
 #define __MEMVEN_H
 
-/* SMBIOS Memory Types */ 
+/* SMBIOS Memory Types */
 #define SMB_MEM_TYPE_UNDEFINED	0
 #define SMB_MEM_TYPE_OTHER		1
 #define SMB_MEM_TYPE_UNKNOWN	2
@@ -32,7 +32,7 @@
 #define SMB_MEM_TYPE_DDR3		24				// Supported in 10.5.6+ AppleSMBIOS
 #define SMB_MEM_TYPE_DDR4  26
 
-/* Memory Configuration Types */ 
+/* Memory Configuration Types */
 #define SMB_MEM_CHANNEL_UNKNOWN		0
 #define SMB_MEM_CHANNEL_SINGLE		1
 #define SMB_MEM_CHANNEL_DUAL		2

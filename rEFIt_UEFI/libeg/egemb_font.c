@@ -1,4 +1,4 @@
-#include "libegint.h" 
+#include "libegint.h"
 
 // emb_font_len = 1549;
 DEFINE_EMB_DATA(emb_font_data) {

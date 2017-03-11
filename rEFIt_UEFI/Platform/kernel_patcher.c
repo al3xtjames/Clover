@@ -792,14 +792,14 @@ BOOLEAN HaswellEXCPM(VOID *kernelData, LOADER_ENTRY *Entry, BOOLEAN use_xcpm_idl
     UINT32      i;
     UINT32      patchLocation;
     UINT64      os_version = AsciiOSVersionToUint64(Entry->OSVersion);
-  
+
     // check OS version suit for patches
     if (os_version < AsciiOSVersionToUint64("10.8.5") || os_version >= AsciiOSVersionToUint64("10.14")) {
         DBG("Unsupported macOS.\nHaswell-E requires macOS 10.8.5 - 10.13.x, aborted\n");
         DBG("HaswellEXCPM() <===FALSE\n");
         return FALSE;
     }
-    
+
     // _cpuid_set_info
     comment = "_cpuid_set_info";
     if (os_version <= AsciiOSVersionToUint64("10.8.5")) {
@@ -818,7 +818,7 @@ BOOLEAN HaswellEXCPM(VOID *kernelData, LOADER_ENTRY *Entry, BOOLEAN use_xcpm_idl
         STATIC UINT8 repl[] = { 0x74, 0x11, 0x83, 0xF8, 0x3F };
         applyKernPatch(kern, find, sizeof(find), repl, comment);
     } // 10.10.2+: native support reached, no need to patch
-    
+
     // _xcpm_bootstrap
     comment = "_xcpm_bootstrap";
     if (os_version <= AsciiOSVersionToUint64("10.8.5")) {
@@ -868,7 +868,7 @@ BOOLEAN HaswellEXCPM(VOID *kernelData, LOADER_ENTRY *Entry, BOOLEAN use_xcpm_idl
         STATIC UINT8 repl[] = { 0x89, 0xD8, 0x04, 0xC1, 0x3C, 0x22 };
         applyKernPatch(kern, find, sizeof(find), repl, comment);
     }
-    
+
     DBG("Searching _xcpm_pkg_scope_msr ...\n");
     comment = "_xcpm_pkg_scope_msrs";
     if (os_version <= AsciiOSVersionToUint64("10.8.5")) {
@@ -902,7 +902,7 @@ BOOLEAN HaswellEXCPM(VOID *kernelData, LOADER_ENTRY *Entry, BOOLEAN use_xcpm_idl
                 break;
             }
         }
-        
+
         if (patchLocation) {
             for (i = 0; i < 5; i++) {
                 kern[patchLocation+i] = 0x90;
@@ -914,7 +914,7 @@ BOOLEAN HaswellEXCPM(VOID *kernelData, LOADER_ENTRY *Entry, BOOLEAN use_xcpm_idl
             return FALSE;
         }
     }
-    
+
     DBG("HaswellEXCPM() <===\n");
     return TRUE;
 }
@@ -929,17 +929,17 @@ BOOLEAN BroadwellEPM(VOID *kernelData, LOADER_ENTRY *Entry, BOOLEAN use_xcpm_idl
     UINT32      i;
     UINT32      patchLocation;
     UINT64      os_version = AsciiOSVersionToUint64(Entry->OSVersion);
-    
+
     // check OS version suit for patches
     if (os_version < AsciiOSVersionToUint64("10.8.5")) {
         DBG("Unsupported macOS.\nBroadwell-E/EP requires macOS at least 10.8.5, aborted\n");
         DBG("BroadwellEPM() <===FALSE\n");
         return FALSE;
     }
-    
+
     Entry->KernelAndKextPatches->FakeCPUID = (UINT32)(os_version < AsciiOSVersionToUint64("10.10.3") ? 0x0306C0 : 0x040674);
     KernelCPUIDPatch(kern, Entry);
-    
+
     DBG("Searching _xcpm_pkg_scope_msr ...\n");
     if (os_version >= AsciiOSVersionToUint64("10.12")) {
         // 10.12+
@@ -952,7 +952,7 @@ BOOLEAN BroadwellEPM(VOID *kernelData, LOADER_ENTRY *Entry, BOOLEAN use_xcpm_idl
                 break;
             }
         }
-        
+
         if (patchLocation) {
             for (i = 0; i < 5; i++) {
                 kern[patchLocation+i] = 0x90;
@@ -964,7 +964,7 @@ BOOLEAN BroadwellEPM(VOID *kernelData, LOADER_ENTRY *Entry, BOOLEAN use_xcpm_idl
             return FALSE;
         }
     }
-    
+
     DBG("BroadwellEPM() <===\n");
     return TRUE;
 }
@@ -979,24 +979,24 @@ BOOLEAN HaswellLowEndXCPM(VOID *kernelData, LOADER_ENTRY *Entry, BOOLEAN use_xcp
     UINT8       *kern = (UINT8*)kernelData;
     UINT64      os_version = AsciiOSVersionToUint64(Entry->OSVersion);
     CHAR8       *comment;
-    
+
     // check OS version suit for patches
     if (os_version < AsciiOSVersionToUint64("10.8.5") || os_version >= AsciiOSVersionToUint64("10.14")) {
         DBG("Unsupported macOS.\nHaswell Celeron/Pentium requires macOS 10.8.5 - 10.13.x, aborted\n");
         DBG("HaswellLowEndXCPM() <===FALSE\n");
         return FALSE;
     }
-    
+
     Entry->KernelAndKextPatches->FakeCPUID = (UINT32)(0x0306A0);    // correct FakeCPUID
     KernelCPUIDPatch(kern, Entry);
-    
+
     // 10.8.5 - 10.11.x no need the following kernel patches on Haswell Celeron/Pentium
     if (os_version >= AsciiOSVersionToUint64("10.8.5") && os_version < AsciiOSVersionToUint64("10.12") &&
        (!use_xcpm_idle)) {
         DBG("HaswellLowEndXCPM() <===\n");
         return TRUE;
     }
-    
+
     // _xcpm_idle
     if (use_xcpm_idle) {
         DBG("HWPEnable - ON.\n");
@@ -1005,7 +1005,7 @@ BOOLEAN HaswellLowEndXCPM(VOID *kernelData, LOADER_ENTRY *Entry, BOOLEAN use_xcp
         STATIC UINT8 repl[] = { 0xB9, 0xE2, 0x00, 0x00, 0x00, 0x90, 0x90 };
         applyKernPatch(kern, find, sizeof(find), repl, comment);
     }
-    
+
     comment = "_xcpm_bootstrap";
     if (os_version <= AsciiOSVersionToUint64("10.12.5")) {
         // 10.12 - 10.12.5
@@ -1047,14 +1047,14 @@ BOOLEAN KernelIvyBridgeXCPM(VOID *kernelData, LOADER_ENTRY *Entry, BOOLEAN use_x
   UINT32      i;
   UINT32      patchLocation;
   UINT64      os_version = AsciiOSVersionToUint64(Entry->OSVersion);
-  
+
   // check whether Ivy Bridge
   if (gCPUStructure.Model != CPU_MODEL_IVY_BRIDGE) {
       DBG("Unsupported platform.\nRequires Ivy Bridge, aborted\n");
       DBG("KernelIvyBridgeXCPM() <===FALSE\n");
       return FALSE;
   }
-  
+
   // check OS version suit for patches
   // PMheart: attempt to add 10.14 compatibility
   if (os_version < AsciiOSVersionToUint64("10.8.5") || os_version >= AsciiOSVersionToUint64("10.15")) {
@@ -1066,7 +1066,7 @@ BOOLEAN KernelIvyBridgeXCPM(VOID *kernelData, LOADER_ENTRY *Entry, BOOLEAN use_x
       DBG("KernelIvyBridgeXCPM() <===\n");
       return TRUE;
   }
-  
+
   DBG("Searching _xcpm_pkg_scope_msr ...\n");
   if (os_version >= AsciiOSVersionToUint64("10.12")) {
       // 10.12+
@@ -1079,7 +1079,7 @@ BOOLEAN KernelIvyBridgeXCPM(VOID *kernelData, LOADER_ENTRY *Entry, BOOLEAN use_x
               break;
           }
       }
-      
+
       if (patchLocation) {
           for (i = 0; i < 5; i++) {
               kern[patchLocation+i] = 0x90;
@@ -1091,7 +1091,7 @@ BOOLEAN KernelIvyBridgeXCPM(VOID *kernelData, LOADER_ENTRY *Entry, BOOLEAN use_x
           return FALSE;
       }
   }
-  
+
   comment = "_xcpm_bootstrap";
   if (os_version <= AsciiOSVersionToUint64("10.12.5")) {
     // 10.12 - 10.12.5
@@ -1110,7 +1110,7 @@ BOOLEAN KernelIvyBridgeXCPM(VOID *kernelData, LOADER_ENTRY *Entry, BOOLEAN use_x
     STATIC UINT8 repl[] = { 0x89, 0xD8, 0x04, 0xC6, 0x3C, 0x22 };
     applyKernPatch(kern, find, sizeof(find), repl, comment);
   }
-  
+
   DBG("KernelIvyBridgeXCPM() <===\n");
   return TRUE;
 }
@@ -1126,14 +1126,14 @@ BOOLEAN KernelIvyE5XCPM(VOID *kernelData, LOADER_ENTRY *Entry, BOOLEAN use_xcpm_
   UINT32      i;
   UINT32      patchLocation;
   UINT64      os_version = AsciiOSVersionToUint64(Entry->OSVersion);
-  
+
   // check whether Ivy Bridge-E5
   if (gCPUStructure.Model != CPU_MODEL_IVY_BRIDGE_E5) {
     DBG("Unsupported platform.\nRequires Ivy Bridge-E, aborted\n");
     DBG("KernelIvyE5XCPM() <===FALSE\n");
     return FALSE;
   }
-  
+
   // check OS version suit for patches
   // PMheart: attempt to add 10.14 compatibility
   if (os_version < AsciiOSVersionToUint64("10.8.5") || os_version >= AsciiOSVersionToUint64("10.15")) {
@@ -1141,7 +1141,7 @@ BOOLEAN KernelIvyE5XCPM(VOID *kernelData, LOADER_ENTRY *Entry, BOOLEAN use_xcpm_
     DBG("KernelIvyE5XCPM() <===FALSE\n");
     return FALSE;
   }
-  
+
   // _cpuid_set_info
   // TO-DO: should we use FakeCPUID instead?
   comment = "_cpuid_set_info";
@@ -1156,7 +1156,7 @@ BOOLEAN KernelIvyE5XCPM(VOID *kernelData, LOADER_ENTRY *Entry, BOOLEAN use_xcpm_
     STATIC UINT8 repl[] = { 0x83, 0xF8, 0x3E, 0x75, 0x07 };
     applyKernPatch(kern, find, sizeof(find), repl, comment);
   } // 10.9.2+: native support reached, no need to patch
-  
+
   // _xcpm_pkg_scope_msrs
   DBG("Searching _xcpm_pkg_scope_msrs ...\n");
   comment = "_xcpm_pkg_scope_msrs";
@@ -1191,7 +1191,7 @@ BOOLEAN KernelIvyE5XCPM(VOID *kernelData, LOADER_ENTRY *Entry, BOOLEAN use_xcpm_
         break;
       }
     }
-    
+
     if (patchLocation) {
       for (i = 0; i < 5; i++) {
         kern[patchLocation+i] = 0x90;
@@ -1203,7 +1203,7 @@ BOOLEAN KernelIvyE5XCPM(VOID *kernelData, LOADER_ENTRY *Entry, BOOLEAN use_xcpm_
       return FALSE;
     }
   }
-  
+
   // _xcpm_bootstrap
   comment = "_xcpm_bootstrap";
   if (os_version <= AsciiOSVersionToUint64("10.8.5")) {
@@ -1253,7 +1253,7 @@ BOOLEAN KernelIvyE5XCPM(VOID *kernelData, LOADER_ENTRY *Entry, BOOLEAN use_xcpm_
     STATIC UINT8 repl[] = { 0x89, 0xD8, 0xC2, 0xC1, 0x3C, 0x22 };
     applyKernPatch(kern, find, sizeof(find), repl, comment);
   }
-  
+
   DBG("KernelIvyE5XCPM() <===\n");
   return TRUE;
 }
@@ -1682,7 +1682,7 @@ BooterPatch(IN UINT8 *BooterData, IN UINT64 BooterSize, LOADER_ENTRY *Entry)
       DBG_RT(Entry, "==> disabled\n");
       continue;
     }
-    
+
     Num = SearchAndReplace(
                            BooterData,
                            BooterSize,
@@ -1691,17 +1691,17 @@ BooterPatch(IN UINT8 *BooterData, IN UINT64 BooterSize, LOADER_ENTRY *Entry)
                            Entry->KernelAndKextPatches->BootPatches[i].Patch,
                            Entry->KernelAndKextPatches->BootPatches[i].Count
                            );
-    
+
     if (Num) {
       y++;
     }
-    
+
     DBG_RT(Entry, "==> %a : %d replaces done\n", Num ? "Success" : "Error", Num);
   }
   if (Entry->KernelAndKextPatches->KPDebug) {
     gBS->Stall(2000000);
   }
-  
+
   return (y != 0);
 }
 
@@ -1857,12 +1857,12 @@ KernelAndKextsPatcherStart(IN LOADER_ENTRY *Entry)
             EnableExtCpuXCPM = SandyBridgeEPM;
             gSNBEAICPUFixRequire = TRUE;       // turn on SandyBridge-E AppleIntelCPUPowerManagement Fix
             break;
-              
+
           case CPU_MODEL_IVY_BRIDGE:
             // IvyBridge
             EnableExtCpuXCPM = KernelIvyBridgeXCPM;
             break;
-              
+
           case CPU_MODEL_IVY_BRIDGE_E5:
             // IvyBridge-E
             EnableExtCpuXCPM = KernelIvyE5XCPM;
@@ -1872,7 +1872,7 @@ KernelAndKextsPatcherStart(IN LOADER_ENTRY *Entry)
             // Haswell-E
             EnableExtCpuXCPM = HaswellEXCPM;
             break;
-              
+
           case CPU_MODEL_BROADWELL_E5:
           case CPU_MODEL_BROADWELL_DE:
             // Broadwell-E/EP
@@ -1888,7 +1888,7 @@ KernelAndKextsPatcherStart(IN LOADER_ENTRY *Entry)
             }
             break;
       }
-        
+
       // syscl - now enable extra Cpu's PowerManagement
       // only Intel support this feature till now
       // move below code outside the if condition if AMD supports
@@ -1947,7 +1947,7 @@ KernelAndKextsPatcherStart(IN LOADER_ENTRY *Entry)
         OSFLAG_ISUNSET(Entry->Flags, OSFLAG_WITHKEXTS)) {
     // disabled kext injection if FakeSMC is already present
  //   Entry->Flags = OSFLAG_UNSET(Entry->Flags, OSFLAG_WITHKEXTS); //Slice - we are already here
-    
+
       DBG_RT(Entry, "\nInjectKexts: disabled because FakeSMC is already present and InjectKexts option set to Detect\n");
       gBS->Stall(500000);
     }

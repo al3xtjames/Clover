@@ -1,8 +1,8 @@
 /*
  *  ati.h
- *  
+ *
  *  Created by Slice on 19.02.12.
- *  
+ *
  *  the code ported from Chameleon project as well as from RadeonFB by Joblo and RadeonHD by dong
  *  big thank to Islam M. Ahmed Zaid for the updating the collection
  */

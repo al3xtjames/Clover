@@ -63,7 +63,7 @@ typedef struct {
   ///
   UINT8                           IfType;
 } MAC_ADDR_DEVICE_PATH;
- 
+
  */
 
 VOID
@@ -176,7 +176,7 @@ GetMacAddress()
           Mac0 = IoRead32((UINTN)gLanMmio[Index]);
           Mac4 = IoRead32((UINTN)gLanMmio[Index] + 4);
           goto copy;
-          
+
         case 0x14e4:   //Broadcom
           if (PreviousVendor == gLanVendor[Index]) {
             Offset = EMAC_MACADDR1_HI;
@@ -195,7 +195,7 @@ GetMacAddress()
             Offset = INTEL_MAC_1;
           }
           break;
-          
+
         default:
           break;
       }
@@ -216,7 +216,7 @@ GetMacAddress()
     copy:
       CopyMem(&gLanMac[Index][0], &Mac0, 4);
       CopyMem(&gLanMac[Index][4], &Mac4, 2);
-      
+
     done:
       PreviousVendor = gLanVendor[Index];
       DBG("Legacy MAC address of LAN #%d= ", Index);

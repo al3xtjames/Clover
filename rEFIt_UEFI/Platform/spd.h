@@ -26,7 +26,7 @@
 
 /* Byte numbers. */
 #define SPD_NUM_MANUFACTURER_BYTES          0  /* Number of bytes used by module manufacturer */
-#define SPD_TOTAL_SPD_MEMORY_SIZE           1  /* Total SPD memory size | Byte 1 (0x001): SPD Revision*/ 
+#define SPD_TOTAL_SPD_MEMORY_SIZE           1  /* Total SPD memory size | Byte 1 (0x001): SPD Revision*/
 #define SPD_MEMORY_TYPE                     2  /* (Fundamental) memory type */
 #define SPD_NUM_ROWS                        3  /* Number of row address bits */
 #define SPD_NUM_COLUMNS                     4  /* Number of column address bits */

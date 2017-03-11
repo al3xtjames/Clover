@@ -89,7 +89,7 @@ EG_IMAGE * egDecodeBMP(IN UINT8 *FileData, IN UINTN FileDataLength, IN BOOLEAN W
   UINT8               AlphaValue;
   EFI_UGA_PIXEL       *PixelPtr;
   UINTN               Index, BitIndex;
-  
+
   // read and check header
   if (FileDataLength < sizeof(BMP_IMAGE_HEADER) || FileData == NULL)
     return NULL;
@@ -103,7 +103,7 @@ EG_IMAGE * egDecodeBMP(IN UINT8 *FileData, IN UINTN FileDataLength, IN BOOLEAN W
   // 32-bit images are always stored uncompressed
   if (BmpHeader->CompressionType > 0 && BmpHeader->BitPerPixel != 32)
     return NULL;
-  
+
   // calculate parameters
   ImageLineOffset = BmpHeader->PixelWidth;
   if (BmpHeader->BitPerPixel == 32)
@@ -116,19 +116,19 @@ EG_IMAGE * egDecodeBMP(IN UINT8 *FileData, IN UINTN FileDataLength, IN BOOLEAN W
     ImageLineOffset = (ImageLineOffset + 1) >> 1;
   if ((ImageLineOffset % 4) != 0)
     ImageLineOffset = ImageLineOffset + (4 - (ImageLineOffset % 4));
-  
+
   // check bounds
   RealPixelHeight = BmpHeader->PixelHeight > 0 ? BmpHeader->PixelHeight : -BmpHeader->PixelHeight;
   RealPixelWidth = BmpHeader->PixelWidth > 0 ? BmpHeader->PixelWidth : -BmpHeader->PixelWidth;
   if (BmpHeader->ImageOffset + ImageLineOffset * RealPixelHeight > FileDataLength)
     return NULL;
-  
+
   // allocate image structure and buffer
   NewImage = egCreateImage(RealPixelWidth, RealPixelHeight, WantAlpha);
   if (NewImage == NULL)
     return NULL;
   AlphaValue = WantAlpha ? 255 : 0;
-  
+
   // convert image
   BmpColorMap = (BMP_COLOR_MAP *)(FileData + sizeof(BMP_IMAGE_HEADER));
   ImagePtrBase = FileData + BmpHeader->ImageOffset;
@@ -140,16 +140,16 @@ EG_IMAGE * egDecodeBMP(IN UINT8 *FileData, IN UINTN FileDataLength, IN BOOLEAN W
       PixelPtr = NewImage->PixelData + y * RealPixelWidth;
     } else {
       PixelPtr = NewImage->PixelData + (RealPixelHeight - 1 - y) * RealPixelWidth;
-    }    
-    
+    }
+
     switch (BmpHeader->BitPerPixel) {
-        
+
       case 1:
         for (x = 0; x < RealPixelWidth; x++) {
           BitIndex = x & 0x07;
           if (BitIndex == 0)
             ImageValue = *ImagePtr++;
-          
+
           Index = (ImageValue >> (7 - BitIndex)) & 0x01;
           PixelPtr->Blue = BmpColorMap[Index].Blue;
           PixelPtr->Green = BmpColorMap[Index].Green;
@@ -158,18 +158,18 @@ EG_IMAGE * egDecodeBMP(IN UINT8 *FileData, IN UINTN FileDataLength, IN BOOLEAN W
           PixelPtr++;
         }
         break;
-        
+
       case 4:
         for (x = 0; x <= RealPixelWidth - 2; x += 2) {
           ImageValue = *ImagePtr++;
-          
+
           Index = ImageValue >> 4;
           PixelPtr->Blue = BmpColorMap[Index].Blue;
           PixelPtr->Green = BmpColorMap[Index].Green;
           PixelPtr->Red = BmpColorMap[Index].Red;
           PixelPtr->Reserved = AlphaValue;
           PixelPtr++;
-          
+
           Index = ImageValue & 0x0f;
           PixelPtr->Blue = BmpColorMap[Index].Blue;
           PixelPtr->Green = BmpColorMap[Index].Green;
@@ -179,7 +179,7 @@ EG_IMAGE * egDecodeBMP(IN UINT8 *FileData, IN UINTN FileDataLength, IN BOOLEAN W
         }
         if (x < RealPixelWidth) {
           ImageValue = *ImagePtr++;
-          
+
           Index = ImageValue >> 4;
           PixelPtr->Blue = BmpColorMap[Index].Blue;
           PixelPtr->Green = BmpColorMap[Index].Green;
@@ -188,7 +188,7 @@ EG_IMAGE * egDecodeBMP(IN UINT8 *FileData, IN UINTN FileDataLength, IN BOOLEAN W
           PixelPtr++;
         }
         break;
-        
+
       case 8:
         for (x = 0; x < RealPixelWidth; x++) {
           Index = *ImagePtr++;
@@ -199,7 +199,7 @@ EG_IMAGE * egDecodeBMP(IN UINT8 *FileData, IN UINTN FileDataLength, IN BOOLEAN W
           PixelPtr++;
         }
         break;
-        
+
       case 24:
         for (x = 0; x < RealPixelWidth; x++) {
           PixelPtr->Blue = *ImagePtr++;
@@ -209,6 +209,7 @@ EG_IMAGE * egDecodeBMP(IN UINT8 *FileData, IN UINTN FileDataLength, IN BOOLEAN W
           PixelPtr++;
         }
         break;
+<<<<<<< HEAD:Protocols/AppleImageCodec/load_bmp.c
       case 32:
         for (x = 0; x < RealPixelWidth; x++) {
           PixelPtr->Blue = *ImagePtr++;
@@ -219,10 +220,13 @@ EG_IMAGE * egDecodeBMP(IN UINT8 *FileData, IN UINTN FileDataLength, IN BOOLEAN W
             PixelPtr->Reserved = 255 - PixelPtr->Reserved;
           PixelPtr++;
         }
-        
+
+=======
+
+>>>>>>> Platform: Remove unnecessary whitespace:rEFIt_UEFI/libeg/load_bmp.c
     }
   }
-  
+
   return NewImage;
 }
 
@@ -240,7 +244,7 @@ VOID egEncodeBMP(IN EG_IMAGE *Image, OUT UINT8 **FileDataReturn, OUT UINTN *File
     UINT64               ImageLineOffset;
     EFI_UGA_PIXEL       *PixelPtr;
     INT64                x, y;
-    
+
     ImageLineOffset = MultU64x32(Image->Width, 3);
 //    if ((ImageLineOffset % 4) != 0)
 //        ImageLineOffset = ImageLineOffset + (4 - (ImageLineOffset % 4));
@@ -248,7 +252,7 @@ VOID egEncodeBMP(IN EG_IMAGE *Image, OUT UINT8 **FileDataReturn, OUT UINTN *File
             ImageLineOffset = ImageLineOffset + (4 - (ImageLineOffset & 3));
   }
 
-    
+
     // allocate buffer for file data
     FileDataLength = sizeof(BMP_IMAGE_HEADER) + MultU64x64(Image->Height, ImageLineOffset);
     FileData = AllocateZeroPool((UINTN)FileDataLength);
@@ -258,7 +262,7 @@ VOID egEncodeBMP(IN EG_IMAGE *Image, OUT UINT8 **FileDataReturn, OUT UINTN *File
         *FileDataLengthReturn = 0;
         return;
     }
-    
+
     // fill header
     BmpHeader = (BMP_IMAGE_HEADER *)FileData;
     BmpHeader->CharB = 'B';
@@ -273,7 +277,7 @@ VOID egEncodeBMP(IN EG_IMAGE *Image, OUT UINT8 **FileDataReturn, OUT UINTN *File
     BmpHeader->CompressionType = 0;
     BmpHeader->XPixelsPerMeter = 0xb13;
     BmpHeader->YPixelsPerMeter = 0xb13;
-    
+
     // fill pixel buffer
     ImagePtrBase = FileData + BmpHeader->ImageOffset;
     for (y = 0; y < Image->Height; y++) {
@@ -281,7 +285,7 @@ VOID egEncodeBMP(IN EG_IMAGE *Image, OUT UINT8 **FileDataReturn, OUT UINTN *File
         ImagePtrBase += ImageLineOffset;
 //        PixelPtr = Image->PixelData + (Image->Height - 1 - y) * Image->Width;
       PixelPtr = Image->PixelData + (INT32)(Image->Height - 1 - y) * (INT32)Image->Width;
-        
+
         for (x = 0; x < Image->Width; x++) {
             *ImagePtr++ = PixelPtr->Blue;
             *ImagePtr++ = PixelPtr->Green;
@@ -289,7 +293,7 @@ VOID egEncodeBMP(IN EG_IMAGE *Image, OUT UINT8 **FileDataReturn, OUT UINTN *File
             PixelPtr++;
         }
     }
-    
+
     *FileDataReturn = FileData;
     *FileDataLengthReturn = (UINTN)FileDataLength;
 }

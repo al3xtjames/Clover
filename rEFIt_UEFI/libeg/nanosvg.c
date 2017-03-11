@@ -4184,7 +4184,7 @@ void takeXformBounds(NSVGshape *shape, float *xform, float *bounds)
   bounds[2] = nsvg__maxf(bounds[2], newBounds[2]);
   bounds[2] = nsvg__maxf(bounds[2], newBounds[4]);
   bounds[2] = nsvg__maxf(bounds[2], newBounds[6]);
-  
+
   bounds[3] = nsvg__maxf(bounds[3], newBounds[1]);
   bounds[3] = nsvg__maxf(bounds[3], newBounds[3]);
   bounds[3] = nsvg__maxf(bounds[3], newBounds[5]);
@@ -4362,5 +4362,3 @@ void nsvgDelete(NSVGimage* image)
  return res;
  }
  */
-
-

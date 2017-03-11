@@ -411,7 +411,7 @@ EFI_STATUS egSaveFile(IN EFI_FILE_HANDLE BaseDir OPTIONAL, IN CHAR16 *FileName,
       return Status;
     }
   }
-    
+
   // syscl - make directory if not exist
   while (*p != L'\\' && p >= FileName) {
     // find the first '\\' traverse from the end to head of FileName
@@ -421,7 +421,7 @@ EFI_STATUS egSaveFile(IN EFI_FILE_HANDLE BaseDir OPTIONAL, IN CHAR16 *FileName,
   StrnCpy(DirName, FileName, dirNameLen);
   Status = BaseDir->Open(BaseDir, &FileHandle, DirName,
                            EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE, EFI_FILE_DIRECTORY);
-    
+
   if (EFI_ERROR(Status)) {
       // make dir
 //    DBG("no dir %r\n", Status);
@@ -586,7 +586,7 @@ EG_IMAGE * egLoadIcon(IN EFI_FILE_HANDLE BaseDir, IN CHAR16 *FileName, IN UINTN 
   if (!NewImage) {
     NewImage = egDecodeICNS(FileData, FileDataLength, IconSize, TRUE);
   }
-  
+
   FreePool(FileData);
   return NewImage;
 }

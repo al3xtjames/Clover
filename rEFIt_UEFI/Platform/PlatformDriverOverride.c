@@ -46,21 +46,21 @@ OurPlatformGetDriver (
   )
 {
   EFI_HANDLE     *HandlePtr;
-  
+
   if (ControllerHandle == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   if (mPriorityDrivers == NULL) {
     return EFI_NOT_FOUND;
   }
-  
+
   // if first call - return first
   if (*DriverImageHandle == NULL) {
     *DriverImageHandle = mPriorityDrivers[0];
     return EFI_SUCCESS;
   }
-  
+
   // search through our list
   for (HandlePtr = mPriorityDrivers; *HandlePtr != NULL; HandlePtr++) {
     if (*HandlePtr == *DriverImageHandle) {
@@ -73,7 +73,7 @@ OurPlatformGetDriver (
       return EFI_SUCCESS;
     }
   }
-  
+
   return EFI_INVALID_PARAMETER;
 }
 ///
@@ -107,7 +107,7 @@ OurPlatformDriverLoaded (
   CHAR16                           *DriverName;
   EFI_COMPONENT_NAME_PROTOCOL      *CompName;
   EFI_BLOCK_IO_PROTOCOL         *BlkIo = NULL;
-  
+
   Status = gBS->HandleProtocol (
                                 ControllerHandle,
                                 &gEfiBlockIoProtocolGuid,
@@ -116,7 +116,7 @@ OurPlatformDriverLoaded (
   if (EFI_ERROR(Status)) {
     return EFI_UNSUPPORTED;
   }
-  
+
   Status = gBS->OpenProtocol(
                              DriverImageHandle,
                              &gEfiComponentNameProtocolGuid,
@@ -124,7 +124,7 @@ OurPlatformDriverLoaded (
                              gImageHandle,
                              NULL,
                              EFI_OPEN_PROTOCOL_GET_PROTOCOL);
-  
+
   if (EFI_ERROR(Status)) {
     DBG(" CompName %r\n", Status);
     return EFI_UNSUPPORTED;
@@ -176,7 +176,7 @@ OvrPlatformGetDriver(
     *DriverImageHandle = mPriorityDrivers[0];
     return EFI_SUCCESS;
   }
-  
+
   // search through our list
   for (HandlePtr = mPriorityDrivers; *HandlePtr != NULL; HandlePtr++) {
     if (*HandlePtr == *DriverImageHandle) {
@@ -211,7 +211,7 @@ VOID RegisterDriversToHighestPriority(IN EFI_HANDLE *PriorityDrivers)
 {
   EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL *PlatformDriverOverride;
   EFI_STATUS                            Status;
-  
+
   mPriorityDrivers = PriorityDrivers;
   Status = gBS->LocateProtocol(&gEfiPlatformDriverOverrideProtocolGuid, NULL, (VOID **) &PlatformDriverOverride);
   if (EFI_ERROR(Status)) {
@@ -225,12 +225,11 @@ VOID RegisterDriversToHighestPriority(IN EFI_HANDLE *PriorityDrivers)
     DBG("%r\n", Status);
     return;
   }
-  
+
   mOrigPlatformGetDriver = PlatformDriverOverride->GetDriver;
   PlatformDriverOverride->GetDriver = OvrPlatformGetDriver;
   DBG("PlatformDriverOverrideProtocol->GetDriver overriden\n");
   mOrigPlatformDriverLoaded = PlatformDriverOverride->DriverLoaded;
   PlatformDriverOverride->DriverLoaded = OurPlatformDriverLoaded;
-  
-}
 
+}

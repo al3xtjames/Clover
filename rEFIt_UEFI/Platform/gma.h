@@ -17,7 +17,7 @@ switch (ram)
 {
   case 96:
     ig_platform_id = 0x01660000; // 96mb
-    break;    
+    break;
   case 64:
     ig_platform_id = 0x01660009; // 64mb
     break;
@@ -25,6 +25,6 @@ switch (ram)
     ig_platform_id = 0x01620005; // 32mb
     break;
   default:
-*/    
-    
+*/
+
 #endif /* !__LIBSAIO_GMA_H */

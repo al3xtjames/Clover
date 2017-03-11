@@ -321,11 +321,11 @@ SetVariablesForOSX(LOADER_ENTRY *Entry)
     NvidiaWebValue = "1";
     SetNvramVariable(L"nvda_drv", &gAppleBootVariableGuid, Attributes, 2, (VOID*)NvidiaWebValue);
   }
-  
+
   if (!gDriversFlags.AptioMemFixLoaded) {
     DeleteNvramVariable(L"recovery-boot-mode", &gAppleBootVariableGuid);
   }
-  
+
   // Check for AptioFix2Drv loaded to store efi-boot-device for special boot
     if (gDriversFlags.AptioFix2Loaded || gDriversFlags.AptioFixLoaded ||
         gDriversFlags.AptioFix3Loaded || gDriversFlags.AptioMemFixLoaded)  {

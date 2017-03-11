@@ -235,7 +235,7 @@ DevPathVendor (
       return ;
 
     } else
-*/		
+*/
 	if (CompareGuid (&Vendor->Guid, &gEfiSasDevicePathGuid)) {
       CatPrint (
         Str,
@@ -336,7 +336,7 @@ DevPathExtendedAcpi (
   )
 {
   ACPI_EXTENDED_HID_DEVICE_PATH   *ExtendedAcpi;
-  
+
   //
   // Index for HID, UID and CID strings, 0 for non-exist
   //

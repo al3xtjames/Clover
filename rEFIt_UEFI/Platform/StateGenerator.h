@@ -19,7 +19,7 @@
 #if DEBUG_AML==0
 #define DBG(...)
 #else
-#define DBG(...) DebugLog(DEBUG_AML, __VA_ARGS__)	
+#define DBG(...) DebugLog(DEBUG_AML, __VA_ARGS__)
 #endif
 
 

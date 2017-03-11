@@ -1,8 +1,8 @@
 /*
  *  BootOptions.c
- *  
+ *
  *  Created by dmazar, 10.2012.
- *  
+ *
  *  Functions for modifying UEFI boot options.
  *
  */
@@ -35,7 +35,7 @@ WaitForKeyPress(
     EFI_STATUS      Status;
     UINTN           index;
     EFI_INPUT_KEY   key;
-    
+
     Print(Message);
     do {
         Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &key);
@@ -55,8 +55,8 @@ ToUpperChar(
     )
 {
     CHAR8               C;
-    
-    
+
+
     if (Chr > 0xFF) return Chr;
     C = (CHAR8)Chr;
     return ((C >= 'a' && C <= 'z') ? C - ('a' - 'A') : C);
@@ -74,8 +74,8 @@ StrCmpiBasic(
 {
     CHAR16              Chr1;
     CHAR16              Chr2;
-    
-    
+
+
     if (String1 == NULL || String2 == NULL) {
         return 1;
     }
@@ -85,7 +85,7 @@ StrCmpiBasic(
     if (*String1 == L'\0' || *String2 == L'\0') {
         return 1;
     }
-    
+
     Chr1 = ToUpperChar(*String1);
     Chr2 = ToUpperChar(*String2);
     while ((*String1 != L'\0') && (Chr1 == Chr2)) {
@@ -94,7 +94,7 @@ StrCmpiBasic(
         Chr1 = ToUpperChar(*String1);
         Chr2 = ToUpperChar(*String2);
     }
-    
+
     return Chr1 - Chr2;
 }
 */
@@ -115,7 +115,7 @@ StrStriBasic (
 {
     CONST CHAR16 *FirstMatch;
     CONST CHAR16 *SearchStringTmp;
-    
+
     if (String == NULL || SearchString == NULL) {
         return NULL;
     }
@@ -123,28 +123,28 @@ StrStriBasic (
     if (*SearchString == L'\0') {
         return (CHAR16 *) String;
     }
-    
+
     while (*String != L'\0') {
         SearchStringTmp = SearchString;
         FirstMatch = String;
-        
+
         while ((ToUpperChar(*String) == ToUpperChar(*SearchStringTmp))
                && (*String != L'\0')) {
             String++;
             SearchStringTmp++;
         }
-        
+
         if (*SearchStringTmp == L'\0') {
             return (CHAR16 *) FirstMatch;
         }
-        
+
         if (*String == L'\0') {
             return NULL;
         }
-        
+
         String = FirstMatch + 1;
     }
-    
+
     return NULL;
 }
 */
@@ -158,14 +158,14 @@ FindDevicePathNodeWithType (
     IN  UINT8           SubType OPTIONAL
 )
 {
-    
+
     while ( !IsDevicePathEnd (DevicePath) ) {
         if (DevicePathType (DevicePath) == Type && (SubType == 0 || DevicePathSubType (DevicePath) == SubType)) {
             return DevicePath;
         }
         DevicePath = NextDevicePathNode (DevicePath);
     }
-    
+
     //
     // Not found
     //
@@ -193,7 +193,7 @@ CreateBootOptionDevicePath (
     EFI_STATUS          Status;
     EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *Volume;
     EFI_DEVICE_PATH_PROTOCOL        *TmpDevPath;
-    
+
     //
     // Check that FileDeviceHandle is file system volume
     //
@@ -202,7 +202,7 @@ CreateBootOptionDevicePath (
         DBG("CreateBootOptionDevicePath: FileDeviceHandle %p is not fs volume", FileDeviceHandle);
         return EFI_INVALID_PARAMETER;
     }
-    
+
     //
     // Create file path node with FileName
     //
@@ -210,7 +210,7 @@ CreateBootOptionDevicePath (
     if (*DevicePath == NULL) {
         return EFI_OUT_OF_RESOURCES;
     }
-    
+
     //
     // Extract only short form if specified
     //
@@ -230,7 +230,7 @@ CreateBootOptionDevicePath (
           }
         }*/
     }
-    
+
     return EFI_SUCCESS;
 }
 
@@ -248,15 +248,15 @@ DevicePathEqual (
     UINTN           Len1;
     CHAR16          *FPath1;
     CHAR16          *FPath2;
-    
-    
+
+
     Equal = FALSE;
-    
+
     while (TRUE) {
         Type1 = DevicePathType (DevicePath1);
         SubType1 = DevicePathSubType (DevicePath1);
         Len1 = DevicePathNodeLength (DevicePath1);
-        
+
         /*
          DBG("Type: %d, %d\n", Type1, DevicePathType (DevicePath2));
          DBG("SubType: %d, %d\n", SubType1, DevicePathSubType (DevicePath2));
@@ -264,7 +264,7 @@ DevicePathEqual (
          DBG("%s\n", DevicePathToStr(DevicePath1));
          DBG("%s\n", DevicePathToStr(DevicePath2));
          */
-        
+
         if (Type1 != DevicePathType (DevicePath2)
             || SubType1 != DevicePathSubType (DevicePath2)
             || Len1 != DevicePathNodeLength (DevicePath2)
@@ -274,17 +274,17 @@ DevicePathEqual (
             //DBG("Not equal type/subtype/len\n");
             break;
         }
-        
+
         //
         // Same type/subtype/len ...
         //
-        
+
         if (IsDevicePathEnd (DevicePath1)) {
             // END node - they are the same
             Equal = TRUE;
             break;
         }
-        
+
         //
         // Do mem compare of nodes or special compare for selected types/subtypes
         //
@@ -313,14 +313,14 @@ DevicePathEqual (
                 break;
             }
         }
-        
+
         //
         // Advance to next node
         //
         DevicePath1 =  NextDevicePathNode (DevicePath1);
         DevicePath2 =  NextDevicePathNode (DevicePath2);
     }
-    
+
     return Equal;
 }
 
@@ -472,15 +472,15 @@ DeleteFromBootOrder (
     UINT16              *BootOrder;
     UINTN               BootOrderLen;
     UINTN               Index;
-    
-    
+
+
     DBG("DeleteFromBootOrder: %04X\n", BootNum);
-    
+
     Status = GetBootOrder (&BootOrder, &BootOrderLen);
     if (EFI_ERROR(Status)) {
         return Status;
     }
-    
+
     //
     // Find BootNum and remove it by sliding others to it's place
     //
@@ -489,13 +489,13 @@ DeleteFromBootOrder (
             break;
         }
     }
-    
+
     if (Index >= BootOrderLen) {
         DBG("Not found\n");
         return EFI_NOT_FOUND;
     }
     DBG(" found at index %d\n", Index);
-    
+
     //
     // BootNum found at Index - copy the rest over it
     //
@@ -506,7 +506,7 @@ DeleteFromBootOrder (
                  );
     }
     BootOrderLen -= 1;
-    
+
     //
     // Save it
     //
@@ -519,16 +519,16 @@ DeleteFromBootOrder (
                                BootOrder
                                );
     DBG("SetVariable: %s = %r\n", BOOT_ORDER_VAR, Status);
-    
+
     FreePool (BootOrder);
-    
+
     // Debug: Get and print new BootOrder value
     //GetBootOrder (&BootOrder, &BootOrderLen);
-    
+
     if (EFI_ERROR(Status)) {
         return Status;
     }
-    
+
     return EFI_SUCCESS;
 }
 
@@ -542,14 +542,14 @@ PrintBootOption (
 {
     UINTN               VarSizeTmp;
     CHAR16              *FPStr;
-    
-    
+
+
     DBG("%2d) Boot%04X: %s, Attr: 0x%x\n",
         Index, BootOption->BootNum, BootOption->Description, BootOption->Attributes);
     FPStr = FileDevicePathToStr(BootOption->FilePathList);
     DBG("    %s\n", FPStr);
     FreePool (FPStr);
-    
+
     VarSizeTmp = sizeof(BootOption->Attributes)
                         + sizeof(BootOption->FilePathListLength)
                         + BootOption->DescriptionSize
@@ -569,7 +569,7 @@ PrintBootOption (
     //DBG(" FP F: %s\n", FileDevicePathToStr(BootOption->FilePathList));
     //DBG(" Description: %p, %d, %s\n", BootOption->Description, BootOption->DescriptionSize, BootOption->Description);
     //DBG("OptionalData: %p, %d\n", BootOption->OptionalData, BootOption->OptionalDataSize);
-    
+
 }
 
 
@@ -584,8 +584,8 @@ ParseBootOption (
     UINT8               *Ptr8;
     UINT8               *VarStart;
     UINT8               *VarEnd;
-    
-    
+
+
     if (BootOption->Variable == NULL
         || BootOption->VariableSize <= sizeof(BootOption->Attributes) + sizeof(BootOption->FilePathListLength)
         )
@@ -593,19 +593,19 @@ ParseBootOption (
         DBG("ParseBootOption: invalid input params\n");
         return EFI_INVALID_PARAMETER;
     }
-    
+
     VarStart = (UINT8*)BootOption->Variable;
     VarEnd = VarStart + BootOption->VariableSize;
     Ptr8 = VarStart;
-    
+
     // Attributes
     BootOption->Attributes = *((UINT32*)Ptr8);
     Ptr8 += sizeof(BootOption->Attributes);
-    
+
     // FilePathListLength
     BootOption->FilePathListLength = *((UINT16*)Ptr8);
     Ptr8 += sizeof(BootOption->FilePathListLength);
-    
+
     // Description and it's size
     BootOption->Description = (CHAR16*)Ptr8;
     BootOption->DescriptionSize = StrSize(BootOption->Description);
@@ -614,7 +614,7 @@ ParseBootOption (
         DBG("ParseBootOption: invalid boot variable\n");
         return EFI_INVALID_PARAMETER;
     }
-    
+
     // FilePathList
     BootOption->FilePathList = (EFI_DEVICE_PATH_PROTOCOL*)Ptr8;
     Ptr8 += BootOption->FilePathListLength;
@@ -622,7 +622,7 @@ ParseBootOption (
         DBG("ParseBootOption: invalid boot variable\n");
         return EFI_INVALID_PARAMETER;
     }
-    
+
     // OptionalData and it's size
     if (Ptr8 < VarEnd) {
         BootOption->OptionalData = Ptr8;
@@ -632,7 +632,7 @@ ParseBootOption (
         BootOption->OptionalDataSize = 0;
     }
     Ptr8 += BootOption->OptionalDataSize;
-    
+
     return EFI_SUCCESS;
 }
 
@@ -647,8 +647,8 @@ CompileBootOption (
     )
 {
     UINT8               *Ptr8;
-    
-    
+
+
     if (BootOption->Description == NULL
         || BootOption->FilePathList == NULL
         || BootOption->FilePathListLength == 0
@@ -658,11 +658,11 @@ CompileBootOption (
         DBG("CompileBootOption: invalid input params\n");
         return EFI_INVALID_PARAMETER;
     }
-    
+
     BootOption->DescriptionSize = StrSize(BootOption->Description);
     BootOption->VariableSize = sizeof(BootOption->Attributes)   //UINT32
                                 + sizeof(BootOption->FilePathListLength) //UINT16
-                                + BootOption->DescriptionSize 
+                                + BootOption->DescriptionSize
                                 + BootOption->FilePathListLength
                                 + BootOption->OptionalDataSize;
     BootOption->Variable = AllocateZeroPool (BootOption->VariableSize);
@@ -671,29 +671,29 @@ CompileBootOption (
         return EFI_OUT_OF_RESOURCES;
     }
     Ptr8 = (UINT8*)BootOption->Variable;
-    
+
     // Attributes
     *((UINT32*)Ptr8) = BootOption->Attributes;
     Ptr8 += sizeof(BootOption->Attributes);
-    
+
     // FilePathListLength;
     *((UINT16*)Ptr8) = BootOption->FilePathListLength;
     Ptr8 += sizeof(BootOption->FilePathListLength);
-    
+
     // Description
     CopyMem ((CHAR16*)Ptr8, BootOption->Description, BootOption->DescriptionSize);
     Ptr8 += BootOption->DescriptionSize;
-    
+
     // FilePathList
     CopyMem (Ptr8, BootOption->FilePathList, BootOption->FilePathListLength);
     Ptr8 += BootOption->FilePathListLength;
-    
+
     // OptionalData
     if (BootOption->OptionalDataSize > 0) {
         CopyMem (Ptr8, BootOption->OptionalData, BootOption->OptionalDataSize);
 //        Ptr8 += BootOption->OptionalDataSize;
     }
-    
+
     return EFI_SUCCESS;
 }
 
@@ -1210,4 +1210,3 @@ DeleteBootOptionsContainingFile (
   DBG("DeleteBootOptionContainingFile: %r\n", ReturnStatus);
   return ReturnStatus;
 }
-

@@ -53,7 +53,7 @@
 #include "device_inject.h"
 
 extern CHAR8* gDeviceProperties;
-	
+
 //BOOLEAN setup_nvidia_devprop(pci_dt_t *nvda_dev);
 
 struct nvidia_pci_info_t;

@@ -79,7 +79,7 @@ EFI_STATUS
 InitializeConsoleSim ()
 {
   EFI_STATUS Status;
-  
+
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &gImageHandle,
                   &gEfiConsoleControlProtocolGuid,

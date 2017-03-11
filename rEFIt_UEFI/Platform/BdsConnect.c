@@ -110,7 +110,7 @@ BdsLibConnectDevicePath (
     return EFI_OUT_OF_RESOURCES;
   }
   CopyOfDevicePath  = DevicePath;
-  
+
   do {
     //
     // The outer loop handles multi instance device paths.
@@ -123,7 +123,7 @@ BdsLibConnectDevicePath (
       FreePool (CopyOfDevicePath);
       return EFI_OUT_OF_RESOURCES;
     }
-    
+
     Next      = Instance;
     while (!IsDevicePathEndType (Next)) {
       Next = NextDevicePathNode (Next);
@@ -194,8 +194,8 @@ BdsLibConnectDevicePath (
 
 
 /**
-  This function will connect all current system handles recursively. 
-  
+  This function will connect all current system handles recursively.
+
   gBS->ConnectController() service is invoked for each handle exist in system handler buffer.
   If the handle is bus type handler, all childrens also will be connected recursively
   by gBS->ConnectController().
@@ -227,7 +227,7 @@ BdsLibConnectAllEfi (
   }
 
   for (Index = 0; Index < HandleCount; Index++) {
-    //Status = 
+    //Status =
     gBS->ConnectController (HandleBuffer[Index], NULL, NULL, TRUE);
   }
 
@@ -239,8 +239,8 @@ BdsLibConnectAllEfi (
 }
 
 /**
-  This function will disconnect all current system handles. 
-  
+  This function will disconnect all current system handles.
+
   gBS->DisconnectController() is invoked for each handle exists in system handle buffer.
   If handle is a bus type handle, all childrens also are disconnected recursively by
   gBS->DisconnectController().
@@ -275,7 +275,7 @@ BdsLibDisconnectAllEfi (
   }
 
   for (Index = 0; Index < HandleCount; Index++) {
-    //Status = 
+    //Status =
     gBS->DisconnectController (HandleBuffer[Index], NULL, NULL);
   }
 
@@ -300,20 +300,20 @@ EFI_STATUS ScanDeviceHandles(EFI_HANDLE ControllerHandle,
   UINTN                               OpenInfoCount;
   UINTN                               OpenInfoIndex;
   UINTN                               ChildIndex;
-  
+
   *HandleCount  = 0;
   *HandleBuffer = NULL;
   *HandleType   = NULL;
-  
+
   //
   // Retrieve the list of all handles from the handle database
   //
   Status = gBS->LocateHandleBuffer (AllHandles, NULL, NULL, HandleCount, HandleBuffer);
   if (EFI_ERROR (Status)) goto Error;
-  
+
   *HandleType = AllocatePool (*HandleCount * sizeof (UINT32));
   if (*HandleType == NULL) goto Error;
-    
+
   for (HandleIndex = 0; HandleIndex < *HandleCount; HandleIndex++) {
     (*HandleType)[HandleIndex] = EFI_HANDLE_TYPE_UNKNOWN;
     //
@@ -324,37 +324,37 @@ EFI_STATUS ScanDeviceHandles(EFI_HANDLE ControllerHandle,
                   &ProtocolGuidArray,
                   &ArrayCount
                   );
-    if (!EFI_ERROR (Status)) {      
+    if (!EFI_ERROR (Status)) {
       for (ProtocolIndex = 0; ProtocolIndex < ArrayCount; ProtocolIndex++) {
-        
+
         if (CompareGuid (ProtocolGuidArray[ProtocolIndex], &gEfiLoadedImageProtocolGuid)) {
           (*HandleType)[HandleIndex] |= EFI_HANDLE_TYPE_IMAGE_HANDLE;
         }
-        
+
         if (CompareGuid (ProtocolGuidArray[ProtocolIndex], &gEfiDriverBindingProtocolGuid)) {
           (*HandleType)[HandleIndex] |= EFI_HANDLE_TYPE_DRIVER_BINDING_HANDLE;
         }
-        
+
         if (CompareGuid (ProtocolGuidArray[ProtocolIndex], &gEfiDriverConfigurationProtocolGuid)) {
           (*HandleType)[HandleIndex] |= EFI_HANDLE_TYPE_DRIVER_CONFIGURATION_HANDLE;
         }
-        
+
         if (CompareGuid (ProtocolGuidArray[ProtocolIndex], &gEfiDriverDiagnosticsProtocolGuid)) {
           (*HandleType)[HandleIndex] |= EFI_HANDLE_TYPE_DRIVER_DIAGNOSTICS_HANDLE;
         }
-        
+
         if (CompareGuid (ProtocolGuidArray[ProtocolIndex], &gEfiComponentName2ProtocolGuid)) {
           (*HandleType)[HandleIndex] |= EFI_HANDLE_TYPE_COMPONENT_NAME_HANDLE;
         }
-        
+
         if (CompareGuid (ProtocolGuidArray[ProtocolIndex], &gEfiComponentNameProtocolGuid) ) {
           (*HandleType)[HandleIndex] |= EFI_HANDLE_TYPE_COMPONENT_NAME_HANDLE;
         }
-        
+
         if (CompareGuid (ProtocolGuidArray[ProtocolIndex], &gEfiDevicePathProtocolGuid)) {
           (*HandleType)[HandleIndex] |= EFI_HANDLE_TYPE_DEVICE_HANDLE;
         }
-        
+
         //
         // Retrieve the list of agents that have opened each protocol
         //
@@ -365,9 +365,9 @@ EFI_STATUS ScanDeviceHandles(EFI_HANDLE ControllerHandle,
                                                &OpenInfoCount
                                                );
         if (!EFI_ERROR (Status)) {
-          
+
           for (OpenInfoIndex = 0; OpenInfoIndex < OpenInfoCount; OpenInfoIndex++) {
-            
+
             if (OpenInfo[OpenInfoIndex].ControllerHandle == ControllerHandle) {
               if ((OpenInfo[OpenInfoIndex].Attributes & EFI_OPEN_PROTOCOL_BY_DRIVER) == EFI_OPEN_PROTOCOL_BY_DRIVER) {
                 for (ChildIndex = 0; ChildIndex < *HandleCount; ChildIndex++) {
@@ -376,10 +376,10 @@ EFI_STATUS ScanDeviceHandles(EFI_HANDLE ControllerHandle,
                   }
                 }
               }
-              
+
               if ((OpenInfo[OpenInfoIndex].Attributes & EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER) == EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER) {
                 (*HandleType)[HandleIndex] |= EFI_HANDLE_TYPE_PARENT_HANDLE;
-                for (ChildIndex = 0; ChildIndex < *HandleCount; ChildIndex++) 
+                for (ChildIndex = 0; ChildIndex < *HandleCount; ChildIndex++)
                 {
                   if ((*HandleBuffer)[ChildIndex] == OpenInfo[OpenInfoIndex].AgentHandle) {
                     (*HandleType)[ChildIndex] |= EFI_HANDLE_TYPE_BUS_DRIVER;
@@ -388,30 +388,30 @@ EFI_STATUS ScanDeviceHandles(EFI_HANDLE ControllerHandle,
               }
             }
           }
-          
+
           FreePool (OpenInfo);
         }
       }
-      
+
       FreePool (ProtocolGuidArray);
     }
   }
-  
+
   return EFI_SUCCESS;
-  
+
 Error:
   if (*HandleType != NULL) {
     FreePool (*HandleType);
   }
-  
+
   if (*HandleBuffer != NULL) {
     FreePool (*HandleBuffer);
   }
-  
+
   *HandleCount  = 0;
   *HandleBuffer = NULL;
   *HandleType   = NULL;
-  
+
   return Status;
 }
 
@@ -431,32 +431,32 @@ EFI_STATUS BdsLibConnectMostlyAllEfi()
 	BOOLEAN           Device;
 	EFI_PCI_IO_PROTOCOL*	PciIo = NULL;
 	PCI_TYPE00				Pci;
-  
-  
+
+
 	Status = gBS->LocateHandleBuffer (AllHandles, NULL, NULL, &AllHandleCount, &AllHandleBuffer);
-	if (EFI_ERROR (Status)) 
+	if (EFI_ERROR (Status))
 		return Status;
-  
+
 	for (Index = 0; Index < AllHandleCount; Index++) {
 		Status = ScanDeviceHandles(AllHandleBuffer[Index], &HandleCount, &HandleBuffer, &HandleType);
-    
+
 		if (EFI_ERROR (Status))
 			goto Done;
-    
+
 		Device = TRUE;
-		
+
 		if (HandleType[Index] & EFI_HANDLE_TYPE_DRIVER_BINDING_HANDLE)
 			Device = FALSE;
 		if (HandleType[Index] & EFI_HANDLE_TYPE_IMAGE_HANDLE)
 			Device = FALSE;
-    
-		if (Device) {					
+
+		if (Device) {
 			Parent = FALSE;
 			for (HandleIndex = 0; HandleIndex < HandleCount; HandleIndex++) {
 				if (HandleType[HandleIndex] & EFI_HANDLE_TYPE_PARENT_HANDLE)
 					Parent = TRUE;
 			}
-      
+
 			if (!Parent) {
 				if (HandleType[Index] & EFI_HANDLE_TYPE_DEVICE_HANDLE) {
 					Status = gBS->HandleProtocol (AllHandleBuffer[Index], &gEfiPciIoProtocolGuid, (VOID*)&PciIo);
@@ -472,11 +472,11 @@ EFI_STATUS BdsLibConnectMostlyAllEfi()
 				}
 			}
 		}
-    
+
 		FreePool (HandleBuffer);
 		FreePool (HandleType);
 	}
-  
+
 Done:
 	FreePool (AllHandleBuffer);
 	return Status;

@@ -250,7 +250,7 @@ typedef enum {
   AlignCenter,
   AlignUp,
   AlignDown
-  
+
 } ALIGNMENT;
 
 //mouse types
@@ -273,10 +273,10 @@ typedef struct _pointers {
   EG_IMAGE *Pointer;
   EG_IMAGE *newImage;
   EG_IMAGE *oldImage;
-  
+
   EG_RECT  newPlace;
   EG_RECT  oldPlace;
-  
+
   UINT64	LastClickTime;  //not EFI_TIME
   EFI_SIMPLE_POINTER_STATE    State;
   MOUSE_EVENT MouseEvent;
@@ -291,7 +291,7 @@ typedef enum {
   UNIString,
   RadioSwitch,
   CheckBit,
-  
+
 } ITEM_TYPE;
 
 typedef struct {
@@ -459,7 +459,7 @@ typedef enum {
   imScale,
   imCrop,
   imTile
-  
+
 } SCALING;
 
 typedef struct {
@@ -566,7 +566,7 @@ typedef struct KERNEL_AND_KEXT_PATCHES
   BOOLEAN KPKernelCpu;
   BOOLEAN KPKernelLapic;
   BOOLEAN KPKernelXCPM;
-  BOOLEAN KPKernelPm; 
+  BOOLEAN KPKernelPm;
   BOOLEAN KPAppleIntelCPUPM;
   BOOLEAN KPAppleRTC;
   BOOLEAN KPDELLSMBIOS;  // Dell SMBIOS patch
@@ -577,12 +577,12 @@ typedef struct KERNEL_AND_KEXT_PATCHES
 #if defined(MDE_CPU_IA32)
   UINT32  align1;
 #endif
-  
+
   UINT8   *KPATIConnectorsData;
 #if defined(MDE_CPU_IA32)
   UINT32  align2;
 #endif
-  
+
   UINTN   KPATIConnectorsDataLen;
 #if defined(MDE_CPU_IA32)
   UINT32  align3;
@@ -591,14 +591,14 @@ typedef struct KERNEL_AND_KEXT_PATCHES
 #if defined(MDE_CPU_IA32)
   UINT32  align4;
 #endif
-  
+
   INT32   NrKexts;
   UINT32  align40;
   KEXT_PATCH *KextPatches;   //zzzz
 #if defined(MDE_CPU_IA32)
   UINT32  align5;
 #endif
-  
+
   INT32    NrForceKexts;
   UINT32  align50;
   CHAR16 **ForceKexts;
@@ -609,7 +609,7 @@ typedef struct KERNEL_AND_KEXT_PATCHES
   KERNEL_PATCH *KernelPatches;
   INT32   NrBoots;
   KERNEL_PATCH *BootPatches;
-  
+
 } KERNEL_AND_KEXT_PATCHES;
 
 typedef struct {
@@ -1020,5 +1020,5 @@ VOID DbgHeader(CHAR8 *str);
 
 #endif
 /*
- 
+
  EOF */

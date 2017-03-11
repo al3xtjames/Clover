@@ -1,14 +1,14 @@
 /** @file
   Provide legacy thunk interface for accessing Bios Video Rom.
-  
+
 Copyright (c) 2006 - 2007, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -33,7 +33,7 @@ extern THUNK_CONTEXT                   *mThunkContext;
 
 /**
   Initialize legacy environment for BIOS INI caller.
-  
+
   @param ThunkContext   the instance pointer of THUNK_CONTEXT
 **/
 EFI_STATUS
@@ -62,7 +62,7 @@ InitializeBiosIntCaller (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   mThunkContext->RealModeBuffer     = (VOID*)(UINTN)LegacyRegionBase;
   mThunkContext->RealModeBufferSize = LegacyRegionSize;
   mThunkContext->ThunkAttributes    = THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15;
@@ -77,9 +77,9 @@ InitializeBiosIntCaller (
    Or the interrupt will lost when we do thunk.
    NOTE: We do not reset 8259 vector base, because it will cause pending
    interrupt lost.
-   
+
    @param Legacy8259  Instance pointer for EFI_LEGACY_8259_PROTOCOL.
-   
+
 **/
 CONST   UINT32   InterruptRedirectionCode[8] = {
   0x90CF08CD, // INT8; IRET; NOP
@@ -187,17 +187,17 @@ DisconnectVga ( VOID )
 
 
 /**
-  Thunk to 16-bit real mode and execute a software interrupt with a vector 
-  of BiosInt. Regs will contain the 16-bit register context on entry and 
+  Thunk to 16-bit real mode and execute a software interrupt with a vector
+  of BiosInt. Regs will contain the 16-bit register context on entry and
   exit.
-  
+
   @param  This    Protocol instance pointer.
   @param  BiosInt Processor interrupt vector to invoke
   @param  Reg     Register contexted passed into (and returned) from thunk to 16-bit mode
-  
+
   @retval TRUE   Thunk completed, and there were no BIOS errors in the target code.
                  See Regs for status.
-  @retval FALSE  There was a BIOS erro in the target code.  
+  @retval FALSE  There was a BIOS erro in the target code.
 **/
 BOOLEAN
 EFIAPI
@@ -212,7 +212,7 @@ LegacyBiosInt86 (
   IA32_REGISTER_SET     ThunkRegSet;
   BOOLEAN               Ret;
   UINT16                *Stack16;
-  
+
   ZeroMem (&ThunkRegSet, sizeof (ThunkRegSet));
   ThunkRegSet.E.EFLAGS.Bits.Reserved_0 = 1;
   ThunkRegSet.E.EFLAGS.Bits.Reserved_1 = 0;
@@ -223,7 +223,7 @@ LegacyBiosInt86 (
   ThunkRegSet.E.EFLAGS.Bits.IF         = 1;
   ThunkRegSet.E.EFLAGS.Bits.TF         = 0;
   ThunkRegSet.E.EFLAGS.Bits.CF         = 0;
-  
+
   ThunkRegSet.E.EDI  = Regs->E.EDI;
   ThunkRegSet.E.ESI  = Regs->E.ESI;
   ThunkRegSet.E.EBP  = Regs->E.EBP;
@@ -250,7 +250,7 @@ LegacyBiosInt86 (
   if (EFI_ERROR (Status)) {
     return FALSE;
   }
-  
+
   Stack16 = (UINT16 *)((UINT8 *) mThunkContext->RealModeBuffer + mThunkContext->RealModeBufferSize - sizeof (UINT16));
 
   ThunkRegSet.E.SS   = (UINT16) (((UINTN) Stack16 >> 16) << 12);
@@ -260,7 +260,7 @@ LegacyBiosInt86 (
   ThunkRegSet.E.CS   = *(UINT16*)((((UINTN)BiosInt) * sizeof(UINT32)) + sizeof(UINT16));
   mThunkContext->RealModeState = &ThunkRegSet;
   AsmThunk16 (mThunkContext);
-  
+
   //
   // Restore protected mode interrupt state
   //
@@ -277,16 +277,16 @@ LegacyBiosInt86 (
     EnableInterrupts ();
   }
 
-  Regs->E.EDI      = ThunkRegSet.E.EDI;      
-  Regs->E.ESI      = ThunkRegSet.E.ESI;  
-  Regs->E.EBP      = ThunkRegSet.E.EBP;  
-  Regs->E.EBX      = ThunkRegSet.E.EBX;  
-  Regs->E.EDX      = ThunkRegSet.E.EDX;  
-  Regs->E.ECX      = ThunkRegSet.E.ECX;  
+  Regs->E.EDI      = ThunkRegSet.E.EDI;
+  Regs->E.ESI      = ThunkRegSet.E.ESI;
+  Regs->E.EBP      = ThunkRegSet.E.EBP;
+  Regs->E.EBX      = ThunkRegSet.E.EBX;
+  Regs->E.EDX      = ThunkRegSet.E.EDX;
+  Regs->E.ECX      = ThunkRegSet.E.ECX;
   Regs->E.EAX      = ThunkRegSet.E.EAX;
   Regs->E.SS       = ThunkRegSet.E.SS;
-  Regs->E.CS       = ThunkRegSet.E.CS;  
-  Regs->E.DS       = ThunkRegSet.E.DS;  
+  Regs->E.CS       = ThunkRegSet.E.CS;
+  Regs->E.DS       = ThunkRegSet.E.DS;
   Regs->E.ES       = ThunkRegSet.E.ES;
 
   CopyMem (&(Regs->E.EFLAGS), &(ThunkRegSet.E.EFLAGS), sizeof (UINT32));
@@ -361,14 +361,14 @@ LegacyBiosFarCall86 (
 
   // Critical section - execute without interruption until Legacy boots
   OriginalTpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
-	
+
 //xxx - Slice
   //AsmWriteIdtr(NULL);
 	Stack16 = (UINT16 *)((UINT8 *) mThunkContext->RealModeBuffer + mThunkContext->RealModeBufferSize - sizeof (UINT16));
-	
+
 	ThunkRegSet.E.SS   = (UINT16) (((UINTN) Stack16 >> 16) << 12);
 	ThunkRegSet.E.ESP  = (UINT16) (UINTN) Stack16;
-	
+
 	ThunkRegSet.E.CS   = Segment;
 	ThunkRegSet.E.Eip  = Offset;
 	mThunkContext->RealModeState = &ThunkRegSet;
@@ -431,26 +431,24 @@ LegacyBiosFarCall86 (
       EnableInterrupts ();
   }
 
-  Regs->E.EDI      = ThunkRegSet.E.EDI;      
-  Regs->E.ESI      = ThunkRegSet.E.ESI;  
-  Regs->E.EBP      = ThunkRegSet.E.EBP;  
-  Regs->E.EBX      = ThunkRegSet.E.EBX;  
-  Regs->E.EDX      = ThunkRegSet.E.EDX;  
-  Regs->E.ECX      = ThunkRegSet.E.ECX;  
+  Regs->E.EDI      = ThunkRegSet.E.EDI;
+  Regs->E.ESI      = ThunkRegSet.E.ESI;
+  Regs->E.EBP      = ThunkRegSet.E.EBP;
+  Regs->E.EBX      = ThunkRegSet.E.EBX;
+  Regs->E.EDX      = ThunkRegSet.E.EDX;
+  Regs->E.ECX      = ThunkRegSet.E.ECX;
   Regs->E.EAX      = ThunkRegSet.E.EAX;
   Regs->E.SS       = ThunkRegSet.E.SS;
-  Regs->E.CS       = ThunkRegSet.E.CS;  
-  Regs->E.DS       = ThunkRegSet.E.DS;  
+  Regs->E.CS       = ThunkRegSet.E.CS;
+  Regs->E.DS       = ThunkRegSet.E.DS;
   Regs->E.ES       = ThunkRegSet.E.ES;
 
 	CopyMem (&(Regs->E.EFLAGS), &(ThunkRegSet.E.EFLAGS), sizeof (UINT32));
-	
+
 	Ret = (BOOLEAN) (Regs->E.EFLAGS.Bits.CF == 1);
 
   // Connect VGA EFI Driver
   BdsLibConnectAllDriversToAllControllers();
-	
+
   return Ret;
 }
-
-

@@ -37,7 +37,7 @@
 //#include "Platform.h"
 #include "libegint.h"   //this includes platform.h
 //#include "../include/scroll_images.h"
-#include "Version.h"
+#include <Version.h>
 //#include "colors.h"
 
 #include "nanosvg.h"
@@ -1436,7 +1436,7 @@ VOID HelpRefit(VOID)
         AddMenuInfo(&HelpMenu, L"F11 - Reset NVRAM");
         AddMenuInfo(&HelpMenu, L"F12 - Відкрити обраний диск (DVD)");
         AddMenuInfo(&HelpMenu, L"Пробіл - докладніше про обраний пункт меню");
-        AddMenuInfo(&HelpMenu, L"Клавіші 1-9 -  клавіші пунктів меню");
+        AddMenuInfo(&HelpMenu, L"Клавіші 1-9 -  клавіші пунктів меню");
         AddMenuInfo(&HelpMenu, L"A - Про систему");
         AddMenuInfo(&HelpMenu, L"O - Опції меню");
         AddMenuInfo(&HelpMenu, L"R - Перезавантаження");

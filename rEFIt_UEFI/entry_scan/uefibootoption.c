@@ -34,7 +34,7 @@
  */
 
 /*
- 
+
  VOID AddUEFIBootOption(BO_BOOT_OPTION *bootOption)
  {
  UINTN                       volumeIndex;
@@ -47,30 +47,30 @@
  CHAR16                      *title;
  EFI_GUID                    *volumeGUID;
  EFI_GUID                    *bootGUID;
- 
+
  for (volumeIndex = 0; volumeIndex < VolumesCount; volumeIndex++) {
  volume = Volumes[volumeIndex];
  volumeGUID = FindGPTPartitionGuidInDevicePath(volume->DevicePath);
  bootGUID = FindGPTPartitionGuidInDevicePath(bootOption->FilePathList);
  if (!volumeGUID || !bootGUID || !CompareGuid(volumeGUID, bootGUID)) continue;
- 
+
  devPathNode = bootOption->FilePathList;
  loaderDevicePath = (FILEPATH_DEVICE_PATH *) FindDevicePathNodeWithType(devPathNode, MEDIA_DEVICE_PATH,
  MEDIA_FILEPATH_DP);
  if (!loaderDevicePath) continue;
- 
+
  loaderPath = loaderDevicePath->PathName;
  bootParams = (CHAR16 *) bootOption->OptionalData;
  title = bootOption->Description;
- 
+
  volume->OSIconName = L"unknown";
  volume->BootType = BOOTING_BY_EFI;
- 
+
  loaderEntry = AddLoaderEntry(loaderPath, title, volume, OSTYPE_EFI);
  loaderEntry->LoadOptions = EfiStrDuplicate(bootParams);
  }
  }
- 
+
  VOID ScanUEFIBootOptions(BOOLEAN allBootOptions)
  {
  EFI_STATUS          status;
@@ -78,33 +78,33 @@
  UINTN               bootOrderCnt;
  UINT16              i;
  BO_BOOT_OPTION      bootOption;
- 
+
  DBG("Scanning boot options from UEFI ...\n");
- 
+
  if (allBootOptions) {
  for (i = 0; i <= 0xFFFF; i++) {
  status = GetBootOption(i, &bootOption);
  if (EFI_ERROR(status)) continue;
- 
+
  AddUEFIBootOption(&bootOption);
- 
+
  FreePool(bootOption.Variable);
  }
  } else {
  status = GetBootOrder(&bootOrder, &bootOrderCnt);
  if (EFI_ERROR(status)) return;
- 
+
  for (i = 0; i < bootOrderCnt; i++) {
  status = GetBootOption(bootOrder[i], &bootOption);
  if (EFI_ERROR(status)) continue;
- 
+
  AddUEFIBootOption(&bootOption);
- 
+
  FreePool(bootOption.Variable);
  }
- 
+
  FreePool(bootOrder);
  }
  }
- 
+
  // */

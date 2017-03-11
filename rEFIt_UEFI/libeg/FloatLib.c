@@ -1,6 +1,6 @@
 //
 //  FloatLib.c
-//  
+//
 //
 //  Created by Slice on 20.06.2018.
 //
@@ -54,7 +54,7 @@ float SinF(float X)
   INTN Period;
   float X2;
   float Sign = 1.0f;
-  
+
   if (X < 0.0f) {
     X = -X;
     Sign = -1.0f;
@@ -81,7 +81,7 @@ float CosF(float X)
   INTN Period;
   float Sign = 1.0f;
   float X2;
-  
+
   if (X < 0.0f) {
     X = -X;
   }
@@ -169,7 +169,7 @@ float AcosF(float X)
       res = PI - res;
     }
   }
-  
+
   return res;
 }
 
@@ -275,7 +275,7 @@ AsciiStrToFloat(IN  CONST CHAR8              *String,
     }
     Mantissa += Ftemp;
   }
-  
+
   if ((*String == 'E') || (*String == 'e')){
     INTN ExpSign = 1;
     String++;
@@ -346,7 +346,7 @@ VOID AsciiSPrintFloat(CHAR8* S, INTN N, CHAR8* F, float X)
   if (!S) {
     return;
   }
-  
+
   I = (INTN)X;
   D = (float)I;
   Fract = fabsf((X - D) * 1000000.0f);

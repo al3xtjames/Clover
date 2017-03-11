@@ -1,6 +1,6 @@
 /*
  *  BootLog.c
- *  
+ *
  *
  *  Created by Slice on 19.08.11.
  *  Edited by apianti 2012-09-08
@@ -20,19 +20,19 @@ VOID
 PrintBytesRow(IN UINT8 *Bytes, IN UINTN Number, IN UINTN MaxNumber)
 {
 	UINTN	Index;
-	
+
 	// print hex vals
 	for (Index = 0; Index < Number; Index++) {
 		DebugLog(1, "%02x ", Bytes[Index]);
 	}
-	
+
 	// pad to MaxNumber if needed
 	for (; Index < MaxNumber; Index++) {
 		DebugLog(1, "   ");
 	}
-	
+
 	DebugLog(1, "| ");
-	
+
 	// print ASCII
 	for (Index = 0; Index < Number; Index++) {
 		if (Bytes[Index] >= 0x20 && Bytes[Index] <= 0x7e) {
@@ -41,7 +41,7 @@ PrintBytesRow(IN UINT8 *Bytes, IN UINTN Number, IN UINTN MaxNumber)
 			DebugLog(1, "%c", L'.');
 		}
 	}
-	
+
 	DebugLog(1, "\n");
 }
 
@@ -50,7 +50,7 @@ VOID
 PrintBytes(IN VOID *Bytes, IN UINTN Number)
 {
 	UINTN	Index;
-	
+
 	for (Index = 0; Index < Number; Index += 16) {
 		PrintBytesRow((UINT8*)Bytes + Index, ((Index + 16 < Number) ? 16 : (Number - Index)), 16);
 	}
@@ -64,7 +64,7 @@ EFI_FILE_PROTOCOL* GetDebugLogFile()
   EFI_LOADED_IMAGE    *LoadedImage;
   EFI_FILE_PROTOCOL   *RootDir;
   EFI_FILE_PROTOCOL   *LogFile;
-  
+
   // get RootDir from device we are loaded from
   Status = gBS->HandleProtocol(gImageHandle, &gEfiLoadedImageProtocolGuid, (VOID **) &LoadedImage);
   if (EFI_ERROR(Status)) {
@@ -74,7 +74,7 @@ EFI_FILE_PROTOCOL* GetDebugLogFile()
   if (RootDir == NULL) {
     return NULL;
   }
-  
+
   // Open log file from current root
   Status = RootDir->Open(RootDir, &LogFile, DEBUG_LOG,
                          EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE, 0);
@@ -86,7 +86,7 @@ EFI_FILE_PROTOCOL* GetDebugLogFile()
   }
   RootDir->Close(RootDir);
   RootDir = NULL;
-  
+
   if (EFI_ERROR(Status)) {
     // try on first EFI partition
     Status = egFindESP(&RootDir);
@@ -102,11 +102,11 @@ EFI_FILE_PROTOCOL* GetDebugLogFile()
       RootDir = NULL;
     }
   }
-  
+
   if (EFI_ERROR(Status)) {
     LogFile = NULL;
   }
-  
+
   return LogFile;
 }
 
@@ -120,14 +120,14 @@ VOID SaveMessageToDebugLogFile(IN CHAR8 *LastMessage)
   CHAR8                   *Text;
   UINTN                   TextLen;
   EFI_FILE_HANDLE         LogFile;
-  
+
   MemLogBuffer = GetMemLogBuffer();
   MemLogLen = GetMemLogLen();
   Text = LastMessage;
   TextLen = AsciiStrLen(LastMessage);
 
   LogFile = GetDebugLogFile();
-  
+
   // Write to the log file
   if (LogFile != NULL) {
     // Advance to the EOF so we append
@@ -153,7 +153,7 @@ VOID EFIAPI MemLogCallback(IN INTN DebugMode, IN CHAR8 *LastMessage)
   if (DebugMode >= 2) {
     AsciiPrint(LastMessage);
   }
-  
+
   if ((DebugMode >= 1) && GlobalConfig.DebugLog) {
     SaveMessageToDebugLogFile(LastMessage);
   }
@@ -168,7 +168,7 @@ VOID EFIAPI DebugLog(IN INTN DebugMode, IN CONST CHAR8 *FormatString, ...)
 {
    VA_LIST Marker;
    //UINTN offset = 0;
-   
+
    // Make sure the buffer is intact for writing
    if (FormatString == NULL || DebugMode < 0) {
      return;
@@ -190,14 +190,14 @@ EFI_STATUS SetupBooterLog(BOOLEAN AllowGrownSize)
   EFI_STATUS              Status = EFI_SUCCESS;
   CHAR8                   *MemLogBuffer;
   UINTN                   MemLogLen;
-  
+
   MemLogBuffer = GetMemLogBuffer();
   MemLogLen = GetMemLogLen();
-  
+
   if (MemLogBuffer == NULL || MemLogLen == 0) {
 		return EFI_NOT_FOUND;
   }
-  
+
   if (MemLogLen > MEM_LOG_INITIAL_SIZE && !AllowGrownSize) {
     CHAR8 PrevChar = MemLogBuffer[MEM_LOG_INITIAL_SIZE-1];
     MemLogBuffer[MEM_LOG_INITIAL_SIZE-1] = '\0';
@@ -206,7 +206,7 @@ EFI_STATUS SetupBooterLog(BOOLEAN AllowGrownSize)
   } else {
     Status = LogDataHub(&gEfiMiscSubClassGuid, L"boot-log", MemLogBuffer, (UINT32)MemLogLen);
   }
-  
+
 	return Status;
 }
 
@@ -216,14 +216,13 @@ EFI_STATUS SaveBooterLog(IN EFI_FILE_HANDLE BaseDir OPTIONAL, IN CHAR16 *FileNam
 {
   CHAR8                   *MemLogBuffer;
   UINTN                   MemLogLen;
-  
+
   MemLogBuffer = GetMemLogBuffer();
   MemLogLen = GetMemLogLen();
-  
+
   if (MemLogBuffer == NULL || MemLogLen == 0) {
 		return EFI_NOT_FOUND;
   }
-  
+
   return egSaveFile(BaseDir, FileName, (UINT8*)MemLogBuffer, MemLogLen);
 }
-

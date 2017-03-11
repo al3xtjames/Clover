@@ -202,7 +202,7 @@ EFI_STATUS EnrollSecureBootKeys(IN VOID    *AuthorizedDatabase,
   // Set the exchange database
   DBG("Modifying exchange database ...\n");
   Status = AppendSignatureToDatabase(&Database, &DatabaseSize, &gEfiCertX509Guid, (VOID *)gSecureBootExchangeKeyDER, sizeof(gSecureBootExchangeKeyDER));
-    
+
   if (EFI_ERROR(Status)) {
     if (Database != NULL) {
       FreePool(Database);
@@ -300,7 +300,7 @@ STATIC UINTN CumulativeDays[2][14] = {
     31 + 29 + 31 + 30 + 31 + 30 + 31 + 31 + 30,
     31 + 29 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31,
     31 + 29 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30,
-    31 + 29 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30 + 31 
+    31 + 29 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30 + 31
   }
 };
 
@@ -324,10 +324,10 @@ STATIC EFI_STATUS GetUTCTime(OUT EFI_TIME *Timestamp)
   }
   // Get the current offset
   Timer += (UINTN)((Timestamp->TimeZone != EFI_UNSPECIFIED_TIMEZONE) ? (Timestamp->TimeZone * 60) : 0) +
-           (UINTN)(CumulativeDays[IsLeap(Timestamp->Year)][Timestamp->Month] * SECSPERDAY) + 
-           (UINTN)(((Timestamp->Day > 0) ? Timestamp->Day - 1 : 0) * SECSPERDAY) + 
-           (UINTN)(Timestamp->Hour * SECSPERHOUR) + 
-           (UINTN)(Timestamp->Minute * 60) + 
+           (UINTN)(CumulativeDays[IsLeap(Timestamp->Year)][Timestamp->Month] * SECSPERDAY) +
+           (UINTN)(((Timestamp->Day > 0) ? Timestamp->Day - 1 : 0) * SECSPERDAY) +
+           (UINTN)(Timestamp->Hour * SECSPERHOUR) +
+           (UINTN)(Timestamp->Minute * 60) +
            (UINTN)Timestamp->Second;
   // Convert back to time
   ZeroMem(Timestamp, sizeof(EFI_TIME));
@@ -448,7 +448,7 @@ EFI_STATUS SetSignedVariable(IN CHAR16   *DatabaseName,
     PKCS7_set_detached(p7, 1);
 
     PKCS7_final(p7, BioData, PKCS7_BINARY | PKCS7_DETACHED | PKCS7_NOSMIMECAP);
-    
+
     X509_free(Certificate);
     EVP_PKEY_free(PrivateKey);
 

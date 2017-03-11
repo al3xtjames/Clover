@@ -28,7 +28,7 @@ UINT64 AsciiStrVersionToUint64(const CHAR8 *Version, UINT8 MaxDigitByPart, UINT8
   UINT16 part_value = 0;
   UINT16 part_mult  = 1;
   UINT16 max_part_value;
-  
+
   if (!Version) {
     Version = NonDetected; //pointer to non-NULL string
   }

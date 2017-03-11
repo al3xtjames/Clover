@@ -880,7 +880,7 @@ struct symtab_command {
 struct dysymtab_command {
     uint32_t cmd;	/* LC_DYSYMTAB */
     uint32_t cmdsize;	/* sizeof(struct dysymtab_command) */
-    
+
     /*
      * The symbols indicated by symoff and nsyms of the LC_SYMTAB load command
      * are grouped into the following three groups:
@@ -898,13 +898,13 @@ struct dysymtab_command {
      */
     uint32_t ilocalsym;	/* index to local symbols */
     uint32_t nlocalsym;	/* number of local symbols */
-    
+
     uint32_t iextdefsym;/* index to externally defined symbols */
     uint32_t nextdefsym;/* number of externally defined symbols */
-    
+
     uint32_t iundefsym;	/* index to undefined symbols */
     uint32_t nundefsym;	/* number of undefined symbols */
-    
+
     /*
      * For the for the dynamic binding process to find which module a symbol
      * is defined in the table of contents is used (analogous to the ranlib
@@ -915,7 +915,7 @@ struct dysymtab_command {
      */
     uint32_t tocoff;	/* file offset to table of contents */
     uint32_t ntoc;	/* number of entries in table of contents */
-    
+
     /*
      * To support dynamic binding of "modules" (whole object files) the symbol
      * table must reflect the modules that the file was created from.  This is
@@ -927,7 +927,7 @@ struct dysymtab_command {
      */
     uint32_t modtaboff;	/* file offset to module table */
     uint32_t nmodtab;	/* number of module table entries */
-    
+
     /*
      * To support dynamic module binding the module structure for each module
      * indicates the external references (defined and undefined) each module
@@ -939,7 +939,7 @@ struct dysymtab_command {
      */
     uint32_t extrefsymoff;	/* offset to referenced symbol table */
     uint32_t nextrefsyms;	/* number of referenced symbol table entries */
-    
+
     /*
      * The sections that contain "symbol pointers" and "routine stubs" have
      * indexes and (implied counts based on the size of the section and fixed
@@ -952,7 +952,7 @@ struct dysymtab_command {
      */
     uint32_t indirectsymoff; /* file offset to the indirect symbol table */
     uint32_t nindirectsyms;  /* number of indirect symbol table entries */
-    
+
     /*
      * To support relocating an individual module in a library file quickly the
      * external relocation entries for each module in the library need to be
@@ -982,7 +982,7 @@ struct dysymtab_command {
      */
     uint32_t extreloff;	/* offset to external relocation entries */
     uint32_t nextrel;	/* number of external relocation entries */
-    
+
     /*
      * All the local relocation entries are grouped together (they are not
      * grouped by their module since they are only used if the object is moved
@@ -990,7 +990,7 @@ struct dysymtab_command {
      */
     uint32_t locreloff;	/* offset to local relocation entries */
     uint32_t nlocrel;	/* number of local relocation entries */
-    
+
 };
 
 /*
@@ -1015,24 +1015,24 @@ struct dylib_table_of_contents {
 /* a module table entry */
 struct dylib_module {
     uint32_t module_name;	/* the module name (index into string table) */
-    
+
     uint32_t iextdefsym;	/* index into externally defined symbols */
     uint32_t nextdefsym;	/* number of externally defined symbols */
     uint32_t irefsym;		/* index into reference symbol table */
     uint32_t nrefsym;		/* number of reference symbol table entries */
     uint32_t ilocalsym;		/* index into symbols for local symbols */
     uint32_t nlocalsym;		/* number of local symbols */
-    
+
     uint32_t iextrel;		/* index into external relocation entries */
     uint32_t nextrel;		/* number of external relocation entries */
-    
+
     uint32_t iinit_iterm;	/* low 16 bits are the index into the init
                              section, high 16 bits are the index into
                              the term section */
     uint32_t ninit_nterm;	/* low 16 bits are the number of init section
                              entries, high 16 bits are the number of
                              term section entries */
-    
+
     uint32_t			/* for this module address of the start of */
 	objc_module_info_addr;  /*  the (__OBJC,__module_info) section */
     uint32_t			/* for this module size of */
@@ -1042,24 +1042,24 @@ struct dylib_module {
 /* a 64-bit module table entry */
 struct dylib_module_64 {
     uint32_t module_name;	/* the module name (index into string table) */
-    
+
     uint32_t iextdefsym;	/* index into externally defined symbols */
     uint32_t nextdefsym;	/* number of externally defined symbols */
     uint32_t irefsym;		/* index into reference symbol table */
     uint32_t nrefsym;		/* number of reference symbol table entries */
     uint32_t ilocalsym;		/* index into symbols for local symbols */
     uint32_t nlocalsym;		/* number of local symbols */
-    
+
     uint32_t iextrel;		/* index into external relocation entries */
     uint32_t nextrel;		/* number of external relocation entries */
-    
+
     uint32_t iinit_iterm;	/* low 16 bits are the index into the init
                              section, high 16 bits are the index into
                              the term section */
     uint32_t ninit_nterm;      /* low 16 bits are the number of init section
                                 entries, high 16 bits are the number of
                                 term section entries */
-    
+
     uint32_t			/* for this module size of */
     objc_module_info_size;	/*  the (__OBJC,__module_info) section */
     uint64_t			/* for this module address of the start of */
@@ -1197,7 +1197,7 @@ struct version_min_command {
 struct dyld_info_command {
     uint32_t   cmd;		/* LC_DYLD_INFO or LC_DYLD_INFO_ONLY */
     uint32_t   cmdsize;		/* sizeof(struct dyld_info_command) */
-    
+
     /*
      * Dyld rebases an image whenever dyld loads it at an address different
      * from its preferred address.  The rebase information is a stream
@@ -1211,7 +1211,7 @@ struct dyld_info_command {
      */
     uint32_t   rebase_off;	/* file offset to rebase info  */
     uint32_t   rebase_size;	/* size of rebase info   */
-    
+
     /*
      * Dyld binds an image during the loading process, if the image
      * requires any pointers to be initialized to symbols in other images.
@@ -1226,7 +1226,7 @@ struct dyld_info_command {
      */
     uint32_t   bind_off;	/* file offset to binding info   */
     uint32_t   bind_size;	/* size of binding info  */
-    
+
     /*
      * Some C++ programs require dyld to unique symbols so that all
      * images in the process use the same copy of some code/data.
@@ -1244,7 +1244,7 @@ struct dyld_info_command {
      */
     uint32_t   weak_bind_off;	/* file offset to weak binding info   */
     uint32_t   weak_bind_size;  /* size of weak binding info  */
-    
+
     /*
      * Some uses of external symbols do not need to be bound immediately.
      * Instead they can be lazily bound on first use.  The lazy_bind
@@ -1259,7 +1259,7 @@ struct dyld_info_command {
      */
     uint32_t   lazy_bind_off;	/* file offset to lazy binding info */
     uint32_t   lazy_bind_size;  /* size of lazy binding infs */
-    
+
     /*
      * The symbols exported by a dylib are encoded in a trie.  This
      * is a compact representation that factors out common prefixes.

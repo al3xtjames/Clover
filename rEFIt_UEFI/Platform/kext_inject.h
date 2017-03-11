@@ -25,7 +25,7 @@ kext injection
 /*
  *	Machine types known by all.
  */
- 
+
 #define CPU_TYPE_ANY		((cpu_type_t) -1)
 
 #define CPU_TYPE_VAX		((cpu_type_t) 1)
@@ -61,14 +61,14 @@ kext injection
 ////////////////////
 // types
 ////////////////////
-typedef struct 
+typedef struct
 {
 	UINT32   magic;          /* FAT_MAGIC */
 	UINT32   nfat_arch;      /* number of structs that follow */
 
 } FAT_HEADER;
 
-typedef struct 
+typedef struct
 {
 	UINT32	cputype;        /* cpu specifier (int) */
 	UINT32	cpusubtype;     /* machine specifier (int) */

@@ -53,4 +53,3 @@ int base64_decode_block(const char* code_in, const int length_in, char* plaintex
 
 
 #endif /* BASE64_CDECODE_H */
-

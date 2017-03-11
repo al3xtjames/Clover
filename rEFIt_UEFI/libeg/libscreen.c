@@ -108,51 +108,51 @@ VOID egDumpGOPVideoModes(VOID)
     UINTN       SizeOfInfo;
     EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *Info;
     CHAR16      *PixelFormatDesc;
-    
+
     if (GraphicsOutput == NULL) {
         return;
     }
-    
+
     // get dump
     MaxMode = GraphicsOutput->Mode->MaxMode;
     Mode = GraphicsOutput->Mode->Mode;
 //    MsgLog("Available graphics modes for refit.conf screen_resolution:\n");
 //    MsgLog("Curr. Mode = %d, Modes = %d, FB = %lx, FB size=0x%x\n",
 //           Mode, MaxMode, GraphicsOutput->Mode->FrameBufferBase, GraphicsOutput->Mode->FrameBufferSize);
-    
+
     for (Mode = 0; Mode < MaxMode; Mode++) {
         Status = GraphicsOutput->QueryMode(GraphicsOutput, Mode, &SizeOfInfo, &Info);
         if (Status == EFI_SUCCESS) {
-            
+
             switch (Info->PixelFormat) {
                 case PixelRedGreenBlueReserved8BitPerColor:
                     PixelFormatDesc = L"8bit RGB";
                     break;
-                    
+
                 case PixelBlueGreenRedReserved8BitPerColor:
                     PixelFormatDesc = L"8bit BGR";
                     break;
-                    
+
                 case PixelBitMask:
                     PixelFormatDesc = L"BITMASK";
                     break;
-                    
+
                 case PixelBltOnly:
                     PixelFormatDesc = L"NO FB";
                     break;
-                    
+
                 default:
                     PixelFormatDesc = L"invalid";
                     break;
             }
-            
+
             MsgLog("- Mode %d: %dx%d PixFmt = %s, PixPerScanLine = %d\n",
                   Mode, Info->HorizontalResolution, Info->VerticalResolution, PixelFormatDesc, Info->PixelsPerScanLine);
         } else {
             MsgLog("- Mode %d: %r\n", Mode, Status);
         }
     }
-    
+
 }
 */
 VOID egDumpSetConsoleVideoModes(VOID)
@@ -162,12 +162,12 @@ VOID egDumpSetConsoleVideoModes(VOID)
   UINTN BestMode = 0, BestWidth = 0, BestHeight = 0;
   EFI_STATUS Status;
   STATIC int Once=0;
-  
+
   if (gST->ConOut != NULL && gST->ConOut->Mode != NULL) {
     if (!Once) {
       MsgLog("Console modes reported: %d, available modes:\n",gST->ConOut->Mode->MaxMode);
     }
-    
+
     for (i=1; i <= (UINTN)gST->ConOut->Mode->MaxMode; i++) {
       Status = gST->ConOut->QueryMode(gST->ConOut, i-1, &Width, &Height);
       if (Status == EFI_SUCCESS) {
@@ -189,12 +189,12 @@ VOID egDumpSetConsoleVideoModes(VOID)
     MsgLog("Console modes are not available.\n");
     return;
   }
-  
+
   if (GlobalConfig.ConsoleMode > 0) {
     // Specific mode chosen, try to set it
     BestMode = GlobalConfig.ConsoleMode;
   }
-  
+
   if (BestMode >= 1 && BestMode <= (UINTN)gST->ConOut->Mode->MaxMode) {
     // Mode is valid
     if (BestMode-1 != (UINTN)gST->ConOut->Mode->Mode) {
@@ -206,6 +206,7 @@ VOID egDumpSetConsoleVideoModes(VOID)
   } else if (BestMode != 0) {
     MsgLog("  Selected mode (%d) is not valid\n",BestMode);
   }
+
 }
 
 EFI_STATUS egSetMaxResolution()
@@ -218,7 +219,7 @@ EFI_STATUS egSetMaxResolution()
   UINT32      Mode;
   UINTN       SizeOfInfo;
   EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *Info;
-  
+
   if (GraphicsOutput == NULL) {
     return EFI_UNSUPPORTED;
   }
@@ -271,7 +272,7 @@ EFI_STATUS egSetMode(INT32 Next)
   EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *Info;
   INT32      Mode;
   UINT32     Index = 0;
-  
+
   if (GraphicsOutput == NULL) {
     return EFI_UNSUPPORTED;
   }
@@ -328,7 +329,7 @@ EFI_STATUS egSetScreenResolution(IN CHAR16 *WidthHeight)
     HeightP++;
     Width = (UINT32)StrDecimalToUintn(WidthHeight);
     Height = (UINT32)StrDecimalToUintn(HeightP);
-    
+
     // check if requested mode is equal to current mode
     if ((GraphicsOutput->Mode->Info->HorizontalResolution == Width) && (GraphicsOutput->Mode->Info->VerticalResolution == Height)) {
         MsgLog(" - already set\n");
@@ -336,7 +337,7 @@ EFI_STATUS egSetScreenResolution(IN CHAR16 *WidthHeight)
         egScreenHeight = GraphicsOutput->Mode->Info->VerticalResolution;
         return EFI_SUCCESS;
     }
-    
+
     // iterate through modes and set it if found
     MaxMode = GraphicsOutput->Mode->MaxMode;
     for (Mode = 0; Mode < MaxMode; Mode++) {
@@ -368,11 +369,11 @@ VOID egInitScreen(IN BOOLEAN SetMaxResolution)
     Status = EfiLibLocateProtocol(&ConsoleControlProtocolGuid, (VOID **) &ConsoleControl);
     if (EFI_ERROR(Status))
         ConsoleControl = NULL;
-    
+
     Status = EfiLibLocateProtocol(&UgaDrawProtocolGuid, (VOID **) &UgaDraw);
     if (EFI_ERROR(Status))
         UgaDraw = NULL;
-    
+
     Status = EfiLibLocateProtocol(&GraphicsOutputProtocolGuid, (VOID **) &GraphicsOutput);
     if (EFI_ERROR(Status))
         GraphicsOutput = NULL;
@@ -384,8 +385,8 @@ VOID egInitScreen(IN BOOLEAN SetMaxResolution)
         ConsoleControl->GetMode = egConsoleControlGetMode;
         ConsoleControl->SetMode = egConsoleControlSetMode;
     }
- 
-    // if it not the first run, just restore resolution   
+
+    // if it not the first run, just restore resolution
     if (egScreenWidth  != 0 && egScreenHeight != 0) {
         Resolution = PoolPrint(L"%dx%d",egScreenWidth,egScreenHeight);
         if (Resolution) {
@@ -415,7 +416,7 @@ VOID egInitScreen(IN BOOLEAN SetMaxResolution)
         egScreenWidth = GraphicsOutput->Mode->Info->HorizontalResolution;
         egScreenHeight = GraphicsOutput->Mode->Info->VerticalResolution;
         egHasGraphics = TRUE;
-    } 
+    }
     //is there anybody ever see UGA protocol???
     else if (UgaDraw != NULL) {
       //MsgLog("you are lucky guy having UGA, inform please projectosx!\n");
@@ -470,7 +471,7 @@ BOOLEAN egIsGraphicsModeEnabled(VOID)
         ConsoleControl->GetMode(ConsoleControl, &CurrentMode, NULL, NULL);
         return (CurrentMode == EfiConsoleControlScreenGraphics) ? TRUE : FALSE;
     }
-    
+
     return FALSE;
 }
 
@@ -479,7 +480,7 @@ VOID egSetGraphicsModeEnabled(IN BOOLEAN Enable)
     EFI_CONSOLE_CONTROL_SCREEN_MODE CurrentMode;
     EFI_CONSOLE_CONTROL_SCREEN_MODE NewMode;
 
-    if (ConsoleControl != NULL) {   
+    if (ConsoleControl != NULL) {
         // Some UEFI bioses may cause resolution switch when switching to Text Mode via the ConsoleControl->SetMode command
         // EFI applications wishing to use text, call the ConsoleControl->GetMode() command, and depending on its result may call ConsoleControl->SetMode().
         // To avoid the resolution switch, when we set text mode, we can make ConsoleControl->GetMode report that text mode is enabled.
@@ -519,15 +520,15 @@ VOID egSetGraphicsModeEnabled(IN BOOLEAN Enable)
 VOID egClearScreen(IN EG_PIXEL *Color)
 {
     EFI_UGA_PIXEL FillColor;
-    
+
     if (!egHasGraphics)
         return;
-    
+
     FillColor.Red   = Color->r;
     FillColor.Green = Color->g;
     FillColor.Blue  = Color->b;
     FillColor.Reserved = 0;
-    
+
     if (GraphicsOutput != NULL) {
         // EFI_GRAPHICS_OUTPUT_BLT_PIXEL and EFI_UGA_PIXEL have the same
         // layout, and the header from TianoCore actually defines them
@@ -539,38 +540,38 @@ VOID egClearScreen(IN EG_PIXEL *Color)
                      0, 0, 0, 0, egScreenWidth, egScreenHeight, 0);
     }
 }
-    
+
 VOID egDrawImageArea(IN EG_IMAGE *Image,
                      IN INTN AreaPosX, IN INTN AreaPosY,
                      IN INTN AreaWidth, IN INTN AreaHeight,
                      IN INTN ScreenPosX, IN INTN ScreenPosY)
 {
   if (!egHasGraphics || !Image) return;
-  
+
   if (ScreenPosX < 0 || ScreenPosX >= UGAWidth || ScreenPosY < 0 || ScreenPosY >= UGAHeight) {
     // This is outside of screen area
     return;
   }
-  
+
   if (AreaWidth == 0) {
     AreaWidth = Image->Width;
   }
-  
+
   if (AreaHeight == 0) {
     AreaHeight = Image->Height;
   }
-  
+
   if ((AreaPosX != 0) || (AreaPosY != 0)) {
     egRestrictImageArea(Image, AreaPosX, AreaPosY, &AreaWidth, &AreaHeight);
     if (AreaWidth == 0)
       return;
   }
-  
+
 //   if (Image->HasAlpha) { // It shouldn't harm Blt
 //     //Image->HasAlpha = FALSE;
 //     egSetPlane(PLPTR(Image, a), 255, Image->Width * Image->Height);
 //   }
-  
+
   if (ScreenPosX + AreaWidth > UGAWidth)
   {
     AreaWidth = UGAWidth - ScreenPosX;
@@ -579,7 +580,7 @@ VOID egDrawImageArea(IN EG_IMAGE *Image,
   {
     AreaHeight = UGAHeight - ScreenPosY;
   }
-  
+
   if (GraphicsOutput != NULL) {
     GraphicsOutput->Blt(GraphicsOutput, (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)Image->PixelData,
                         EfiBltBufferToVideo,
@@ -604,7 +605,7 @@ VOID egTakeImage(IN EG_IMAGE *Image, INTN ScreenPosX, INTN ScreenPosY,
     {
       AreaHeight = UGAHeight - ScreenPosY;
     }
-    
+
     if (GraphicsOutput != NULL) {
       GraphicsOutput->Blt(GraphicsOutput,
                           (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)Image->PixelData,
@@ -636,17 +637,17 @@ EFI_STATUS egScreenShot(VOID)
     UINTN           FileDataLength = 0U;
     UINTN           Index;
     CHAR16          ScreenshotName[128];
-      
+
     if (!egHasGraphics)
         return EFI_NOT_READY;
-    
+
     // allocate a buffer for the whole screen
     Image = egCreateImage(egScreenWidth, egScreenHeight, FALSE);
     if (Image == NULL) {
         Print(L"Error egCreateImage returned NULL\n");
         return EFI_NO_MEDIA;
     }
-    
+
     // get full screen image
     if (GraphicsOutput != NULL) {
         GraphicsOutput->Blt(GraphicsOutput, (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)Image->PixelData,
@@ -683,13 +684,13 @@ EFI_STATUS egScreenShot(VOID)
     // encode as BMP
     egEncodeBMP(Image, &FileData, &FileDataLength);
 #endif //LODEPNG
-    
+
     egFreeImage(Image);
     if (FileData == NULL) {
         Print(L"Error egEncode returned NULL\n");
         return EFI_NO_MEDIA;
     }
-  
+
   for (Index=0; Index < 60; Index++) {
 #if defined(LODEPNG)
     UnicodeSPrint(ScreenshotName, 256, L"EFI\\CLOVER\\misc\\screenshot%d.png", Index);
@@ -700,7 +701,7 @@ EFI_STATUS egScreenShot(VOID)
       Status = egSaveFile(SelfRootDir, ScreenshotName, FileData, FileDataLength);
       if (!EFI_ERROR(Status)) {
         break;
-      }		
+      }
     }
   }
   // else save to file on the ESP
@@ -715,7 +716,7 @@ EFI_STATUS egScreenShot(VOID)
         Status = egSaveFile(NULL, ScreenshotName, FileData, FileDataLength);
         if (!EFI_ERROR(Status)) {
           break;
-        }		
+        }
 //      }
     }
     CheckError(Status, L"Error egSaveFile\n");
@@ -746,7 +747,7 @@ static EFI_STATUS GopSetModeAndReconnectTextOut(IN UINT32 ModeNumber)
     Status = GraphicsOutput->SetMode(GraphicsOutput, ModeNumber);
     MsgLog("Video mode change to mode #%d: %r\n", ModeNumber, Status);
 
-    if (gFirmwareClover && !EFI_ERROR (Status)) { 
+    if (gFirmwareClover && !EFI_ERROR (Status)) {
         // When we change mode on GOP, we need to reconnect the drivers which produce simple text out
         // Otherwise, they won't produce text based on the new resolution
         Status = gBS->LocateHandleBuffer (
@@ -770,7 +771,7 @@ static EFI_STATUS GopSetModeAndReconnectTextOut(IN UINT32 ModeNumber)
         }
         // return value is according to whether SetMode succeeded
         Status = EFI_SUCCESS;
-    } 
+    }
 
     return Status;
 }

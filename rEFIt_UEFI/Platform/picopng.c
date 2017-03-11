@@ -446,11 +446,11 @@ void Inflator_getTreeInflateDynamic(HuffmanTree *tree, HuffmanTree *treeD, const
 	codelengthcode = vector32_new(19, 0);
 	for (i = 0; i < 19; i++)
 		codelengthcode->data[CLCL[i]] = (i < HCLEN) ? Zlib_readBitsFromStream(bp, in, 3) : 0;
-  
+
 	Inflator_error = HuffmanTree_makeFromLengths(codelengthcodetree, codelengthcode, 7);
 	if (Inflator_error)
 		return;
-  
+
 	for (i = 0; i < HLIT + HDIST; )
 	{
 		UINT32 code = Inflator_huffmanDecodeSymbol(in, bp, codelengthcodetree, inlength);
@@ -471,7 +471,7 @@ void Inflator_getTreeInflateDynamic(HuffmanTree *tree, HuffmanTree *treeD, const
 				return;
 			}
 			replength = 3 + Zlib_readBitsFromStream(bp, in, 2);
-			
+
 			if ((i - 1) < HLIT)
 				value = bitlen->data[i - 1];
 			else
@@ -517,7 +517,7 @@ void Inflator_getTreeInflateDynamic(HuffmanTree *tree, HuffmanTree *treeD, const
 			replength = 11 + Zlib_readBitsFromStream(bp, in, 7);
 			for (n = 0; n < replength; n++)
 			{
-        
+
 				if (i >= HLIT + HDIST)
 				{
 					Inflator_error = 15; // error: i is larger than the amount of codes
@@ -576,7 +576,7 @@ void Inflator_inflateHuffmanBlock(VECTOR_8 *out, const UINT8 *in, UINT32 *bp, UI
 			out->data[(*pos)++] = (UINT8) code;
 		}
 		else
-			
+
 			if (code >= 257 && code <= 285)
       { // length code
         UINT32 length = LENBASE[code - 257], numextrabits = LENEXTRA[code - 257];
@@ -609,7 +609,7 @@ void Inflator_inflateHuffmanBlock(VECTOR_8 *out, const UINT8 *in, UINT32 *bp, UI
         back = start - dist; // backwards
         if (*pos + length >= out->size)
           vector8_resize(out, (*pos + length) * 2); // reserve more room
-        
+
         for (i = 0; i < length; i++)
         {
           out->data[(*pos)++] = out->data[back++];
@@ -626,7 +626,7 @@ void Inflator_inflateNoCompression(VECTOR_8 *out, const UINT8 *in, UINT32 *bp, U
 	UINT32 LEN,NLEN;
 	UINT32 p;
 	UINT32 n;
-  
+
 	while ((*bp & 0x7) != 0)
 		(*bp)++; // go to first boundary of byte
 	p = *bp / 8;
@@ -636,7 +636,7 @@ void Inflator_inflateNoCompression(VECTOR_8 *out, const UINT8 *in, UINT32 *bp, U
 	}
 	LEN = in[p] + 256 * in[p + 1];
 	NLEN = in[p + 2] + 256 * in[p + 3];
-	
+
 	p += 4;
 	if (LEN + NLEN != 65535) {
 		Inflator_error = 21; // error: NLEN is not one's complement of LEN
@@ -648,7 +648,7 @@ void Inflator_inflateNoCompression(VECTOR_8 *out, const UINT8 *in, UINT32 *bp, U
 		Inflator_error = 23; // error: reading outside of in buffer
 		return;
 	}
-	
+
 	for (n = 0; n < LEN; n++)
 		out->data[(*pos)++] = in[p++]; // read LEN bytes of literal data
 	*bp = p * 8;
@@ -703,7 +703,7 @@ INT32 Zlib_decompress(VECTOR_8 *out, const VECTOR_8 *in) // returns error value
     //    DBG("Error 25 : compression method %d and CINFO=%d FDICT=%d\n", CM, CINFO, FDICT);
 		// error: only compression method 8: inflate with sliding window of 32k is supported by
 		// the PNG spec
-		
+
 		return 25;
 	}
 	if (FDICT != 0){
@@ -909,7 +909,7 @@ void PNG_adam7Pass(UINT8 *out, UINT8 *linen, UINT8 *lineo, const UINT8 *in, UINT
 	// function can only do it after the full image is already decoded. The out buffer must have
 	// the correct allocated memory size already.
 	UINT32 bytewidth,linelength,y;
-  
+
 	if (passw == 0)
 		return;
 	bytewidth = (bpp + 7) / 8;
@@ -1050,9 +1050,9 @@ PNG_INFO *PNG_decode(/* const*/ UINT8 *in, UINT32 size)
 	VECTOR_8 *scanlines; // now the out buffer will be filled
 	UINT32 bytewidth, outlength ;
 	UINT8 *out_data;
-  
+
 	PNG_error = 0;
-  
+
 	if (size == 0 || in == 0)
 	{
 		PNG_error = 48; // the given data is empty
@@ -1289,11 +1289,11 @@ EG_IMAGE * egDecodePNG(IN UINT8 *FileData, IN UINTN FileDataLength, IN BOOLEAN W
   //  UINT8               AlphaValue;
   EG_PIXEL            *Pixel;
   INTN                x, y;
-  
+
   // read and check header
   if (FileDataLength < sizeof(BMP_IMAGE_HEADER) || FileData == NULL)
     return NULL;
-  
+
   // read and check header
   PNG_error = 0;
   info = PNG_decode(FileData, (UINT32)FileDataLength);
@@ -1301,13 +1301,13 @@ EG_IMAGE * egDecodePNG(IN UINT8 *FileData, IN UINTN FileDataLength, IN BOOLEAN W
     //       DBG("PNG_decode == null, PNG_error=%d", PNG_error);
     return NULL;
   }
-	
+
   NewImage = egCreateImage((INTN)info->width, (INTN)info->height, WantAlpha);
   if (NewImage == NULL) {
     //        DBG("egCreateImage == null");
     return NULL;
   }
-  
+
   CopyMem(NewImage->PixelData, info->image->data, info->image->size);
   png_alloc_free_all();
   Pixel = (EG_PIXEL*)NewImage->PixelData;
@@ -1317,7 +1317,7 @@ EG_IMAGE * egDecodePNG(IN UINT8 *FileData, IN UINTN FileDataLength, IN BOOLEAN W
       Temp = Pixel->b;
       Pixel->b = Pixel->r;
       Pixel->r = Temp;
-      Pixel++;        
+      Pixel++;
     }
   }
   //      DBG("png decoded %dx%d datalenght=%d iconsize=%d\n", NewImage->Height, NewImage->Width, FileDataLength, IconSize);
@@ -1325,5 +1325,3 @@ EG_IMAGE * egDecodePNG(IN UINT8 *FileData, IN UINTN FileDataLength, IN BOOLEAN W
 }
 
 #endif //LODEPNG
-
-

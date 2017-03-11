@@ -3,7 +3,7 @@
  * Copyright (c) 2000 Apple Computer, Inc. All rights reserved.
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_START@
- * 
+ *
  * This file contains Original Code and/or Modifications of Original Code
  * as defined in and that are subject to the Apple Public Source License
  * Version 2.0 (the 'License'). You may not use this file except in
@@ -12,10 +12,10 @@
  * unlawful or unlicensed copies of an Apple operating system, or to
  * circumvent, violate, or enable the circumvention or violation of, any
  * terms of an Apple operating system software license agreement.
- * 
+ *
  * Please obtain a copy of the License at
  * http://www.opensource.apple.com/apsl/ and read it before using this file.
- * 
+ *
  * The Original Code and all software distributed under the License are
  * distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
  * EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
@@ -23,7 +23,7 @@
  * FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR NON-INFRINGEMENT.
  * Please see the License for the specific language governing rights and
  * limitations under the License.
- * 
+ *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 #ifndef _PEXPERT_DEVICE_TREE_H_
@@ -103,7 +103,7 @@ typedef struct DTSavedScope {
 	struct DTSavedScope * nextScope;
 	RealDTEntry scope;
 	RealDTEntry entry;
-	unsigned long index;		
+	unsigned long index;
 } *DTSavedScopePtr;
 
 /* Entry Iterator*/
@@ -112,7 +112,7 @@ typedef struct OpaqueDTEntryIterator {
 	RealDTEntry currentScope;
 	RealDTEntry currentEntry;
 	DTSavedScopePtr savedScope;
-	UINT32 currentIndex;		
+	UINT32 currentIndex;
 } *RealDTEntryIterator;
 
 /* Property Iterator*/
@@ -206,11 +206,11 @@ extern INTN DTEnterEntry(DTEntryIterator iterator, DTEntry childEntry);
 extern INTN DTExitEntry(DTEntryIterator iterator, DTEntry *currentPosition);
 
 /*
- Iterate Entries 
+ Iterate Entries
  Iterate and return entries contained within the entry defined by the current
  scope of the iterator.  Entries are returned one at a time. When
 INTN== kIterationDone, all entries have been exhausted, and the
- value of nextEntry will be Nil. 
+ value of nextEntry will be Nil.
 */
 extern INTN DTIterateEntries(DTEntryIterator iterator, DTEntry *nextEntry);
 
@@ -229,7 +229,7 @@ extern INTN DTRestartEntryIteration(DTEntryIterator iterator);
 -------------------------------------------------------------------------------
 */
 /*
- Get the value of the specified property for the specified entry.  
+ Get the value of the specified property for the specified entry.
 
  Get Property
 */
@@ -259,7 +259,7 @@ extern INTN DTDisposePropertyIterator(DTPropertyIterator iterator);
 
 /*
  Iterate Properites
- Iterate and return properties for given entry.  
+ Iterate and return properties for given entry.
  WhenINTN== kIterationDone, all properties have been exhausted.
 */
 

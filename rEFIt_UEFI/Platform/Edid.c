@@ -43,7 +43,7 @@ InitializeEdidOverride ()
   EFI_EDID_OVERRIDE_PROTOCOL *EdidOverride;
 
   EdidOverride = AllocateCopyPool(sizeof(EFI_EDID_OVERRIDE_PROTOCOL), &gEdidOverride);
-  
+
   Status = gBS->InstallMultipleProtocolInterfaces (
                                                    &gImageHandle,
                                                    &gEfiEdidOverrideProtocolGuid,
@@ -62,7 +62,7 @@ UINT8* getCurrentEdid (VOID)
   EFI_STATUS                      Status;
   EFI_EDID_ACTIVE_PROTOCOL        *EdidProtocol;
   UINT8                           *Edid;
-  
+
   DBG ("EdidActive:");
   Edid = NULL;
   Status = gBS->LocateProtocol (&gEfiEdidActiveProtocolGuid, NULL, (VOID**)&EdidProtocol);
@@ -73,7 +73,7 @@ UINT8* getCurrentEdid (VOID)
     }
   }
   DBG(" %a\n", Edid != NULL ? "found" : "not found");
-  
+
   return Edid;
 }
 

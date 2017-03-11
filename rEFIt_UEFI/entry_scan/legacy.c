@@ -55,11 +55,11 @@ static LEGACY_ENTRY * AddLegacyEntry(IN CHAR16 *FullTitle, IN CHAR16 *LoaderTitl
   CHAR16            *VolDesc;
   CHAR16             ShortcutLetter = 0;
   INTN               i;
-  
+
   if (Volume == NULL) {
     return NULL;
   }
-  
+
   // Ignore this loader if it's device path is already present in another loader
   if (MainMenu.Entries) {
     for (i = 0; i < MainMenu.EntryCount; ++i) {
@@ -73,7 +73,7 @@ static LEGACY_ENTRY * AddLegacyEntry(IN CHAR16 *FullTitle, IN CHAR16 *LoaderTitl
       }
     }
   }
-  
+
   // If this isn't a custom entry make sure it's not hidden by a custom entry
   if (!CustomEntry) {
     CUSTOM_LEGACY_ENTRY *Custom = gSettings.CustomLegacy;
@@ -100,7 +100,7 @@ static LEGACY_ENTRY * AddLegacyEntry(IN CHAR16 *FullTitle, IN CHAR16 *LoaderTitl
       Custom = Custom->Next;
     }
   }
-  
+
   if (LoaderTitle == NULL) {
     if (Volume->LegacyOS->Name != NULL) {
       LoaderTitle = Volume->LegacyOS->Name;
@@ -136,12 +136,12 @@ static LEGACY_ENTRY * AddLegacyEntry(IN CHAR16 *FullTitle, IN CHAR16 *LoaderTitl
   Entry->me.DriveImage = (DriveImage != NULL) ? DriveImage : ScanVolumeDefaultIcon(Volume, Volume->LegacyOS->Type, Volume->DevicePath);
   //  DBG("HideBadges=%d Volume=%s\n", GlobalConfig.HideBadges, Volume->VolName);
   //  DBG("Title=%s OSName=%s OSIconName=%s\n", LoaderTitle, Volume->OSName, Volume->OSIconName);
-  
+
   //actions
   Entry->me.AtClick = ActionSelect;
   Entry->me.AtDoubleClick = ActionEnter;
   Entry->me.AtRightClick = ActionDetails;
-  
+
   if (GlobalConfig.HideBadges & HDBADGES_SHOW) {
     if (GlobalConfig.HideBadges & HDBADGES_SWAP) {
       Entry->me.BadgeImage = egCopyScaledImage(Entry->me.DriveImage, GlobalConfig.BadgeScale);
@@ -149,18 +149,18 @@ static LEGACY_ENTRY * AddLegacyEntry(IN CHAR16 *FullTitle, IN CHAR16 *LoaderTitl
       Entry->me.BadgeImage = egCopyScaledImage(Entry->me.Image, GlobalConfig.BadgeScale);
       }
     }
-  
+
   Entry->Volume           = Volume;
   Entry->DevicePathString = Volume->DevicePathString;
   Entry->LoadOptions      = (Volume->DiskKind == DISK_KIND_OPTICAL) ? L"CD" :
   ((Volume->DiskKind == DISK_KIND_EXTERNAL) ? L"USB" : L"HD");
-  
+
   // create the submenu
   SubScreen = AllocateZeroPool(sizeof(REFIT_MENU_SCREEN));
   SubScreen->Title = PoolPrint(L"Boot Options for %s on %s", LoaderTitle, VolDesc);
   SubScreen->TitleImage = Entry->me.Image;
   SubScreen->AnimeRun = GetAnime(SubScreen);
-  
+
   // default entry
   SubEntry = AllocateZeroPool(sizeof(LEGACY_ENTRY));
   SubEntry->me.Title         = PoolPrint(L"Boot %s", LoaderTitle);
@@ -170,7 +170,7 @@ static LEGACY_ENTRY * AddLegacyEntry(IN CHAR16 *FullTitle, IN CHAR16 *LoaderTitl
   SubEntry->LoadOptions      = Entry->LoadOptions;
   SubEntry->me.AtClick       = ActionEnter;
   AddMenuEntry(SubScreen, (REFIT_MENU_ENTRY *)SubEntry);
-  
+
   AddMenuEntry(SubScreen, &MenuEntryReturn);
   Entry->me.SubScreen = SubScreen;
   AddMenuEntry(&MainMenu, (REFIT_MENU_ENTRY *)Entry);
@@ -183,9 +183,9 @@ VOID ScanLegacy(VOID)
   UINTN                   VolumeIndex, VolumeIndex2;
   BOOLEAN                 ShowVolume, HideIfOthersFound;
   REFIT_VOLUME            *Volume;
-  
+
   DBG("Scanning legacy ...\n");
-  
+
   for (VolumeIndex = 0; VolumeIndex < VolumesCount; VolumeIndex++) {
     Volume = Volumes[VolumeIndex];
     if ((Volume->BootType != BOOTING_BY_PBR) &&
@@ -196,7 +196,7 @@ VOID ScanLegacy(VOID)
     }
 
     DBG("%2d: '%s' (%s)", VolumeIndex, Volume->VolName, Volume->LegacyOS->IconName);
-    
+
 #if 0 // REFIT_DEBUG > 0
     DBG(" %d %s\n  %d %d %s %d %s\n",
         VolumeIndex, FileDevicePathToStr(Volume->DevicePath),
@@ -204,7 +204,7 @@ VOID ScanLegacy(VOID)
         Volume->IsAppleLegacy ? L"AL" : L"--", Volume->HasBootCode,
         Volume->VolName ? Volume->VolName : L"(no name)");
 #endif
-    
+
     // skip volume if its kind is configured as disabled
     if ((Volume->DiskKind == DISK_KIND_OPTICAL && (GlobalConfig.DisableFlags & VOLTYPE_OPTICAL)) ||
         (Volume->DiskKind == DISK_KIND_EXTERNAL && (GlobalConfig.DisableFlags & VOLTYPE_EXTERNAL)) ||
@@ -214,7 +214,7 @@ VOID ScanLegacy(VOID)
       DBG(" hidden\n");
       continue;
     }
-    
+
     ShowVolume = FALSE;
     HideIfOthersFound = FALSE;
     if (Volume->IsAppleLegacy) {
@@ -243,7 +243,7 @@ VOID ScanLegacy(VOID)
         }
       }
     }
-    
+
     if (ShowVolume && (!Volume->Hidden)){
       DBG(" add legacy\n");
       AddLegacyEntry(NULL, NULL, Volume, NULL, NULL, 0, FALSE);
@@ -262,7 +262,7 @@ VOID AddCustomLegacy(VOID)
   CUSTOM_LEGACY_ENTRY *Custom;
   EG_IMAGE            *Image, *DriveImage;
   UINTN                i = 0;
-  
+
 //  DBG("Custom legacy start\n");
   if (gSettings.CustomLegacy) {
     DbgHeader("AddCustomLegacy");
@@ -283,9 +283,9 @@ VOID AddCustomLegacy(VOID)
     }
     for (VolumeIndex = 0; VolumeIndex < VolumesCount; ++VolumeIndex) {
       Volume = Volumes[VolumeIndex];
-      
+
       DBG("   Checking volume \"%s\" (%s) ... ", Volume->VolName, Volume->DevicePathString);
-      
+
       // skip volume if its kind is configured as disabled
       if ((Volume->DiskKind == DISK_KIND_OPTICAL && (GlobalConfig.DisableFlags & VOLTYPE_OPTICAL)) ||
           (Volume->DiskKind == DISK_KIND_EXTERNAL && (GlobalConfig.DisableFlags & VOLTYPE_EXTERNAL)) ||
@@ -295,7 +295,7 @@ VOID AddCustomLegacy(VOID)
         DBG("skipped because media is disabled\n");
         continue;
       }
-      
+
       if (Custom->VolumeType != 0) {
         if ((Volume->DiskKind == DISK_KIND_OPTICAL && ((Custom->VolumeType & VOLTYPE_OPTICAL) == 0)) ||
             (Volume->DiskKind == DISK_KIND_EXTERNAL && ((Custom->VolumeType & VOLTYPE_EXTERNAL) == 0)) ||
@@ -311,7 +311,7 @@ VOID AddCustomLegacy(VOID)
         DBG("skipped because volume is not legacy bootable\n");
         continue;
       }
-      
+
       ShowVolume = FALSE;
       HideIfOthersFound = FALSE;
       if (Volume->IsAppleLegacy) {
@@ -337,12 +337,12 @@ VOID AddCustomLegacy(VOID)
           }
         }
       }
-      
+
       if (!ShowVolume || (Volume->Hidden)) {
         DBG("skipped because volume is hidden\n");
         continue;
       }
-      
+
       // Check for exact volume matches
       if (Custom->Volume) {
         if ((StrStr(Volume->DevicePathString, Custom->Volume) == NULL) &&
