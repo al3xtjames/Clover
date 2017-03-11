@@ -6906,25 +6906,29 @@ GetDevices ()
         }
 
         else if ((Pci.Hdr.ClassCode[2] == PCI_CLASS_MEDIA) &&
-                 ((Pci.Hdr.ClassCode[1] == PCI_CLASS_MEDIA_HDA) ||
-                  (Pci.Hdr.ClassCode[1] == PCI_CLASS_MEDIA_AUDIO)) &&
-                 (NHDA < 4)) {
-
+         ((Pci.Hdr.ClassCode[1] == PCI_CLASS_MEDIA_HDA) ||
+         (Pci.Hdr.ClassCode[1] == PCI_CLASS_MEDIA_AUDIO)) &&
+         (NHDA < 4)) {
           HDA_PROPERTIES *hda = &gAudios[NHDA];
 
           // Populate Controllers IDs
           hda->controller_vendor_id       = Pci.Hdr.VendorId;
           hda->controller_device_id       = Pci.Hdr.DeviceId;
 
+          MsgLog (
+            " - HDA: %a\n",
+            GetHdaControllerName (Pci.Hdr.VendorId, Pci.Hdr.DeviceId)
+            );
 
           // HDA Controller Info
-          AsciiSPrint ( hda->controller_name,64, "%a",
-                       get_hda_controller_name ( Pci.Hdr.DeviceId, Pci.Hdr.VendorId )
-                       );
+          AsciiSPrint (
+            hda->controller_name,
+            64,
+            "%a",
+            GetHdaControllerName (Pci.Hdr.VendorId, Pci.Hdr.DeviceId)
+            );
 
-          if (IsHDMIAudio(HandleArray[Index])) {
-            DBG(" - HDMI Audio: \n");
-
+          if (IsHDMIAudio (HandleArray[Index])) {
             SlotDevice = &SlotDevices[4];
             SlotDevice->SegmentGroupNum = (UINT16)Segment;
             SlotDevice->BusNum          = (UINT8)Bus;
@@ -7679,18 +7683,19 @@ SetDevices (LOADER_ENTRY *Entry)
 
         // HDA
         else if (gSettings.HDAInjection &&
-                 (Pci.Hdr.ClassCode[2] == PCI_CLASS_MEDIA) &&
-                 ((Pci.Hdr.ClassCode[1] == PCI_CLASS_MEDIA_HDA) ||
-                  (Pci.Hdr.ClassCode[1] == PCI_CLASS_MEDIA_AUDIO))) {
-                   // HDMI injection inside
-                   TmpDirty    = setup_hda_devprop (PciIo, &PCIdevice, Entry->OSVersion);
-                   StringDirty |= TmpDirty;
-                 }
+         (Pci.Hdr.ClassCode[2] == PCI_CLASS_MEDIA) &&
+         ((Pci.Hdr.ClassCode[1] == PCI_CLASS_MEDIA_HDA) ||
+         (Pci.Hdr.ClassCode[1] == PCI_CLASS_MEDIA_AUDIO))) {
+          // HDMI injection inside
+          InjectHdaProperties (
+            &Pci,
+            DevicePathFromHandle (HandleBuffer[i]),
+            IsHDMIAudio (HandleBuffer[i])
+            );
 
         //LPC
-        else if ((Pci.Hdr.ClassCode[2] == PCI_CLASS_BRIDGE) &&
-                 (Pci.Hdr.ClassCode[1] == PCI_CLASS_BRIDGE_ISA))
-        {
+        } else if ((Pci.Hdr.ClassCode[2] == PCI_CLASS_BRIDGE) &&
+                 (Pci.Hdr.ClassCode[1] == PCI_CLASS_BRIDGE_ISA)) {
           if (gSettings.LpcTune) {
             Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint16, GEN_PMCON_1, 1, &PmCon);
             MsgLog ("Initial PmCon value=%x\n", PmCon);

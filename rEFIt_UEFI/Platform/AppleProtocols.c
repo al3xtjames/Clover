@@ -1,7 +1,7 @@
 /** @file
   Apple UEFI protocol installer.
 
-  Copyright (C) 2016 Alex James. All rights reserved.<BR>
+  Copyright (C) 2016-2017 Alex James. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made
   available under the terms and conditions of the BSD License which
@@ -13,7 +13,7 @@
   EXPRESS OR IMPLIED.
 **/
 
-#include "Platform.h"
+#include <Platform.h>
 
 #include <Driver/AppleGraphicsConfiguration.h>
 #include <Driver/EfiOSInfo.h>
@@ -27,12 +27,10 @@
           Status = EntryPoint (gImageHandle, gST);                   \
           MsgLog ("Installed %a, Status = %r\n", Protocol, Status);
 
-#if 0
 //
 // Pointer to the EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL.
 //
 EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL *gEfiDppDbProtocol = NULL;
-#endif
 
 /** Installs the Apple UEFI protocols.
 
@@ -44,7 +42,8 @@ InstallAppleProtocols (
   )
 {
   EFI_STATUS Status;
-#if 0
+
+  // TODO: Remove once an implementation is added to Clover
   Status = gBS->LocateProtocol (
                   &gEfiDevicePathPropertyDatabaseProtocolGuid,
                   NULL,
@@ -52,9 +51,8 @@ InstallAppleProtocols (
                   );
 
   if (EFI_ERROR (Status)) {
-    MsgLog ("EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL not found.\n");
+    MsgLog ("EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL not found. Device property injection will fail.\n");
   }
-#endif
 
   INSTALL_PROTOCOL_IMPL ("APPLE_GRAPHICS_CONFIGURATION_PROTOCOL", AppleGraphicsConfigurationMain);
   INSTALL_PROTOCOL_IMPL ("APPLE_SMC_IO_PROTOCOL", SmcHelperMain);

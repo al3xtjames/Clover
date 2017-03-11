@@ -59,11 +59,12 @@ Headers collection for procedures
 #include <Protocol/Variable.h>
 #include <Protocol/UgaDraw.h>
 
-#include <Protocol/FSInject.h>
-#include <Protocol/MsgLog.h>
+#include <Protocol/AppleSmcIo.h>
+#include <Protocol/DevicePathPropertyDatabase.h>
 #include <Protocol/efiConsoleControl.h>
 #include <Protocol/EmuVariableControl.h>
-#include <Protocol/AppleSmcIo.h>
+#include <Protocol/FSInject.h>
+#include <Protocol/MsgLog.h>
 
 #include "../refit/lib.h"
 #include "string.h"
@@ -1549,6 +1550,7 @@ typedef struct {
 
 #define CARDLIST_SIGNATURE SIGNATURE_32('C','A','R','D')
 
+extern EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL *gEfiDppDbProtocol;
 
 
 //extern CHAR8                          *msgbuf;
@@ -1974,6 +1976,19 @@ SetupDataForOSX (BOOLEAN Hibernate);
 
 EFI_STATUS
 SetPrivateVarProto (VOID);
+
+CHAR8 *
+GetHdaControllerName (
+  IN UINT32 VendorId,
+  IN UINT32 DeviceId
+  );
+
+EFI_STATUS
+InjectHdaProperties (
+  IN PCI_TYPE00               *HdaControllerDev,
+  IN EFI_DEVICE_PATH_PROTOCOL *DevicePath,
+  IN BOOLEAN                  IsHdmiAudio
+  );
 
 EFI_STATUS
 InstallAppleProtocols (
