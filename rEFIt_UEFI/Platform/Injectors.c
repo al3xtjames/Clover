@@ -20,9 +20,6 @@
 #include "Platform.h"
 #include <Protocol/KeyboardInfo.h>
 
-EFI_GUID gDevicePropertiesGuid = {
-  0x91BD12FE, 0xF6C3, 0x44FB, {0xA5, 0xB7, 0x51, 0x22, 0xAB, 0x30, 0x3A, 0xE0}
-};
 /*
 EFI_GUID gAppleScreenInfoProtocolGuid = {
 	0xe316e100, 0x0751, 0x4c49, {0x90, 0x56, 0x48, 0x6c, 0x7e, 0x47, 0x29, 0x03}
@@ -43,139 +40,6 @@ CHAR8* BootOSName = NULL;
 
 UINT16 KeyboardVendor = 0x05ac; //Apple inc.
 UINT16 KeyboardProduct = 0x021d; //iMac aluminium
-
-typedef struct _APPLE_GETVAR_PROTOCOL APPLE_GETVAR_PROTOCOL;
-
-// GET_PROPERTY_VALUE
-/** Locates a device property in the database and returns its value into Value.
-
- @param[in]      This        A pointer to the protocol instance.
- @param[in]      DevicePath  The device path of the device to get the property of.
- @param[in]      Name        The Name of the requested property.
- @param[out]     Value       The Buffer allocated by the caller to return the
-                              value of the property into.
- @param[in, out] Size        On input the size of the allocated Value Buffer.
-                              On output the size required to fill the Buffer.
-
- @return                       The status of the operation is returned.
- @retval EFI_BUFFER_TOO_SMALL  The memory required to return the value exceeds
-                               the size of the allocated Buffer.
-                               The required size to complete the operation has
-                                been returned into Size.
- @retval EFI_NOT_FOUND         The given device path does not have a property
-                                with the specified Name.
- @retval EFI_SUCCESS           The operation completed successfully.
- **/
-
-typedef
-EFI_STATUS
-(EFIAPI *APPLE_GETVAR_PROTOCOL_GET_PROPERTY_VALUE) (
-    IN     APPLE_GETVAR_PROTOCOL        *This,
-    IN     EFI_DEVICE_PATH_PROTOCOL     *DevicePath,
-    IN     CHAR16                       *Name,
-    OUT    VOID                         *Value, OPTIONAL
-    IN OUT UINTN                        *Size
-);
-
-// SET_PROPERTY
-/** Sets the specified property of the given device path to the provided Value.
-
- @param[in]  This        A pointer to the protocol instance.
- @param[in]  DevicePath  The device path of the device to set the property of.
- @param[in]  Name        The Name of the desired property.
- @param[in]  Value       The Buffer holding the value to set the property to.
- @param[out] Size        The size of the Value Buffer.
-
- @return                       The status of the operation is returned.
- @retval EFI_OUT_OF_RESOURCES  The memory necessary to complete the operation
- could not be allocated.
- @retval EFI_SUCCESS           The operation completed successfully.
- **/
-
-typedef
-EFI_STATUS
-(EFIAPI *APPLE_GETVAR_PROTOCOL_SET_PROPERTY) (
-    IN APPLE_GETVAR_PROTOCOL        *This,
-    IN EFI_DEVICE_PATH_PROTOCOL     *DevicePath,
-    IN CHAR16                       *Name,
-    IN VOID                         *Value,
-    IN UINTN                        Size
-);
-
-// REMOVE_PROPERTY
-/** Removes the specified property from the given device path.
-
- @param[in] This        A pointer to the protocol instance.
- @param[in] DevicePath  The device path of the device to set the property of.
- @param[in] Name        The Name of the desired property.
-
- @return                The status of the operation is returned.
- @retval EFI_NOT_FOUND  The given device path does not have a property with
-                        the specified Name.
- @retval EFI_SUCCESS    The operation completed successfully.
- **/
-typedef
-EFI_STATUS
-(EFIAPI *APPLE_GETVAR_PROTOCOL_REMOVE_PROPERTY) (
-    IN APPLE_GETVAR_PROTOCOL        *This,
-    IN EFI_DEVICE_PATH_PROTOCOL     *DevicePath,
-    IN CHAR16                       *Name
-);
-
-
-typedef
-EFI_STATUS
-(EFIAPI *APPLE_GETVAR_PROTOCOL_GET_DEVICE_PROPS) (
-    IN     APPLE_GETVAR_PROTOCOL    *This,
-    IN     CHAR8                    *Buffer,
-    IN OUT UINT32                   *BufferSize);
-
-struct _APPLE_GETVAR_PROTOCOL {
-  UINT64    Sign;
-  APPLE_GETVAR_PROTOCOL_GET_PROPERTY_VALUE  GetPropertyValue;
-  APPLE_GETVAR_PROTOCOL_SET_PROPERTY        SetProperty;
-  APPLE_GETVAR_PROTOCOL_REMOVE_PROPERTY     RemoveProperty;
-  APPLE_GETVAR_PROTOCOL_GET_DEVICE_PROPS    GetPropertyBuffer;
-};
-
-
-#define DEVICE_PROPERTIES_SIGNATURE SIGNATURE_64('A','P','P','L','E','D','E','V')
-
-EFI_STATUS EFIAPI
-GetDeviceProps(IN     APPLE_GETVAR_PROTOCOL   *This,
-               IN     CHAR8                   *Buffer,
-               IN OUT UINT32                  *BufferSize)
-{
-
-  if(!gSettings.StringInjector && (mProperties != NULL) && (mPropSize > 1)) {
-    if (*BufferSize < mPropSize) {
-      *BufferSize = mPropSize;
-      return EFI_BUFFER_TOO_SMALL;
-    }
-    *BufferSize = mPropSize;
-    CopyMem(Buffer, mProperties,  mPropSize);
-    return EFI_SUCCESS;
-  } else if ((cProperties != NULL) && (cPropSize > 1)) {
-    if (*BufferSize < cPropSize) {
-      *BufferSize = cPropSize;
-      return EFI_BUFFER_TOO_SMALL;
-    }
-    *BufferSize = cPropSize;
-    CopyMem(Buffer, cProperties,  cPropSize);
-    return EFI_SUCCESS;
-  }
-  *BufferSize = 0;
-	return EFI_SUCCESS;
-}
-
-APPLE_GETVAR_PROTOCOL mDeviceProperties=
-{
-	DEVICE_PROPERTIES_SIGNATURE,
-	NULL,
-	NULL,
-	NULL,
-	GetDeviceProps
-};
 
 typedef	EFI_STATUS (EFIAPI *EFI_SCREEN_INFO_FUNCTION)(
                                                       VOID* This,
@@ -267,12 +131,6 @@ SetPrivateVarProto(VOID)
                                                        &mKeyboardInfo,
                                                        NULL
                                                        );
-	//obligatory protocol
-  Status = gBS->InstallProtocolInterface (&gImageHandle,
-                                          &gDevicePropertiesGuid,
-                                          EFI_NATIVE_INTERFACE,
-                                          &mDeviceProperties
-                                          );
 
   return Status;
 }

@@ -1613,7 +1613,6 @@ extern CHAR8                          *BootOSName;
 extern UINT64                    machineSignature;
 
 extern EFI_GUID                        AppleSystemInfoProducerName;
-extern EFI_GUID                        AppleDevicePropertyProtocolGuid;
 extern EFI_GUID                        gAppleScreenInfoProtocolGuid;
 extern EFI_GUID                        gEfiPartTypeSystemPartGuid;
 extern EFI_GUID                        gMsgLogProtocolGuid;
