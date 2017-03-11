@@ -124,13 +124,13 @@ SetPrivateVarProto(VOID)
   EFI_STATUS  Status;
   //This must be independent install
   // optional protocols
-  /*Status = */gBS->InstallMultipleProtocolInterfaces (&gImageHandle,
-                                                       &gAppleScreenInfoProtocolGuid,
-                                                       &mScreenInfo,
-                                                       &gEfiKeyboardInfoProtocolGuid,
-                                                       &mKeyboardInfo,
-                                                       NULL
-                                                       );
+  Status = gBS->InstallMultipleProtocolInterfaces (&gImageHandle,
+                                                    &gAppleScreenInfoProtocolGuid,
+                                                    &mScreenInfo,
+                                                    &gEfiKeyboardInfoProtocolGuid,
+                                                    &mKeyboardInfo,
+                                                    NULL
+                                                    );
 
   return Status;
 }
