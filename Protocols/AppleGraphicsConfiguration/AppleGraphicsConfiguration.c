@@ -19,6 +19,7 @@
 
 #include <Protocol/AppleGraphicsConfiguration.h>
 
+EFIAPI
 EFI_STATUS
 RestoreConfiguration (
   IN APPLE_GRAPHICS_CONFIGURATION_PROTOCOL *This,
