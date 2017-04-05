@@ -39,7 +39,7 @@
 //#include "../include/Handle.h"
 #include "nanosvg.h"
 
-#include "Version.h"
+#include <Version.h>
 
 #ifndef DEBUG_ALL
 #define DEBUG_MAIN 1

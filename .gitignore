@@ -39,9 +39,6 @@
 /Version.h
 /vers.txt
 
-# /rEFIt_UEFI/
-/rEFIt_UEFI/Version.h
-
 # XCode files/directories
 *~.nib
 DerivedData/
