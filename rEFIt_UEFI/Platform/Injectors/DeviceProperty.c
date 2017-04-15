@@ -34,13 +34,7 @@ GetUINT16Str (
   IN  UINT16 *Integer
   )
 {
-  AsciiSPrint (
-    String,
-    8,
-    "<%02X %02X>",
-    *Integer & 0xFF,
-    (*Integer >> (8)) & 0xFF
-  );
+  AsciiSPrint (String, 8, "<%02X %02X>", *Integer & 0xFF, (*Integer >> (8)) & 0xFF);
 }
 
 STATIC
@@ -90,11 +84,14 @@ GetCHAR8Str (
   IN  CHAR8 *SrcString
   )
 {
+  #if 0
   if (SrcString == NULL) {
     AsciiSPrint (DestString, 14, "<null string>");
   } else {
     AsciiSPrint (DestString, AsciiStrLen (SrcString) + 5, "<\"%a\">", SrcString);
   }
+  #endif
+  AsciiSPrint (DestString, AsciiStrLen (SrcString) + 5, "<\"%a\">", SrcString);
 }
 
 /** Logs a formatted string of the device property injection status.

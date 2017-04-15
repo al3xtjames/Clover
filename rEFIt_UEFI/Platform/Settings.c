@@ -6750,8 +6750,8 @@ GetDevices ()
 
             case 0x8086:
               gfx->Vendor                 = Intel;
-              AsciiSPrint (gfx->Model, 64, "%a", get_gma_model (Pci.Hdr.DeviceId));
-              DBG (" - GFX: Model=%a (Intel)\n", gfx->Model);
+              AsciiSPrint (gfx->Model, 64, "%a", GetIntelGraphicsName (Pci.Hdr.DeviceId));
+              DBG (" - GFX: %a\n", gfx->Model);
               gfx->Ports = 1;
               gfx->Connectors = (1 << NGFX);
               gfx->ConnChanged = FALSE;
@@ -7136,11 +7136,12 @@ SetDevices (LOADER_ENTRY *Entry)
 
             case 0x8086:
               if (gSettings.InjectIntel) {
-                TmpDirty    = setup_gma_devprop(Entry, &PCIdevice);
-                StringDirty |=  TmpDirty;
-                MsgLog ("Intel GFX revision  = 0x%x\n", PCIdevice.revision);
+                InjectIntelGraphicsProperties (
+                  &Pci,
+                  DevicePathFromHandle (HandleBuffer[i])
+                  );
               } else {
-                MsgLog ("Intel GFX injection not set\n");
+                MsgLog ("Intel graphics injection not enabled\n");
               }
 
               // IntelBacklight reworked by Sherlocks. 2018.10.07

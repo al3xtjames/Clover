@@ -87,7 +87,7 @@
 	Platform/Events.c
 	Platform/hda.c
 #	Platform/hda.h
-	Platform/gma.c
+#	Platform/gma.c
 #	Platform/gma.h
 	Platform/guid.c
 	Platform/Injectors.c
@@ -135,8 +135,11 @@
   Platform/Net.c
 
   Platform/AppleProtocols.c
-  Platform/DeviceProperty.c
-  Platform/HdaInjector.c
+
+  # Device property injection
+  Platform/Injectors/DeviceProperty.c
+  Platform/Injectors/Hda.c
+  Platform/Injectors/Graphics/Intel.c
 
   # Include/Driver/AppleGraphicsConfiguration.h
   ../Protocols/AppleGraphicsConfiguration/AppleGraphicsConfiguration.c

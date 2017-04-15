@@ -19,16 +19,16 @@
 
 #include <Platform.h>
 
-#include "DeviceProperty.h"
+#include <Injectors/DeviceProperty.h>
 
 typedef struct {
-  UINT32 VendorId;
-  UINT32 DeviceId;
+  UINT16 VendorId;
+  UINT16 DeviceId;
   CHAR8  *Name;
   UINT8  Flags;
 } HDA_CONTROLLER;
 
-#define FLAG_HDMI_AUDIO  (1 << 1)
+#define FLAG_INJECT_HDMI (1 << 1)
 #define FLAG_INJECT_BOTH (1 << 2)
 
 STATIC CONST HDA_CONTROLLER mHdaControllerTable[] = {
@@ -59,12 +59,13 @@ STATIC CONST HDA_CONTROLLER mHdaControllerTable[] = {
 };
 
 STATIC DEVICE_PROPERTY mHdaPropertyTable[] = {
-  { L"hda-gfx",               DEVICE_PROPERTY_CHAR8,  "onboard-0", 10, FLAG_HDMI_AUDIO },
-  { L"layout-id",             DEVICE_PROPERTY_UINT32, &gSettings.HDALayoutId, 4 },
-  { L"MaximumBootBeepVolume", DEVICE_PROPERTY_UINT8,  0, 1 },
-  { L"PinConfigurations",     DEVICE_PROPERTY_UINT8,  0, 1 },
-  { L"platformFamily",        DEVICE_PROPERTY_UINT8,  0, 1 },
-  { NULL, 0, 0 }
+  { L"hda-gfx",                  DEVICE_PROPERTY_CHAR8,  "onboard-0", 10, FLAG_INJECT_HDMI },
+  { L"layout-id",                DEVICE_PROPERTY_UINT32, &gSettings.HDALayoutId, 4 },
+  { L"MaximumBootBeepVolume",    DEVICE_PROPERTY_UINT8,  0, 1 },
+  { L"MaximumBootBeepVolumeAlt", DEVICE_PROPERTY_UINT8,  0, 1 },
+  { L"PinConfigurations",        DEVICE_PROPERTY_UINT8,  0, 1 },
+  { L"platformFamily",           DEVICE_PROPERTY_UINT8,  0, 1 },
+  { NULL, 0, 0, 0 }
 };
 
 /** Retrieves the name of a High Definition Audio (HDA) controller.
@@ -78,8 +79,8 @@ STATIC DEVICE_PROPERTY mHdaPropertyTable[] = {
 **/
 CHAR8 *
 GetHdaControllerName (
-  IN UINT32 VendorId,
-  IN UINT32 DeviceId
+  IN UINT16 VendorId,
+  IN UINT16 DeviceId
   )
 {
   INTN Index;
@@ -123,9 +124,9 @@ GetHdaControllerName (
 STATIC
 CONST
 HDA_CONTROLLER *
-GetHdaController (
-  IN UINT32 VendorId,
-  IN UINT32 DeviceId
+GetHdaControllerTableEntry (
+  IN UINT16 VendorId,
+  IN UINT16 DeviceId
   )
 {
   INTN Index;
@@ -161,16 +162,16 @@ InjectHdaProperties (
   IN BOOLEAN                  IsHdmiAudio
   )
 {
-  CONST HDA_CONTROLLER *HdaController;
+  CONST HDA_CONTROLLER *DeviceTableEntry;
   CHAR8                HdaGfxString[10];
   STATIC UINTN         HdmiControllerCount = 0;
   INTN                 Index;
   EFI_STATUS           Status;
 
-  HdaController = GetHdaController (
-                    HdaControllerDev->Hdr.VendorId,
-                    HdaControllerDev->Hdr.DeviceId
-                    );
+  DeviceTableEntry = GetHdaControllerTableEntry (
+                       HdaControllerDev->Hdr.VendorId,
+                       HdaControllerDev->Hdr.DeviceId
+                       );
 
   MsgLog (
     "%a [%04X:%04X] :: %s\n",
@@ -180,16 +181,15 @@ InjectHdaProperties (
     FileDevicePathToStr (DevicePath)
     );
 
-  // TODO: Remove once an implementation is added to Clover
+  // Do not inject properties if the EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL
+  // is missing.
   if (gEfiDppDbProtocol == NULL) {
+    MsgLog (" - EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL not found, disabling device property injection");
     return EFI_PROTOCOL_ERROR;
   }
 
-  //
-  // Some chipset HDA controllers (Intel 6/7/100 Series) are also HDMI/DP audio
-  // controllers. Inject HDMI audio properties for these controllers.
-  //
-  if ((HdaController->Flags & FLAG_INJECT_BOTH) || IsHdmiAudio) {
+  // Set the hda-gfx property for HDMI/DP audio controllers.
+  if ((DeviceTableEntry->Flags & FLAG_INJECT_BOTH) || IsHdmiAudio) {
     ++HdmiControllerCount;
     AsciiSPrint (HdaGfxString, 10, "onboard-%d", HdmiControllerCount);
     AsciiStrCpyS (mHdaPropertyTable[0].Value, 10, HdaGfxString);
@@ -197,14 +197,16 @@ InjectHdaProperties (
 
   FreePool (HdaGfxString);
 
+  // Inject the device properties in the property table.
   for (Index = 0; mHdaPropertyTable[Index].Name != NULL; ++Index) {
-    //
-    // Only inject properties with FLAG_HDMI_AUDIO flag for GPU HDMI/DP audio controllers.
-    //
-    if ((((IsHdmiAudio) && !(mHdaPropertyTable[Index].Flags & FLAG_HDMI_AUDIO)) ||
-     ((!IsHdmiAudio) && (mHdaPropertyTable[Index].Flags & FLAG_HDMI_AUDIO))) &&
-     !(HdaController->Flags & FLAG_INJECT_BOTH)) {
+    /// Skip hda-gfx for HDA controllers that are not HDMI/DP audio controllers.
+    if ((!(DeviceTableEntry->Flags & FLAG_INJECT_BOTH) && !IsHdmiAudio) && Index == 0) {
       continue;
+    /// Skip platformFamily and MaximumBootBeepVolume for HDMI/DP audio controllers.
+    } else if (IsHdmiAudio) {
+      if (Index == 2 || Index == 3 || Index == 5) {
+        continue;
+      }
     }
 
     Status = gEfiDppDbProtocol->SetProperty (
