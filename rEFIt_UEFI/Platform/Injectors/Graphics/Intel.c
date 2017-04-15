@@ -30,7 +30,7 @@ typedef struct {
 
 #define FLAG_SANDY_BRIDGE  (1 << 1)
 
-STATIC CONST UINT32 mGraphicOptions = 0x0C;
+STATIC UINT32 mGraphicOptions = 0x0C;
 
 STATIC CONST INTEL_IGPU mIntelGraphicsDeviceTable[] = {
   // Sandy Bridge Server GT2
@@ -50,7 +50,7 @@ STATIC CONST INTEL_IGPU mIntelGraphicsDeviceTable[] = {
   // Ivy Bridge GT2
   { 0x016A, 0x01628086, "Intel HD Graphics P4000", 0x0166000A },
   // Haswell Desktop GT2
-  { 0x0412, 0x00000000, "Intel HD Graphics 4600",  0x0D220003 }
+  { 0x0412, 0x00000000, "Intel HD Graphics 4600",  0x0D220003 },
   { 0, 0, NULL, 0 }
 };
 
