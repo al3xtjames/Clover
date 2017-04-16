@@ -35,7 +35,7 @@ STATIC UINT32 mGraphicOptions = 0x0C;
 STATIC CONST INTEL_IGPU mIntelGraphicsDeviceTable[] = {
   // Sandy Bridge Server GT2
   { 0x010A, 0x01168086, "Intel HD Graphics P3000", 0x00030010, FLAG_SANDY_BRIDGE },
-  // Sandy Bridge GT2
+  // Sandy Bridge Desktop GT2
   { 0x0112, 0x01168086, "Intel HD Graphics 3000",  0x00030010, FLAG_SANDY_BRIDGE },
   // Sandy Bridge Mobile GT2
   { 0x0116, 0x00000000, "Intel HD Graphics 3000",  0x00000000, FLAG_SANDY_BRIDGE },
@@ -43,12 +43,12 @@ STATIC CONST INTEL_IGPU mIntelGraphicsDeviceTable[] = {
   { 0x0122, 0x01268086, "Intel HD Graphics 3000",  0x00030010, FLAG_SANDY_BRIDGE },
   // Sandy Bridge Mobile GT2
   { 0x0126, 0x00000000, "Intel HD Graphics 3000",  0x00000000, FLAG_SANDY_BRIDGE },
-  // Ivy Bridge GT2
+  // Ivy Bridge Desktop GT2
   { 0x0162, 0x00000000, "Intel HD Graphics 4000",  0x0166000B },
   // Ivy Bridge Mobile GT2
   { 0x0166, 0x00000000, "Intel HD Graphics 4000",  0x01660001 },
-  // Ivy Bridge GT2
-  { 0x016A, 0x01628086, "Intel HD Graphics P4000", 0x0166000A },
+  // Ivy Bridge Server GT2
+  { 0x016A, 0x01628086, "Intel HD Graphics P4000", 0x0166000B },
   // Haswell Desktop GT2
   { 0x0412, 0x00000000, "Intel HD Graphics 4600",  0x0D220003 },
   { 0, 0, NULL, 0 }
