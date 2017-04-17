@@ -40,7 +40,9 @@
 #include "Platform.h"
 //#include "Version.h"
 
-#include <Guid/DataHubRecords.h>
+#include <Guid/AppleSystemInfo.h>
+
+#include <Protocol/DataHub.h>
 
 #define EFI_CPU_DATA_MAXIMUM_LENGTH 0x100
 
@@ -56,14 +58,7 @@ EFI_SUBCLASS_TYPE1_HEADER mCpuDataRecordHeader = {
   0                                     // RecordType (initialize later)
 };
 
-// gDataHubPlatformGuid
-/// The GUID of the DataHubProtocol
-EFI_GUID gDataHubPlatformGuid = {
-  0x64517cc8, 0x6561, 0x4051, { 0xb0, 0x3c, 0x59, 0x64, 0xb6, 0x0f, 0x4c, 0x7a }
-};
-
-extern EFI_GUID gDataHubPlatformGuid;
-extern APPLE_SMC_IO_PROTOCOL        *gAppleSmc;
+extern APPLE_SMC_IO_PROTOCOL *gAppleSmc;
 
 typedef union {
   EFI_CPU_DATA_RECORD *DataRecord;
@@ -124,8 +119,8 @@ LogDataHub(IN  EFI_GUID *TypeGuid,
 
   RecordSize = CopyRecord(PlatformData, Name, Data, DataSize);
   Status     = gDataHub->LogData(gDataHub,
-                                 TypeGuid,                   // DataRecordGuid
-                                 &gDataHubPlatformGuid,      // ProducerName (always)
+                                 TypeGuid,                          // DataRecordGuid
+                                 &gAppleSystemInfoProducerNameGuid, // ProducerName (always)
                                  EFI_DATA_RECORD_CLASS_DATA,
                                  PlatformData,
                                  RecordSize);
@@ -472,7 +467,7 @@ SetupDataForOSX(BOOLEAN Hibernate)
   AddSMCkey(SMC_MAKE_KEY('B','A','T','P'), 1, SmcKeyTypeFlag, (SMC_DATA *)&Zero); //isBatteryPowered
   AddSMCkey(SMC_MAKE_KEY('B','N','u','m'), 1, SmcKeyTypeUint8, (SMC_DATA *)&gSettings.Mobile); // Num Batteries
   if (gSettings.Mobile) {
-    AddSMCkey(SMC_MAKE_KEY('B','B','I','N'), 1, SmcKeyTypeUint8, (SMC_DATA *)&gSettings.Mobile); //Battery inserted
+    AddSMCkey(SMC_MAKE_KEY('B','B','I','N'), 1, SmcKeyTypeFlag, (SMC_DATA *)&gSettings.Mobile); //Battery inserted
   }
   AddSMCkey(SMC_MAKE_KEY('M','S','T','c'), 1, SmcKeyTypeUint8, (SMC_DATA *)&Zero); // CPU Plimit
   AddSMCkey(SMC_MAKE_KEY('M','S','A','c'), 2, SmcKeyTypeUint16, (SMC_DATA *)&Zero);// GPU Plimit
@@ -481,7 +476,7 @@ SetupDataForOSX(BOOLEAN Hibernate)
 
   AddSMCkey(SMC_MAKE_KEY('M','S','W','r'), 1, SmcKeyTypeUint8, (SMC_DATA *)&Zero);
   Zero = 1;
-  AddSMCkey(SMC_MAKE_KEY('M','S','F','W'), 2, SmcKeyTypeUint8, (SMC_DATA *)&Zero);
+  AddSMCkey(SMC_MAKE_KEY('M','S','F','W'), 2, SmcKeyTypeFlag, (SMC_DATA *)&Zero);
   Zero = 0x300;
   AddSMCkey(SMC_MAKE_KEY('M','S','P','S'), 2, SmcKeyTypeUint16, (SMC_DATA *)&Zero);
 }

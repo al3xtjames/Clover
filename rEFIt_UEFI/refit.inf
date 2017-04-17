@@ -189,8 +189,13 @@
   gEfiAcpiTableGuid
   gEfiAcpi10TableGuid
   gEfiAcpi20TableGuid
-  gAppleBootVariableGuid
-  gAppleVendorVariableGuid
+  gEfiCertSha1Guid
+  gEfiCertSha256Guid
+  gEfiCertPkcs7Guid
+  gEfiCertRsa2048Guid
+  gEfiCertRsa2048Sha256Guid
+  gEfiCertTypeRsa2048Sha256Guid
+  gEfiCertX509Guid
   gEfiDxeServicesTableGuid
   gEfiEventReadyToBootGuid
   gEfiEventVirtualAddressChangeGuid
@@ -199,31 +204,35 @@
   gEfiFileSystemInfoGuid                        ## CONSUMES ## GUID
   gEfiFileSystemVolumeLabelInfoIdGuid
   gEfiGlobalVariableGuid
+  gEfiMiscSubClassGuid
   gEfiPartTypeLegacyMbrGuid
   gEfiPartTypeSystemPartGuid
+  gEfiProcessorSubClassGuid
   gEfiSmbiosTableGuid
   gEfiSmbios3TableGuid
   gEfiSasDevicePathGuid
   gEfiImageSecurityDatabaseGuid
-  gEfiCertX509Guid
-  gEfiCertSha1Guid
-  gEfiCertSha256Guid
-  gEfiCertPkcs7Guid
-  gEfiCertRsa2048Guid
-  gEfiCertRsa2048Sha256Guid
-  gEfiCertTypeRsa2048Sha256Guid
 
-  # Include/Driver/AppleFirmwareVolume.h
+  # Include/Guid/AppleFirmwareVolume.h
   gAppleArrowCursorImageGuid
 
   # Include/Driver/AppleFirmwareVolume.h
   gAppleArrowCursor2xImageGuid
+
+  # Include/Guid/AppleNvram.h
+  gAppleBootVariableGuid
 
   # Include/Driver/AppleFirmwareVolume.h
   gAppleImageListGuid
 
   # Include/Driver/EfiOSInfo.h
   gAppleOsLoadedNamedEventGuid
+
+  # Include/Guid/AppleSystemInfo.h
+  gAppleSystemInfoProducerNameGuid
+
+  # Include/Guid/AppleNvram.h
+  gAppleVendorVariableGuid
 
 
 [Protocols]
@@ -279,6 +288,8 @@
   gMsgLogProtocolGuid
   gEfiPlatformDriverOverrideProtocolGuid
   gEmuVariableControlProtocolGuid
+
+  gEfiDataHubProtocolGuid
 
   # Include/Driver/AppleGraphicsConfiguration.h
   gAppleGraphicsConfigurationProtocolGuid
