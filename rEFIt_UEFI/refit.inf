@@ -270,7 +270,6 @@
   gEfiSecurityArchProtocolGuid
   gEfiSecurity2ArchProtocolGuid
 
-  gAppleScreenInfoProtocolGuid
   gEfiConsoleControlProtocolGuid
   gEfiLegacyBiosProtocolGuid
   gEfiTimerArchProtocolGuid
@@ -280,8 +279,6 @@
   gMsgLogProtocolGuid
   gEfiPlatformDriverOverrideProtocolGuid
   gEmuVariableControlProtocolGuid
-
-  gEfiDevicePathPropertyDatabaseProtocolGuid
 
   # Include/Driver/AppleGraphicsConfiguration.h
   gAppleGraphicsConfigurationProtocolGuid
@@ -294,6 +291,8 @@
 
   # Include/Driver/UserInterfaceThemeDriver.h
   gAppleUserInterfaceThemeProtocolGuid
+
+  gEfiDevicePathPropertyDatabaseProtocolGuid
 
   # Include/Driver/FvInject.h
   gEfiFirmwareVolumeProtocolGuid

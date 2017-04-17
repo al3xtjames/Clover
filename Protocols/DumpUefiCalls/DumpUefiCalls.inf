@@ -64,7 +64,7 @@
   BaseLib
   DevicePathLib
   DebugLib
-  
+
 [Sources]
   DumpUefiCalls.c
   Lib.h
@@ -100,7 +100,7 @@
   gEfiSmbiosTableGuid
   gEfiSmbios3TableGuid
   gEfiPartTypeSystemPartGuid
-  
+
 
 [Protocols]
   gEfiLoadedImageProtocolGuid
@@ -115,16 +115,16 @@
   gEfiFirmwareVolumeProtocolGuid
   gAppleSmcIoProtocolGuid
   gAppleImageCodecProtocolGuid
-  gAppleKeyStateProtocolGuid
+  gAppleKeyMapAggregatorProtocolGuid
   gEfiOSInfoProtocolGuid
   gAppleGraphicsConfigurationProtocolGuid
   gEfiKeyboardInfoProtocolGuid
   gAppleKeyMapDatabaseProtocolGuid
   gEfiSimplePointerProtocolGuid
-  
+
 [Depex]
-  TRUE  
-  
+  TRUE
+
 [BuildOptions]
 #  MSFT:*_*_*_ASM_FLAGS = /Fl
   INTEL:DEBUG_*_*_CC_FLAGS   =

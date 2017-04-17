@@ -19,10 +19,10 @@
 #define APPLE_KEY_MAP_DATABASE_H_
 
 // APPLE_KEY_MAP_DATABASE_PROTOCOL_GUID
- 
+
 #define APPLE_KEY_MAP_DATABASE_PROTOCOL_GUID              \
-  {0x584B9EBE, 0x80C1, 0x4BD6,                           \
-    {0x98, 0xB0, 0xA7, 0x78, 0x6E, 0xC2, 0xF2, 0xE2}}
+  { 0x584B9EBE, 0x80C1, 0x4BD6,                           \
+    { 0x98, 0xB0, 0xA7, 0x78, 0x6E, 0xC2, 0xF2, 0xE2 }}
 
 typedef struct _APPLE_KEY_MAP_DATABASE_PROTOCOL APPLE_KEY_MAP_DATABASE_PROTOCOL;
 

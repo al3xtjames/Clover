@@ -60,8 +60,8 @@ Headers collection for procedures
 #include <Protocol/UgaDraw.h>
 
 #include <Protocol/AppleSmcIo.h>
+#include <Protocol/ConsoleControl.h>
 #include <Protocol/DevicePathPropertyDatabase.h>
-#include <Protocol/efiConsoleControl.h>
 #include <Protocol/EmuVariableControl.h>
 #include <Protocol/FSInject.h>
 #include <Protocol/MsgLog.h>

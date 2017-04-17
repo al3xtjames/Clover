@@ -14,17 +14,19 @@
 #include <Library/DebugLib.h>
 #include <Library/PrintLib.h>
 
+#include <IndustryStandard/AppleHid.h>
+
 //#include <EfiImageFormat.h>
 #include <Protocol/UgaDraw.h>
 #include <Protocol/AppleSMC.h>
 #include <Protocol/AppleImageCodec.h>
-#include <Protocol/AppleKeyState.h>
+#include <Protocol/AppleKeyMapAggregator.h>
 #include <Protocol/OSInfo.h>
-#include <Protocol/AppleGraphConfig.h>
+#include <Protocol/AppleGraphicsConfiguration.h>
 //#include <Protocol/AppleEvent.h>
 #include <Protocol/FirmwareVolume.h>
-#include <Protocol/KeyboardInfo.h> 
-#include <Protocol/AppleKeyMapDatabase.h> 
+#include <Protocol/KeyboardInfo.h>
+#include <Protocol/AppleKeyMapDatabase.h>
 
 #include "Common.h"
 
@@ -51,7 +53,7 @@ OvrReadData (IN  APPLE_SMC_IO_PROTOCOL  *This,
   CHAR8 StrSmall[10];
   CHAR8 *Ptr;
   INTN i;
-  
+
   Status = gOrgAppleSMC.SmcReadValue(This, Key, Size, Value);
   PRINT("->AppleSMC.SmcReadValue SMC=%x (%c%c%c%c) len=%d\n", Key, (Key >> 24) & 0xFF,
         (Key >> 16) & 0xFF, (Key >> 8) & 0xFF,  Key & 0xFF, Size);
@@ -81,7 +83,7 @@ OvrWriteValue (IN  APPLE_SMC_IO_PROTOCOL  *This,
   CHAR8 StrSmall[10];
   CHAR8 *Ptr;
   INTN i;
-  
+
   Status = gOrgAppleSMC.SmcWriteValue(This, Key, Size, Value);
   PRINT("->AppleSMC.SmcWriteValue SMC=%x (%c%c%c%c) len=%d\n", Key, (Key >> 24) & 0xFF,
         (Key >> 16) & 0xFF, (Key >> 8) & 0xFF,  Key & 0xFF, Size);
@@ -98,7 +100,7 @@ OvrWriteValue (IN  APPLE_SMC_IO_PROTOCOL  *This,
   PRINT("%a\n", Str);
   return Status;
 }
-      
+
 EFI_STATUS
 EFIAPI
 OvrGetKeyCount (IN  APPLE_SMC_IO_PROTOCOL  *This,
@@ -110,7 +112,7 @@ OvrGetKeyCount (IN  APPLE_SMC_IO_PROTOCOL  *This,
   PRINT("->AppleSMC.SmcGetKeyCount(%p), =>%d\n", Count, Count?(Count[3] + Count[2]*16):0);
   return Status;
 }
-               
+
 EFI_STATUS
 EFIAPI
 OvrAddKey (IN  APPLE_SMC_IO_PROTOCOL  *This,
@@ -234,19 +236,19 @@ EFI_STATUS EFIAPI
 OvrAppleSMC(VOID)
 {
 	EFI_STATUS				Status;
-	
+
 //	PRINT("Overriding AppleSMC ...\n");
-	
+
 	// Locate AppleSMC protocol
 	Status = gBS->LocateProtocol(&gAppleSmcIoProtocolGuid, NULL, (VOID **) &gAppleSMC);
 	if (EFI_ERROR(Status)) {
 		PRINT("Error Overriding AppleSMC: %r\n", Status);
 		return Status;
 	}
-	
+
 	// Store originals
 	CopyMem(&gOrgAppleSMC, gAppleSMC, sizeof(APPLE_SMC_IO_PROTOCOL));
-	
+
 	// Override with our implementation
 	gAppleSMC->SmcReadValue = OvrReadData;
 	gAppleSMC->SmcWriteValue = OvrWriteValue;
@@ -260,7 +262,7 @@ OvrAppleSMC(VOID)
 	gAppleSMC->SmcUnknown3 = OvrUnknown3;
 	gAppleSMC->SmcUnknown4 = OvrUnknown4;
 	gAppleSMC->SmcUnknown5 = OvrUnknown5; */
-	
+
 	PRINT("AppleSMC overriden!\n");
 	return EFI_SUCCESS;
 }
@@ -281,7 +283,7 @@ OvrRecognizeImageData (//IN APPLE_IMAGE_CODEC_PROTOCOL* This,
                     )
 {
   EFI_STATUS				Status;
-  
+
   Status = gOrgAppleImageCodec.RecognizeImageData(ImageBuffer, ImageSize, OutBuffer);
   if (EFI_ERROR(Status)) {
     PRINT("->AppleImageCodec.RecognizeImageData(%p, 0x%x, %p), sign=%4x, status=%r\n", ImageBuffer, ImageSize, OutBuffer,
@@ -300,7 +302,7 @@ OvrGetImageDimensions (//IN APPLE_IMAGE_CODEC_PROTOCOL* This,
               )
 {
   EFI_STATUS				Status;
-  
+
   Status = gOrgAppleImageCodec.GetImageDimensions(ImageBuffer, ImageSize, ImageWidth, ImageHeight);
   if (EFI_ERROR(Status)) {
     PRINT("->AppleImageCodec.GetImageDimensions(%p, 0x%x, %p, %p), status=%r\n",
@@ -320,7 +322,7 @@ OvrDecodeImageData (//IN APPLE_IMAGE_CODEC_PROTOCOL* This,
                  )
 {
   EFI_STATUS				Status;
-  
+
   Status = gOrgAppleImageCodec.DecodeImageData(ImageBuffer, ImageSize, RawImageData, RawImageDataSize);
   if (EFI_ERROR(Status)) {
     PRINT("->AppleImageCodec.DecodeImageData(%p, 0x%x, %p, %p), status=%r\n",
@@ -328,7 +330,7 @@ OvrDecodeImageData (//IN APPLE_IMAGE_CODEC_PROTOCOL* This,
  // if (!EFI_ERROR(Status)) {
  //   PRINT("--> RawImageDataSize=%d\n", RawImageDataSize?*RawImageDataSize:0);
   }
-  return Status;  
+  return Status;
 }
 
 EFI_STATUS
@@ -337,7 +339,7 @@ OvrAICUnknown1 (VOID* ImageBuffer, UINTN Param1, UINTN Param2, UINTN Param3)
 
 {
   EFI_STATUS				Status;
-  
+
   Status = gOrgAppleImageCodec.Unknown1(ImageBuffer, Param1, Param2, Param3);
   PRINT("->AppleImageCodec.Unknown1(%p, 0x%x, 0x%x, 0x%x), status=%r\n", ImageBuffer, Param1, Param2, Param3);
   return Status;
@@ -349,7 +351,7 @@ OvrAICUnknown2 (VOID* ImageBuffer, UINTN Param1, UINTN Param2, UINTN Param3)
 
 {
   EFI_STATUS				Status;
-  
+
   Status = gOrgAppleImageCodec.Unknown2(ImageBuffer, Param1, Param2, Param3);
   PRINT("->AppleImageCodec.Unknown2(%p, 0x%x, 0x%x, 0x%x), status=%r\n", ImageBuffer, Param1, Param2, Param3);
   return Status;
@@ -360,26 +362,26 @@ EFI_STATUS EFIAPI
 OvrAppleImageCodec(VOID)
 {
 	EFI_STATUS				Status;
-	
+
 //	PRINT("Overriding AppleImageCodec ...\n");
-	
+
 	// Locate AppleSMC protocol
 	Status = gBS->LocateProtocol(&gAppleImageCodecProtocolGuid, NULL, (VOID **) &gAppleImageCodec);
 	if (EFI_ERROR(Status)) {
 		PRINT("Error Overriding AppleImageCodec: %r\n", Status);
 		return Status;
 	}
-	
+
 	// Store originals
 	CopyMem(&gOrgAppleImageCodec, gAppleImageCodec, sizeof(APPLE_IMAGE_CODEC_PROTOCOL));
-	
+
 	// Override with our implementation
 	gAppleImageCodec->RecognizeImageData = OvrRecognizeImageData;
 	gAppleImageCodec->GetImageDimensions = OvrGetImageDimensions;
 	gAppleImageCodec->DecodeImageData = OvrDecodeImageData;
   gAppleImageCodec->Unknown1 = OvrAICUnknown1;
   gAppleImageCodec->Unknown2 = OvrAICUnknown2;
-	
+
 	PRINT("AppleImageCodec overriden!\n");
 	return EFI_SUCCESS;
 }
@@ -388,21 +390,21 @@ OvrAppleImageCodec(VOID)
 /**/
 /** Installs our AppleKeyState overrides. */
 
-APPLE_KEY_STATE_PROTOCOL gOrgAppleKeyState;
-APPLE_KEY_STATE_PROTOCOL *gAppleKeyState;
+APPLE_KEY_MAP_AGGREGATOR_PROTOCOL gOrgAppleKeyState;
+APPLE_KEY_MAP_AGGREGATOR_PROTOCOL *gAppleKeyState;
 
 EFI_STATUS
 EFIAPI
-OvrReadKeyState (IN APPLE_KEY_STATE_PROTOCOL *This,
+OvrGetKeyStrokes (IN APPLE_KEY_MAP_AGGREGATOR_PROTOCOL *This,
                  OUT UINT16 *ModifyFlags,
                  OUT UINTN  *PressedKeyStatesCount,
                  OUT APPLE_KEY *PressedKeyStates)
 {
   EFI_STATUS				Status;
 
-  Status = gOrgAppleKeyState.ReadKeyState(This, ModifyFlags, PressedKeyStatesCount, PressedKeyStates);
+  Status = gOrgAppleKeyState.GetKeyStrokes(This, ModifyFlags, PressedKeyStatesCount, PressedKeyStates);
   if (PressedKeyStatesCount && *PressedKeyStatesCount && PressedKeyStates) {
-    PRINT("->ReadKeyState(), count=%d, flags=0x%x states={%x,%x}, status=%r\n",
+    PRINT("->GetKeyStrokes(), count=%d, flags=0x%x states={%x,%x}, status=%r\n",
           *PressedKeyStatesCount,
           ModifyFlags?*ModifyFlags:0,
           PressedKeyStates[0],
@@ -414,18 +416,18 @@ OvrReadKeyState (IN APPLE_KEY_STATE_PROTOCOL *This,
 
 EFI_STATUS
 EFIAPI
-OvrSearchKeyStroke (APPLE_KEY_STATE_PROTOCOL* This,
+OvrContainsKeyStrokes (APPLE_KEY_MAP_AGGREGATOR_PROTOCOL* This,
                  IN UINT16 ModifyFlags,
                  IN UINTN PressedKeyStatesCount,
                  IN OUT APPLE_KEY *PressedKeyStates,
                  IN BOOLEAN ExactMatch)
 {
   EFI_STATUS				Status;
-  
-  Status = gOrgAppleKeyState.SearchKeyStroke(This, ModifyFlags, PressedKeyStatesCount,
+
+  Status = gOrgAppleKeyState.ContainsKeyStrokes(This, ModifyFlags, PressedKeyStatesCount,
                                              PressedKeyStates, ExactMatch);
   if (PressedKeyStates) {
-    PRINT("->SearchKeyStroke(), count=%d, flags=0x%x, %a match, states={%x,%x}, status=%r\n",
+    PRINT("->ContainsKeyStrokes(), count=%d, flags=0x%x, %a match, states={%x,%x}, status=%r\n",
           PressedKeyStatesCount,
           ModifyFlags, ExactMatch?"exact":"~",
           PressedKeyStates[0], PressedKeyStates[1], Status);
@@ -445,18 +447,18 @@ OvrAppleKeyState(VOID)
 //  PRINT("Overriding AppleKeyState ...\n");
 
   // Locate AppleKeyState protocol
-  Status = gBS->LocateProtocol(&gAppleKeyStateProtocolGuid, NULL, (VOID **) &gAppleKeyState);
+  Status = gBS->LocateProtocol(&gAppleKeyMapAggregatorProtocolGuid, NULL, (VOID **) &gAppleKeyState);
   if (EFI_ERROR(Status)) {
     PRINT("Error Overriding AppleKeyState: %r\n", Status);
     return Status;
   }
 
   // Store originals
-  CopyMem(&gOrgAppleKeyState, gAppleKeyState, sizeof(APPLE_KEY_STATE_PROTOCOL));
+  CopyMem(&gOrgAppleKeyState, gAppleKeyState, sizeof(APPLE_KEY_MAP_AGGREGATOR_PROTOCOL));
 
   // Override with our implementation
-  gAppleKeyState->ReadKeyState = OvrReadKeyState;
-  gAppleKeyState->SearchKeyStroke = OvrSearchKeyStroke;
+  gAppleKeyState->GetKeyStrokes = OvrGetKeyStrokes;
+  gAppleKeyState->ContainsKeyStrokes = OvrContainsKeyStrokes;
 
   PRINT("AppleKeyState overriden!\n");
   return EFI_SUCCESS;
@@ -504,42 +506,42 @@ EFI_STATUS EFIAPI
 OvrOSInfo(VOID)
 {
   EFI_STATUS				Status;
-  
+
 //  PRINT("Overriding OSInfo ...\n");
-  
+
   // Locate EfiOSInfo protocol
   Status = gBS->LocateProtocol(&gEfiOSInfoProtocolGuid, NULL, (VOID **) &gOSInfo);
   if (EFI_ERROR(Status)) {
     PRINT("Error Overriding OSInfo: %r\n", Status);
     return Status;
   }
-  
+
   // Store originals
   CopyMem(&gOrgOSInfo, gOSInfo, sizeof(EFI_OS_INFO_PROTOCOL));
-  
+
   // Override with our implementation
   gOSInfo->OSVendor = OvrOSVendor;
   gOSInfo->OSName = OvrOSName;
   gOSInfo->OSEmpty = OvrOSEmpty;
-  
+
   PRINT("EfiOSInfo overriden!\n");
   return EFI_SUCCESS;
-  
+
 }
 
 //**************************************************
-APPLE_GRAPH_CONFIG_PROTOCOL gOrgGraphConfig;
-APPLE_GRAPH_CONFIG_PROTOCOL *gGraphConfig;
+APPLE_GRAPHICS_CONFIGURATION_PROTOCOL gOrgGraphicsConfiguration;
+APPLE_GRAPHICS_CONFIGURATION_PROTOCOL *gGraphicsConfiguration;
 
 EFI_STATUS
 EFIAPI
-OvrRestoreConfig (APPLE_GRAPH_CONFIG_PROTOCOL* This,
+OvrRestoreConfiguration (APPLE_GRAPHICS_CONFIGURATION_PROTOCOL* This,
                UINT32 Param1, UINT32 Param2, VOID* Param3, VOID* Param4, VOID* Param5
                )
 {
   EFI_STATUS				Status;
-  Status = gOrgGraphConfig.RestoreConfig(This, Param1, Param2, Param3, Param4, Param5);
-  PRINT("->GraphConfig.RestoreConfig(%x, %x, %p, %p, %p) status=%r\n",
+  Status = gOrgGraphicsConfiguration.RestoreConfiguration(This, Param1, Param2, Param3, Param4, Param5);
+  PRINT("->GraphicsConfiguration.RestoreConfiguration(%x, %x, %p, %p, %p) status=%r\n",
         Param1, Param2, Param3, Param4, Param5, Status);
   return EFI_SUCCESS;
 }
@@ -547,28 +549,28 @@ OvrRestoreConfig (APPLE_GRAPH_CONFIG_PROTOCOL* This,
 
 
 EFI_STATUS EFIAPI
-OvrGraphConfig(VOID)
+OvrGraphicsConfiguration(VOID)
 {
   EFI_STATUS				Status;
-  
-//  PRINT("Overriding GraphConfig ...\n");
-  
-  // Locate AppleGraphConfig protocol
-  Status = gBS->LocateProtocol(&gAppleGraphicsConfigurationProtocolGuid, NULL, (VOID **) &gGraphConfig);
+
+//  PRINT("Overriding GraphicsConfiguration ...\n");
+
+  // Locate AppleGraphicsConfiguration protocol
+  Status = gBS->LocateProtocol(&gAppleGraphicsConfigurationProtocolGuid, NULL, (VOID **) &gGraphicsConfiguration);
   if (EFI_ERROR(Status)) {
-    PRINT("Error Overriding GraphConfig: %r\n", Status);
+    PRINT("Error Overriding GraphicsConfiguration: %r\n", Status);
     return Status;
   }
-  
+
   // Store originals
-  CopyMem(&gOrgGraphConfig, gGraphConfig, sizeof(APPLE_GRAPH_CONFIG_PROTOCOL));
-  
+  CopyMem(&gOrgGraphicsConfiguration, gGraphicsConfiguration, sizeof(APPLE_GRAPHICS_CONFIGURATION_PROTOCOL));
+
   // Override with our implementation
-  gGraphConfig->RestoreConfig = OvrRestoreConfig;
-  
-  PRINT("AppleGraphConfig overriden!\n");
+  gGraphicsConfiguration->RestoreConfiguration = OvrRestoreConfiguration;
+
+  PRINT("AppleGraphicsConfiguration overriden!\n");
   return EFI_SUCCESS;
-  
+
 }
 
 //**********************************************
@@ -618,26 +620,26 @@ EFI_STATUS EFIAPI
 OvrFirmwareVolume(VOID)
 {
   EFI_STATUS				Status;
-  
+
   PRINT("Overriding FirmwareVolume ...\n");
-  
+
   // Locate FirmwareVolume protocol
   Status = gBS->LocateProtocol(&gEfiFirmwareVolumeProtocolGuid, NULL, (VOID **) &gFirmwareVolume);
   if (EFI_ERROR(Status)) {
     PRINT("Error Overriding FirmwareVolume: %r\n", Status);
     return Status;
   }
-  
+
   // Store originals
   CopyMem(&gOrgFV, gFirmwareVolume, sizeof(EFI_FIRMWARE_VOLUME_PROTOCOL));
-  
+
   // Override with our implementation
   gFirmwareVolume->ReadSection = OvrFvReadSection;
   gFirmwareVolume->ReadFile = OvrFvReadFile;
-  
+
   PRINT("FirmwareVolume overriden!\n");
   return EFI_SUCCESS;
-  
+
 }
 
 /****************************************************/
@@ -662,7 +664,7 @@ GetKeyboardDeviceInfo (
   Status = gOrgAppleKeyboardInfo.GetInfo(IdVendor, IdProduct, CountryCode);
   PRINT("->KeyboardInfo => Vendor=0x%4x, Product=0x%4x, CountryCode=%x\n",
         IdVendor?*IdVendor:0, IdProduct?*IdProduct:0, CountryCode?*CountryCode:0);
-  
+
   return Status;
 }
 
@@ -670,25 +672,25 @@ EFI_STATUS EFIAPI
 OvrEfiKeyboardInfo(VOID)
 {
   EFI_STATUS				Status;
-  
+
   PRINT("Overriding EfiKeyboardInfo ...\n");
-  
+
   // Locate EfiKeyboardInfo protocol
   Status = gBS->LocateProtocol(&gEfiKeyboardInfoProtocolGuid, NULL, (VOID **)&gAppleKeyboardInfo);
   if (EFI_ERROR(Status)) {
     PRINT("Error Overriding EfiKeyboardInfo: %r\n", Status);
     return Status;
   }
-  
+
   // Store originals
   CopyMem(&gOrgAppleKeyboardInfo, gAppleKeyboardInfo, sizeof(EFI_KEYBOARD_INFO_PROTOCOL));
-  
+
   // Override with our implementation
   gAppleKeyboardInfo->GetInfo = GetKeyboardDeviceInfo;
-  
+
   PRINT("EfiKeyboardInfo overriden!\n");
   return EFI_SUCCESS;
-  
+
 }
 
 //************************
@@ -707,7 +709,7 @@ OvrCreateKeyStrokesBuffer (IN  APPLE_KEY_MAP_DATABASE_PROTOCOL  *This,
   Status = gOrgAppleKeyMapDb.CreateKeyStrokesBuffer(This, KeyBufferSize, Index);
   PRINT("->CreateKeyStrokesBuffer => KeyBufferSize=%d, Index=%d, Status=%r\n",
         KeyBufferSize, Index?*Index:0, Status);
-  
+
   return Status;
 }
 
@@ -722,10 +724,10 @@ OvrRemoveKeyStrokesBuffer (
   Status = gOrgAppleKeyMapDb.RemoveKeyStrokesBuffer(This, Index);
   PRINT("->RemoveKeyStrokesBuffer => Index=%d, Status=%r\n",
         Index, Status);
-  
+
   return Status;
 }
-  
+
  EFI_STATUS
 EFIAPI
 OvrSetKeyStrokeBufferKeys (
@@ -740,7 +742,7 @@ OvrSetKeyStrokeBufferKeys (
   Status = gOrgAppleKeyMapDb.SetKeyStrokeBufferKeys(This, Index, Modifiers, NumberOfKeys, Keys);
   PRINT("->SetKeyStrokeBufferKeys => Index=%d, Modifiers=%x, NoKeys=%d, Keys={%x, %x}, Status=%r\n",
         Index, Modifiers, NumberOfKeys, Keys?*Keys:0, (Keys && NumberOfKeys>1)?Keys[1]:0, Status);
-  
+
   return Status;
 }
 
@@ -750,28 +752,27 @@ EFI_STATUS EFIAPI
 OvrAppleKeyMapDb(VOID)
 {
   EFI_STATUS				Status;
-  
+
   PRINT("Overriding AppleKeyMapDb ...\n");
-  
+
   // Locate AppleKeyMapDb protocol
   Status = gBS->LocateProtocol(&gAppleKeyMapDatabaseProtocolGuid, NULL, (VOID **)&gAppleKeyMapDb);
   if (EFI_ERROR(Status)) {
     PRINT("Error Overriding AppleKeyMapDb: %r\n", Status);
     return Status;
   }
-  
+
   // Store originals
   CopyMem(&gOrgAppleKeyMapDb, gAppleKeyMapDb, sizeof(APPLE_KEY_MAP_DATABASE_PROTOCOL));
-  
+
   // Override with our implementation
   gAppleKeyMapDb->CreateKeyStrokesBuffer = OvrCreateKeyStrokesBuffer;
   gAppleKeyMapDb->RemoveKeyStrokesBuffer = OvrRemoveKeyStrokesBuffer;
   gAppleKeyMapDb->SetKeyStrokeBufferKeys = OvrSetKeyStrokeBufferKeys;
-  
-  
-  
+
+
+
   PRINT("AppleKeyMapDb overriden!\n");
   return EFI_SUCCESS;
-  
-}
 
+}

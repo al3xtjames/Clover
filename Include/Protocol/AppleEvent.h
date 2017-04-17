@@ -65,32 +65,32 @@ typedef PACKED struct {
 } APPLE_KEY_EVENT_DATA;
 
 typedef union {
-  APPLE_KEY_EVENT_DATA     *KeyData;          ///< 
-  APPLE_POINTER_EVENT_TYPE PointerEventType;  ///< 
-  UINTN                    Raw;               ///< 
+  APPLE_KEY_EVENT_DATA     *KeyData;          ///<
+  APPLE_POINTER_EVENT_TYPE PointerEventType;  ///<
+  UINTN                    Raw;               ///<
 } APPLE_EVENT_DATA;
 
 // DIMENSION
 typedef struct {
-  INT32 Horizontal;  ///< 
-  INT32 Vertical;    ///< 
+  INT32 Horizontal;  ///<
+  INT32 Vertical;    ///<
 } DIMENSION;
 
 // APPLE_EVENT_QUERY_INFORMATION
 typedef struct {
   struct {
-    UINT16 Year;    ///< 
-    UINT8  Month;   ///< 
-    UINT8  Day;     ///< 
-    UINT8  Hour;    ///< 
-    UINT8  Minute;  ///< 
-    UINT8  Second;  ///< 
-    UINT8  Pad1;    ///< 
-  }                  CreationTime;     ///< 
-  APPLE_EVENT_TYPE   EventType;        ///< 
-  APPLE_EVENT_DATA   EventData;        ///< 
-  APPLE_MODIFIER_MAP Modifiers;        ///< 
-  DIMENSION          PointerPosition;  ///< 
+    UINT16 Year;    ///<
+    UINT8  Month;   ///<
+    UINT8  Day;     ///<
+    UINT8  Hour;    ///<
+    UINT8  Minute;  ///<
+    UINT8  Second;  ///<
+    UINT8  Pad1;    ///<
+  }                  CreationTime;     ///<
+  APPLE_EVENT_TYPE   EventType;        ///<
+  APPLE_EVENT_DATA   EventData;        ///<
+  APPLE_MODIFIER_MAP Modifiers;        ///<
+  DIMENSION          PointerPosition;  ///<
 } APPLE_EVENT_QUERY_INFORMATION;
 
 // APPLE_EVENT_NOTIFY_FUNCTION
@@ -107,8 +107,8 @@ typedef VOID *APPLE_EVENT_HANDLE;
 
 // APPLE_EVENT_PROTOCOL_GUID
 #define APPLE_EVENT_PROTOCOL_GUID                         \
-  {0x33BE0EF1, 0x89C9, 0x4A6D,                           \
-    {0xBB, 0x9F, 0x69, 0xDC, 0x8D, 0xD5, 0x16, 0xB9}}
+  { 0x33BE0EF1, 0x89C9, 0x4A6D,                           \
+    { 0xBB, 0x9F, 0x69, 0xDC, 0x8D, 0xD5, 0x16, 0xB9 }}
 
 // EVENT_REGISTER_HANDLER
 typedef
@@ -160,12 +160,12 @@ EFI_STATUS
 
 // APPLE_EVENT_PROTOCOL
 struct _APPLE_EVENT_PROTOCOL {
-  UINT32                    Revision;           ///< 
-  EVENT_REGISTER_HANDLER    RegisterHandler;    ///< 
-  EVENT_UNREGISTER_HANDLER  UnregisterHandler;  ///< 
-  EVENT_SET_CURSOR_POSITION SetCursorPosition;  ///< 
-  EVENT_SET_EVENT_NAME      SetEventName;       ///< 
-  EVENT_IS_CAPS_LOCK_ON     IsCapsLockOn;       ///< 
+  UINT32                    Revision;           ///<
+  EVENT_REGISTER_HANDLER    RegisterHandler;    ///<
+  EVENT_UNREGISTER_HANDLER  UnregisterHandler;  ///<
+  EVENT_SET_CURSOR_POSITION SetCursorPosition;  ///<
+  EVENT_SET_EVENT_NAME      SetEventName;       ///<
+  EVENT_IS_CAPS_LOCK_ON     IsCapsLockOn;       ///<
 };
 
 // gAppleEventProtocolGuid

@@ -27,7 +27,7 @@ EFI_GUID gAppleScreenInfoProtocolGuid = {
 // gEfiKeyboardInfoProtocolGuid
 // {0xE82A0A1E, 0x0E4D, 0x45AC, {0xA6, 0xDC, 0x2A, 0xE0, 0x58, 0x00, 0xD3, 0x11}}
 
-extern EFI_GUID gAppleScreenInfoProtocolGuid;
+//extern EFI_GUID gAppleScreenInfoProtocolGuid;
 
 UINT32 mPropSize = 0;
 UINT8* mProperties = NULL;
@@ -36,8 +36,8 @@ CHAR8* gDeviceProperties = NULL;
 UINT32 cPropSize = 0;
 UINT8* cProperties = NULL;
 CHAR8* cDeviceProperties = NULL;
-CHAR8* BootOSName = NULL;
 
+#if 0
 UINT16 KeyboardVendor = 0x05ac; //Apple inc.
 UINT16 KeyboardProduct = 0x021d; //iMac aluminium
 
@@ -117,20 +117,26 @@ UsbKbGetKeyboardDeviceInfo (
 EFI_KEYBOARD_INFO_PROTOCOL mKeyboardInfo = {
   UsbKbGetKeyboardDeviceInfo
 };
+#endif
 
 EFI_STATUS
-SetPrivateVarProto(VOID)
+SetPrivateVarProto (VOID)
 {
+#if 0
   EFI_STATUS  Status;
   //This must be independent install
   // optional protocols
-  Status = gBS->InstallMultipleProtocolInterfaces (&gImageHandle,
-                                                    &gAppleScreenInfoProtocolGuid,
-                                                    &mScreenInfo,
-                                                    &gEfiKeyboardInfoProtocolGuid,
-                                                    &mKeyboardInfo,
-                                                    NULL
-                                                    );
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &gImageHandle,
+                  &gAppleScreenInfoProtocolGuid,
+                  &mScreenInfo,
+                  &gEfiKeyboardInfoProtocolGuid,
+                  &mKeyboardInfo,
+                  NULL
+                  );
 
   return Status;
+#endif
+
+  return EFI_SUCCESS;
 }
