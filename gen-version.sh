@@ -16,7 +16,7 @@ if [ -z "$(git show-ref | grep refs/remotes/git-svn)" ]; then
 fi
 
 SVN_REVISION=$(git svn info | grep Revision | awk '{print $2}')
-SUFFIX="RM-$(git rev-parse --short HEAD)"
+SUFFIX="RM-$(git symbolic-ref --short HEAD)@$(git rev-parse --short HEAD)"
 REVISION="$SVN_REVISION-$SUFFIX"
 BUILD_DATE=$(date '+%Y-%m-%d %H:%M:%S')
 
