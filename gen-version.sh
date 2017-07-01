@@ -10,8 +10,13 @@
 
 # Fix git-svn history if it doesn't exist
 if [ -z "$(git show-ref | grep refs/remotes/git-svn)" ]; then
+	git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+	git fetch origin --unshallow
+	git checkout svn
 	git svn init svn://svn.code.sf.net/p/cloverefiboot/code/
 	git update-ref refs/remotes/git-svn $(git rev-parse HEAD)
+	git svn rebase
+	git checkout development
 	git svn rebase
 fi
 
