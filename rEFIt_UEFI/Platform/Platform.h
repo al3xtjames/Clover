@@ -1996,6 +1996,16 @@ GetIntelGraphicsName (
   IN UINT16 DeviceId
   );
 
+UINT32
+GetDefaultIntelFakeId (
+  IN UINT16 DeviceId
+  );
+
+UINT32
+GetDefaultIntelPlatformId (
+  IN UINT16 DeviceId
+  );
+
 EFI_STATUS
 InjectIntelGraphicsProperties (
   IN PCI_TYPE00               *IntelGraphicsDev,

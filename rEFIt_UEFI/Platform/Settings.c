@@ -6750,7 +6750,18 @@ GetDevices ()
 
             case 0x8086:
               gfx->Vendor                 = Intel;
+              // Set the Intel graphics model name.
               AsciiSPrint (gfx->Model, 64, "%a", GetIntelGraphicsName (Pci.Hdr.DeviceId));
+
+              // Set the default Intel fake device ID (if it exists).
+              UINT32 FakeIntelId = GetDefaultIntelFakeId (Pci.Hdr.DeviceId);
+              if (FakeIntelId) {
+                gSettings.FakeIntel = FakeIntelId;
+              }
+
+              // Set the default Intel platform ID.
+              gSettings.IgPlatform = GetDefaultIntelPlatformId (Pci.Hdr.DeviceId);
+
               DBG (" - GFX: %a\n", gfx->Model);
               gfx->Ports = 1;
               gfx->Connectors = (1 << NGFX);
