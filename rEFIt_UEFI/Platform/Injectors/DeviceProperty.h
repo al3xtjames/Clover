@@ -23,7 +23,7 @@ enum {
 
 typedef struct {
   CHAR16 *Name;
-  UINT32 Type;
+  UINT8  Type;
   VOID   *Value;
   UINT32 Size;
   UINT8  Flags;

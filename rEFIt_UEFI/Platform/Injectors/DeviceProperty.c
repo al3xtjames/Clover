@@ -84,13 +84,6 @@ GetCHAR8Str (
   IN  CHAR8 *SrcString
   )
 {
-  #if 0
-  if (SrcString == NULL) {
-    AsciiSPrint (DestString, 14, "<null string>");
-  } else {
-    AsciiSPrint (DestString, AsciiStrLen (SrcString) + 5, "<\"%a\">", SrcString);
-  }
-  #endif
   AsciiSPrint (DestString, AsciiStrLen (SrcString) + 5, "<\"%a\">", SrcString);
 }
 
@@ -99,14 +92,13 @@ GetCHAR8Str (
   @param[in] Property  A pointer to the device property.
   @param[in] Status    The status of the device property injection.
 **/
-
 VOID
 LogInjectionStatus (
   IN DEVICE_PROPERTY *Property,
   IN EFI_STATUS      Status
   )
 {
-  CHAR8 PropertyValueString[Property->Size];
+  CHAR8 PropertyValueString[Property->Size + 10];
 
   switch (Property->Type) {
     case DEVICE_PROPERTY_UINT8:

@@ -1,5 +1,5 @@
 /** @file
-  Device property injector for Intel IGPUs.
+  Device property injector for Intel HD Graphics devices.
 
   TODO: Read the DVMT value and log it.
 
@@ -27,13 +27,15 @@ typedef struct {
   UINT8  Flags;
 } INTEL_IGPU;
 
-// IGPU series flags
-/// Used for Sandy Bridge IGPUs.
-#define FLAG_SNB_IG  (1 << 1)
-/// Used for Skylake IGPUs.
-#define FLAG_SKL_IG  (1 << 2)
+// Intel HD Graphics series flags
+enum {
+  /// Used for Sandy Bridge IGPUs
+  FLAG_SNB_IG = 1,
+  /// Used for Skylake IGPUs
+  FLAG_SKL_IG
+};
 
-STATIC UINT32 mGfxYTile = 0x01000000;
+STATIC UINT32 mAaplGfxYTile = 0x01000000;
 STATIC UINT32 mGraphicOptions = 0x0C;
 
 STATIC CONST INTEL_IGPU mIntelGraphicsDeviceTable[] = {
@@ -64,13 +66,13 @@ STATIC CONST INTEL_IGPU mIntelGraphicsDeviceTable[] = {
 };
 
 STATIC DEVICE_PROPERTY mIntelGraphicsPropertyTable[] = {
-  { L"AAPL,GfxYTile",        DEVICE_PROPERTY_UINT32, &mGfxYTile, 4, FLAG_SKL_IG },
+  { L"AAPL,GfxYTile",        DEVICE_PROPERTY_UINT32, &mAaplGfxYTile, 4, FLAG_SKL_IG },
   { L"AAPL,ig-platform-id",  DEVICE_PROPERTY_UINT32, 0, 4 },
   { L"AAPL,snb-platform-id", DEVICE_PROPERTY_UINT32, 0, 4, FLAG_SNB_IG },
   { L"device-id",            DEVICE_PROPERTY_UINT32, 0, 4 },
   { L"graphic-options",      DEVICE_PROPERTY_UINT32, &mGraphicOptions, 4 },
   { L"hda-gfx",              DEVICE_PROPERTY_CHAR8,  "onboard-1", 10 },
-  { L"model",                DEVICE_PROPERTY_CHAR8,  "Unknown Intel Graphics Device", 30 },
+  { L"model",                DEVICE_PROPERTY_CHAR8,  "Unknown Intel HD Graphics Device", 33 },
   { NULL, 0, 0, 0 }
 };
 
@@ -92,6 +94,15 @@ GetIntelGraphicsDeviceTableEntry (
   return NULL;
 }
 
+/** Retrieves the name of an Intel HD Graphics device.
+
+  @param[in] DeviceId  The PCI device ID of the Intel HD Graphics device.
+
+  @return                                     The name of the Intel HD Graphics
+                                              device is returned.
+  @return "Unknown Intel HD Graphics Device"  The name for the Intel HD Graphics
+                                              device was not found.
+**/
 CHAR8 *
 GetIntelGraphicsName (
   IN UINT16 DeviceId
@@ -103,9 +114,16 @@ GetIntelGraphicsName (
     return TableEntry->Name;
   }
 
-  return "Unknown Intel Graphics Device";
+  return "Unknown Intel HD Graphics Device";
 }
 
+/** Retrieves the default fake ID for an Intel HD Graphics device.
+
+  @param[in] DeviceId  The PCI device ID of the Intel HD Graphics device.
+
+  @return    The default fake ID for the Intel HD Graphics device is returned.
+  @return 0  The Intel HD Graphics device does not require a fake ID.
+**/
 UINT32
 GetDefaultIntelFakeId (
   IN UINT16 DeviceId
@@ -120,6 +138,14 @@ GetDefaultIntelFakeId (
   return 0;
 }
 
+/** Retrieves the default platorm ID for an Intel HD Graphics device.
+
+  @param[in] DeviceId  The PCI device ID of the Intel HD Graphics device.
+
+  @return    The default platform ID for the Intel HD Graphics device is returned.
+  @return 0  The default platform ID for the Intel HD Graphics device was not
+             found.
+**/
 UINT32
 GetDefaultIntelPlatformId (
   IN UINT16 DeviceId
@@ -134,6 +160,18 @@ GetDefaultIntelPlatformId (
   return 0;
 }
 
+/** Injects device properties for Intel HD Graphics devices.
+
+  @param[in] IntelGraphicsDev  A pointer to the PCI type of the Intel HD
+                               Graphics device.
+  @param[in] DevicePath        The device path of the Intel HD Graphics device.
+
+  @return                       The status of the Intel HD Graphics device
+                                property injection is returned.
+  @retval EFI_OUT_OF_RESOURCES  The memory necessary to complete the operation
+                                could not be allocated.
+  @retval EFI_SUCCESS           The operation completed successfully.
+**/
 EFI_STATUS
 InjectIntelGraphicsProperties (
   IN PCI_TYPE00               *IntelGraphicsDev,
@@ -156,11 +194,11 @@ InjectIntelGraphicsProperties (
     FileDevicePathToStr (DevicePath)
     );
 
-  // Do not inject properties for unknown Intel IGPUs.
+  // Do not inject properties for unknown Intel HD Graphics devices.
   // TODO: Make this behavior more flexible. If the user specifies a platform
   // ID, injection should still work, even if the GPU isn't in the device table.
   if (DeviceTableEntry == NULL) {
-    MsgLog (" - Unsupported Intel IGPU, disabling device property injection");
+    MsgLog (" - Unsupported Intel HD Graphics device, disabling device property injection");
     return EFI_NOT_FOUND;
   }
 
@@ -173,8 +211,8 @@ InjectIntelGraphicsProperties (
 
   // Initialize the device property table.
   /// Set the platform ID.
-  mIntelGraphicsPropertyTable[1].Value = &gSettings.IgPlatform;
-  mIntelGraphicsPropertyTable[2].Value = &gSettings.IgPlatform;
+  mIntelGraphicsPropertyTable[1].Value = (VOID *)&gSettings.IgPlatform;
+  mIntelGraphicsPropertyTable[2].Value = (VOID *)&gSettings.IgPlatform;
 
   /// Use the default fake device ID if none is specified by the user.
   if (!gSettings.FakeIntel) {
@@ -182,35 +220,33 @@ InjectIntelGraphicsProperties (
   }
 
   /// Set the fake device ID.
+  /// gSettings.FakeIntel is already set to the default in GetDevices.
   FakeDeviceId = gSettings.FakeIntel >> 16;
-  mIntelGraphicsPropertyTable[3].Value = &FakeDeviceId;
+  mIntelGraphicsPropertyTable[3].Value = (VOID *)&FakeDeviceId;
 
   /// Set the model property.
-  ZeroMem (mIntelGraphicsPropertyTable[6].Value, 30);
   mIntelGraphicsPropertyTable[6].Size = AsciiStrLen (DeviceTableEntry->Name) + 1;
-  AsciiStrCpyS (
-    mIntelGraphicsPropertyTable[6].Value,
-    mIntelGraphicsPropertyTable[6].Size,
-    DeviceTableEntry->Name
-    );
+  mIntelGraphicsPropertyTable[6].Value = (VOID *)DeviceTableEntry->Name;
 
   // Inject the device properties in the property table.
   for (Index = 0; mIntelGraphicsPropertyTable[Index].Name != NULL; ++Index) {
-    /// Skip AAPL,GfxYTile for older IGPUs.
+    /// Skip AAPL,GfxYTile for older Intel HD Graphics devices.
     if (!(DeviceTableEntry->Flags & FLAG_SKL_IG) && Index == 0) {
       continue;
     }
 
-    /// Skip AAPL,ig-platform-id for Sandy Bridge.
-    if ((DeviceTableEntry->Flags & FLAG_SNB_IG) && Index == 1) {
+    /// Skip AAPL,ig-platform-id for Sandy Bridge HD Graphics devices.
+    if (DeviceTableEntry->Flags & FLAG_SNB_IG && Index == 1) {
       continue;
-    /// Skip AAPL,snb-platform-id for newer IGPUs.
-    } else if ((mIntelGraphicsPropertyTable[Index].Flags & FLAG_SNB_IG) && Index == 2) {
+    }
+
+    /// Skip AAPL,snb-platform-id for newer Intel HD Graphics devices.
+    if (!(DeviceTableEntry->Flags & FLAG_SNB_IG) && Index == 2) {
       continue;
     }
 
     /// Skip device-id if a fake device ID isn't set.
-    if (!gSettings.FakeIntel && Index == 2) {
+    if (!gSettings.FakeIntel && Index == 3) {
       continue;
     }
 

@@ -28,8 +28,10 @@ typedef struct {
   UINT8  Flags;
 } HDA_CONTROLLER;
 
-#define FLAG_INJECT_HDMI (1 << 1)
-#define FLAG_INJECT_BOTH (1 << 2)
+enum {
+  FLAG_INJECT_HDMI = 1,
+  FLAG_INJECT_BOTH
+};
 
 STATIC CONST HDA_CONTROLLER mHdaControllerTable[] = {
   { 0x1002, 0xAAA0, "AMD Tahiti HDMI/DP Audio Controller" },
@@ -68,17 +70,10 @@ STATIC DEVICE_PROPERTY mHdaPropertyTable[] = {
   { NULL, 0, 0, 0 }
 };
 
-/** Retrieves the name of a High Definition Audio (HDA) controller.
-
-  @param[in] VendorId  The PCI vendor ID of the HDA controller.
-  @param[in] DeviceId  The PCI device ID of the HDA controller.
-
-  @return                           The name of the HDA controller is returned.
-  @return "Unknown HDA Controller"  A matching name for the HDA controller could not
-                                    be found.
-**/
-CHAR8 *
-GetHdaControllerName (
+STATIC
+CONST
+HDA_CONTROLLER *
+GetHdaControllerTableEntry (
   IN UINT16 VendorId,
   IN UINT16 DeviceId
   )
@@ -87,11 +82,34 @@ GetHdaControllerName (
 
   for (Index = 0; mHdaControllerTable[Index].VendorId != 0; ++Index) {
     if (
-      mHdaControllerTable[Index].VendorId == VendorId &&
-      mHdaControllerTable[Index].DeviceId == DeviceId
+     mHdaControllerTable[Index].VendorId == VendorId &&
+     mHdaControllerTable[Index].DeviceId == DeviceId
       ) {
-      return mHdaControllerTable[Index].Name;
+      return &mHdaControllerTable[Index];
     }
+  }
+
+  return NULL;
+}
+
+/** Retrieves the name of a High Definition Audio (HDA) controller.
+
+  @param[in] VendorId  The PCI vendor ID of the HDA controller.
+  @param[in] DeviceId  The PCI device ID of the HDA controller.
+
+  @return                           The name of the HDA controller is returned.
+  @return "Unknown HDA Controller"  The name of the HDA controller was not found.
+**/
+CHAR8 *
+GetHdaControllerName (
+  IN UINT16 VendorId,
+  IN UINT16 DeviceId
+  )
+{
+  CONST HDA_CONTROLLER *TableEntry = GetHdaControllerTableEntry (VendorId, DeviceId);
+
+  if (TableEntry != NULL) {
+    return TableEntry->Name;
   }
 
   switch (VendorId) {
@@ -121,36 +139,15 @@ GetHdaControllerName (
   }
 }
 
-STATIC
-CONST
-HDA_CONTROLLER *
-GetHdaControllerTableEntry (
-  IN UINT16 VendorId,
-  IN UINT16 DeviceId
-  )
-{
-  INTN Index;
-
-  for (Index = 0; mHdaControllerTable[Index].VendorId != 0; ++Index) {
-    if (
-      mHdaControllerTable[Index].VendorId == VendorId &&
-      mHdaControllerTable[Index].DeviceId == DeviceId
-      ) {
-      return &mHdaControllerTable[Index];
-    }
-  }
-
-  return NULL;
-}
-
-/** Injects the necessary device properties for High Definition Audio (HDA) controllers.
+/** Injects device properties for High Definition Audio (HDA) controllers.
 
   @param[in] HdaController  A pointer to the PCI type of the HDA controller.
   @param[in] DevicePath     The device path of the HDA controller.
   @param[in] IsHdmiAudio    Specifies whether the HDA controller is a GPU
                             HDMI/DP audio controller.
 
-  @return                       The status of the HDA device injection is returned.
+  @return                       The status of the HDA device property injection
+                                is returned.
   @retval EFI_OUT_OF_RESOURCES  The memory necessary to complete the operation
                                 could not be allocated.
   @retval EFI_SUCCESS           The operation completed successfully.
@@ -189,13 +186,11 @@ InjectHdaProperties (
   }
 
   // Set the hda-gfx property for HDMI/DP audio controllers.
-  if ((DeviceTableEntry->Flags & FLAG_INJECT_BOTH) || IsHdmiAudio) {
+  if (DeviceTableEntry->Flags & FLAG_INJECT_BOTH || IsHdmiAudio) {
     ++HdmiControllerCount;
     AsciiSPrint (HdaGfxString, 10, "onboard-%d", HdmiControllerCount);
-    AsciiStrCpyS (mHdaPropertyTable[0].Value, 10, HdaGfxString);
+    mHdaPropertyTable[0].Value = HdaGfxString;
   }
-
-  FreePool (HdaGfxString);
 
   // Inject the device properties in the property table.
   for (Index = 0; mHdaPropertyTable[Index].Name != NULL; ++Index) {
