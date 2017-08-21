@@ -19,72 +19,83 @@
 
 STATIC
 VOID
-GetUINT8Str (
-  OUT CHAR8 *String,
-  IN  UINT8 *Integer
+LogUint8Property (
+  OUT CHAR8 *LogString,
+  IN  UINT8 *PropertyValue
   )
 {
-  AsciiSPrint (String, 5, "<%02X>", *Integer);
+  AsciiSPrint (LogString, 5, "<%02X>", *PropertyValue);
 }
 
 STATIC
 VOID
-GetUINT16Str (
-  OUT CHAR8  *String,
-  IN  UINT16 *Integer
-  )
-{
-  AsciiSPrint (String, 8, "<%02X %02X>", *Integer & 0xFF, (*Integer >> (8)) & 0xFF);
-}
-
-STATIC
-VOID
-GetUINT32Str (
-  OUT CHAR8  *String,
-  IN  UINT32 *Integer
+LogUint16Property (
+  OUT CHAR8  *LogString,
+  IN  UINT16 *PropertyValue
   )
 {
   AsciiSPrint (
-    String,
+    LogString,
+    8,
+    "<%02X %02X>",
+    *PropertyValue & 0xFF,
+    (*PropertyValue >> (8)) & 0xFF
+    );
+}
+
+STATIC
+VOID
+LogUint32Property (
+  OUT CHAR8  *LogString,
+  IN  UINT32 *PropertyValue
+  )
+{
+  AsciiSPrint (
+    LogString,
     14,
     "<%02X %02X %02X %02X>",
-    *Integer & 0xFF,
-    (*Integer >> (8))  & 0xFF,
-    (*Integer >> (16)) & 0xFF,
-    (*Integer >> (24)) & 0xFF
+    *PropertyValue & 0xFF,
+    (*PropertyValue >> (8))  & 0xFF,
+    (*PropertyValue >> (16)) & 0xFF,
+    (*PropertyValue >> (24)) & 0xFF
   );
 }
 
 STATIC
 VOID
-GetUINT64Str (
-  OUT CHAR8  *String,
-  IN  UINT64 *Integer
+LogUint64Property (
+  OUT CHAR8  *LogString,
+  IN  UINT64 *PropertyValue
   )
 {
   AsciiSPrint (
-    String,
+    LogString,
     26,
     "<%02llX %02llX %02llX %02llX %02llX %02llX %02llX %02llX>",
-    *Integer & 0xFF,
-    (*Integer >> (8))  & 0xFF,
-    (*Integer >> (16)) & 0xFF,
-    (*Integer >> (24)) & 0xFF,
-    (*Integer >> (32)) & 0xFF,
-    (*Integer >> (40)) & 0xFF,
-    (*Integer >> (48)) & 0xFF,
-    (*Integer >> (56)) & 0xFF
+    *PropertyValue & 0xFF,
+    (*PropertyValue >> (8))  & 0xFF,
+    (*PropertyValue >> (16)) & 0xFF,
+    (*PropertyValue >> (24)) & 0xFF,
+    (*PropertyValue >> (32)) & 0xFF,
+    (*PropertyValue >> (40)) & 0xFF,
+    (*PropertyValue >> (48)) & 0xFF,
+    (*PropertyValue >> (56)) & 0xFF
   );
 }
 
 STATIC
 VOID
-GetCHAR8Str (
-  OUT CHAR8 *DestString,
-  IN  CHAR8 *SrcString
+LogChar8Property (
+  OUT CHAR8 *LogString,
+  IN  CHAR8 *PropertyValue
   )
 {
-  AsciiSPrint (DestString, AsciiStrLen (SrcString) + 5, "<\"%a\">", SrcString);
+  AsciiSPrint (
+    LogString,
+    AsciiStrLen (PropertyValue) + 5,
+    "<\"%a\">",
+    PropertyValue
+    );
 }
 
 /** Logs a formatted string of the device property injection status.
@@ -101,33 +112,33 @@ LogInjectionStatus (
   CHAR8 PropertyValueString[Property->Size + 10];
 
   switch (Property->Type) {
-    case DEVICE_PROPERTY_UINT8:
+    case DevicePropertyUint8:
     {
-      GetUINT8Str (PropertyValueString, (UINT8 *)Property->Value);
+      LogUint8Property (PropertyValueString, (UINT8 *)Property->Value);
       break;
     }
 
-    case DEVICE_PROPERTY_UINT16:
+    case DevicePropertyUint16:
     {
-      GetUINT16Str (PropertyValueString, (UINT16 *)Property->Value);
+      LogUint16Property (PropertyValueString, (UINT16 *)Property->Value);
       break;
     }
 
-    case DEVICE_PROPERTY_UINT32:
+    case DevicePropertyUint32:
     {
-      GetUINT32Str (PropertyValueString, (UINT32 *)Property->Value);
+      LogUint32Property (PropertyValueString, (UINT32 *)Property->Value);
       break;
     }
 
-    case DEVICE_PROPERTY_UINT64:
+    case DevicePropertyUint64:
     {
-      GetUINT64Str (PropertyValueString, (UINT64 *)Property->Value);
+      LogUint64Property (PropertyValueString, (UINT64 *)Property->Value);
       break;
     }
 
-    case DEVICE_PROPERTY_CHAR8:
+    case DevicePropertyChar8:
     {
-      GetCHAR8Str (PropertyValueString, (CHAR8 *)Property->Value);
+      LogChar8Property (PropertyValueString, (CHAR8 *)Property->Value);
       break;
     }
   }
@@ -138,6 +149,4 @@ LogInjectionStatus (
     PropertyValueString,
     Status
   );
-
-  FreePool (PropertyValueString);
 }

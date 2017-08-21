@@ -13,20 +13,20 @@
   EXPRESS OR IMPLIED.
 **/
 
-enum {
-  DEVICE_PROPERTY_UINT8 = 0,
-  DEVICE_PROPERTY_UINT16,
-  DEVICE_PROPERTY_UINT32,
-  DEVICE_PROPERTY_UINT64,
-  DEVICE_PROPERTY_CHAR8
-};
+typedef enum {
+  DevicePropertyUint8,
+  DevicePropertyUint16,
+  DevicePropertyUint32,
+  DevicePropertyUint64,
+  DevicePropertyChar8
+} DEVICE_PROPERTY_TYPE;
 
 typedef struct {
-  CHAR16 *Name;
-  UINT8  Type;
-  VOID   *Value;
-  UINT32 Size;
-  UINT8  Flags;
+  CHAR16               *Name;
+  DEVICE_PROPERTY_TYPE Type;
+  VOID                 *Value;
+  UINT32               Size;
+  UINT8                Flags;
 } DEVICE_PROPERTY;
 
 VOID

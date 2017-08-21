@@ -35,8 +35,9 @@ enum {
   FLAG_SKL_IG
 };
 
-STATIC UINT32 mAaplGfxYTile = 0x01000000;
-STATIC UINT32 mGraphicOptions = 0x0C;
+STATIC UINT32 mAaplGfxYTile   = 0x01000000;
+STATIC UINT32 mGraphicOptions = 0x0000000C;
+STATIC UINT32 mZeroValue      = 0x00000000;
 
 STATIC CONST INTEL_IGPU mIntelGraphicsDeviceTable[] = {
   // Sandy Bridge Server GT2
@@ -60,20 +61,20 @@ STATIC CONST INTEL_IGPU mIntelGraphicsDeviceTable[] = {
   // Skylake Mobile GT2
   { 0x191B, 0x00000000, "Intel HD Graphics 530",   0x191B0000, FLAG_SKL_IG },
   // Kaby Lake Mobile GT2
-  { 0x591B, 0x00000000, "Intel HD Graphics 630",   0x591B0006, FLAG_SKL_IG },
+  { 0x591B, 0x00000000, "Intel HD Graphics 630",   0x591B0000, FLAG_SKL_IG },
 
   { 0, 0, NULL, 0 }
 };
 
 STATIC DEVICE_PROPERTY mIntelGraphicsPropertyTable[] = {
-  { L"AAPL,GfxYTile",        DEVICE_PROPERTY_UINT32, &mAaplGfxYTile, 4, FLAG_SKL_IG },
-  { L"AAPL,ig-platform-id",  DEVICE_PROPERTY_UINT32, 0, 4 },
-  { L"AAPL,snb-platform-id", DEVICE_PROPERTY_UINT32, 0, 4, FLAG_SNB_IG },
-  { L"device-id",            DEVICE_PROPERTY_UINT32, 0, 4 },
-  { L"graphic-options",      DEVICE_PROPERTY_UINT32, &mGraphicOptions, 4 },
-  { L"hda-gfx",              DEVICE_PROPERTY_CHAR8,  "onboard-1", 10 },
-  { L"model",                DEVICE_PROPERTY_CHAR8,  "Unknown Intel HD Graphics Device", 33 },
-  { NULL, 0, 0, 0 }
+  { L"AAPL,GfxYTile",        DevicePropertyUint32, &mAaplGfxYTile, 4, FLAG_SKL_IG },
+  { L"AAPL,ig-platform-id",  DevicePropertyUint32, &mZeroValue, 4 },
+  { L"AAPL,snb-platform-id", DevicePropertyUint32, &mZeroValue, 4, FLAG_SNB_IG },
+  { L"device-id",            DevicePropertyUint32, &mZeroValue, 4 },
+  { L"graphic-options",      DevicePropertyUint32, &mGraphicOptions, 4 },
+  { L"hda-gfx",              DevicePropertyChar8,  "onboard-1", 10 },
+  { L"model",                DevicePropertyChar8,  "Unknown Intel HD Graphics Device", 33 },
+  { NULL, 0, NULL, 0 }
 };
 
 STATIC
@@ -174,7 +175,7 @@ GetDefaultIntelPlatformId (
 **/
 EFI_STATUS
 InjectIntelGraphicsProperties (
-  IN PCI_TYPE00               *IntelGraphicsDev,
+  IN PCI_TYPE00               *IntelGraphicsDevice,
   IN EFI_DEVICE_PATH_PROTOCOL *DevicePath
   )
 {
@@ -184,13 +185,13 @@ InjectIntelGraphicsProperties (
   EFI_STATUS       Status;
 
   DeviceTableEntry = GetIntelGraphicsDeviceTableEntry (
-                       IntelGraphicsDev->Hdr.DeviceId
+                       IntelGraphicsDevice->Hdr.DeviceId
                        );
 
   MsgLog (
     "%a [8086:%04X] :: %s\n",
-    GetIntelGraphicsName (IntelGraphicsDev->Hdr.DeviceId),
-    IntelGraphicsDev->Hdr.DeviceId,
+    GetIntelGraphicsName (IntelGraphicsDevice->Hdr.DeviceId),
+    IntelGraphicsDevice->Hdr.DeviceId,
     FileDevicePathToStr (DevicePath)
     );
 
