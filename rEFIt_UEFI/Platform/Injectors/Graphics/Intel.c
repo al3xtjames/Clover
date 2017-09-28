@@ -3,16 +3,19 @@
 
   TODO: Read the DVMT value and log it.
 
-  Copyright (C) 2016-2017 Alex James. All rights reserved.<BR>
+  Copyright (C) 2016-2017 Alex James (TheRacerMaster). All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made
-  available under the terms and conditions of the BSD License which
-  accompanies this distribution. The full text of the license may be
-  found at http://opensource.org/licenses/bsd-license.php
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS"
-  BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER
-  EXPRESS OR IMPLIED.
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 **/
 
 #include <Platform.h>
@@ -32,13 +35,14 @@ enum {
   /// Used for Sandy Bridge IGPUs
   FLAG_SNB_IG = 1,
   /// Used for Skylake IGPUs
-  FLAG_SKL_IG
+  FLAG_SKL_IG = 2,
 };
 
 STATIC UINT32 mAaplGfxYTile   = 0x01000000;
+STATIC UINT32 mFakeId         = 0x00000000;
 STATIC UINT32 mGraphicOptions = 0x0000000C;
-STATIC UINT32 mZeroValue      = 0x00000000;
 
+// Table of Intel HD Graphics devices.
 STATIC CONST INTEL_IGPU mIntelGraphicsDeviceTable[] = {
   // Sandy Bridge Server GT2
   { 0x010A, 0x01168086, "Intel HD Graphics P3000", 0x00030010, FLAG_SNB_IG },
@@ -64,17 +68,6 @@ STATIC CONST INTEL_IGPU mIntelGraphicsDeviceTable[] = {
   { 0x591B, 0x00000000, "Intel HD Graphics 630",   0x591B0000, FLAG_SKL_IG },
 
   { 0, 0, NULL, 0 }
-};
-
-STATIC DEVICE_PROPERTY mIntelGraphicsPropertyTable[] = {
-  { L"AAPL,GfxYTile",        DevicePropertyUint32, &mAaplGfxYTile, 4, FLAG_SKL_IG },
-  { L"AAPL,ig-platform-id",  DevicePropertyUint32, &mZeroValue, 4 },
-  { L"AAPL,snb-platform-id", DevicePropertyUint32, &mZeroValue, 4, FLAG_SNB_IG },
-  { L"device-id",            DevicePropertyUint32, &mZeroValue, 4 },
-  { L"graphic-options",      DevicePropertyUint32, &mGraphicOptions, 4 },
-  { L"hda-gfx",              DevicePropertyChar8,  "onboard-1", 10 },
-  { L"model",                DevicePropertyChar8,  "Unknown Intel HD Graphics Device", 33 },
-  { NULL, 0, NULL, 0 }
 };
 
 STATIC
@@ -180,9 +173,6 @@ InjectIntelGraphicsProperties (
   )
 {
   CONST INTEL_IGPU *DeviceTableEntry;
-  UINT32           FakeDeviceId;
-  INTN             Index;
-  EFI_STATUS       Status;
 
   DeviceTableEntry = GetIntelGraphicsDeviceTableEntry (
                        IntelGraphicsDevice->Hdr.DeviceId
@@ -195,14 +185,6 @@ InjectIntelGraphicsProperties (
     FileDevicePathToStr (DevicePath)
     );
 
-  // Do not inject properties for unknown Intel HD Graphics devices.
-  // TODO: Make this behavior more flexible. If the user specifies a platform
-  // ID, injection should still work, even if the GPU isn't in the device table.
-  if (DeviceTableEntry == NULL) {
-    MsgLog (" - Unsupported Intel HD Graphics device, disabling device property injection");
-    return EFI_NOT_FOUND;
-  }
-
   // Do not inject properties if the EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL
   // is missing.
   if (gEfiDppDbProtocol == NULL) {
@@ -210,57 +192,110 @@ InjectIntelGraphicsProperties (
     return EFI_PROTOCOL_ERROR;
   }
 
-  // Initialize the device property table.
-  /// Set the platform ID.
-  mIntelGraphicsPropertyTable[1].Value = (VOID *)&gSettings.IgPlatform;
-  mIntelGraphicsPropertyTable[2].Value = (VOID *)&gSettings.IgPlatform;
+  // Inject model-specific properties (based off the device table entry).
+  if (DeviceTableEntry != NULL) {
+    // Inject the AAPL,GfxYTile property for SKL/KBL IGPUs.
+    if (DeviceTableEntry->Flags & FLAG_SKL_IG) {
+      InjectDeviceProperty (
+        DevicePath,
+        L"AAPL,GfxYTile",
+        DevicePropertyUint32,
+        &mAaplGfxYTile,
+        DevicePropertyWidthUint32
+        );
+    }
 
-  /// Use the default fake device ID if none is specified by the user.
-  if (!gSettings.FakeIntel) {
-    gSettings.FakeIntel = DeviceTableEntry->DefaultFakeId;
+    // Inject the platform ID (SNB or IG).
+    /// gSettings.IgPlatform (and mPlatformId) are already initialized to the
+    /// default value in GetDevices if the user does not specify a value.
+    if (gSettings.IgPlatform)
+    {
+      if (DeviceTableEntry->Flags & FLAG_SNB_IG) {
+        InjectDeviceProperty (
+          DevicePath,
+          L"AAPL,snb-platform-id",
+          DevicePropertyUint32,
+          &gSettings.IgPlatform,
+          DevicePropertyWidthUint32
+          );
+      } else {
+        InjectDeviceProperty (
+          DevicePath,
+          L"AAPL,ig-platform-id",
+          DevicePropertyUint32,
+          &gSettings.IgPlatform,
+          DevicePropertyWidthUint32
+          );
+      }
+    }
+  } else {
+    // Fall back to generic property values if no device table entry exists.
+    if (gSettings.IgPlatform)
+    {
+      InjectDeviceProperty (
+        DevicePath,
+        L"AAPL,ig-platform-id",
+        DevicePropertyUint32,
+        &gSettings.IgPlatform,
+        DevicePropertyWidthUint32
+        );
+    }
   }
 
-  /// Set the fake device ID.
-  /// gSettings.FakeIntel is already set to the default in GetDevices.
-  FakeDeviceId = gSettings.FakeIntel >> 16;
-  mIntelGraphicsPropertyTable[3].Value = (VOID *)&FakeDeviceId;
-
-  /// Set the model property.
-  mIntelGraphicsPropertyTable[6].Size = AsciiStrLen (DeviceTableEntry->Name) + 1;
-  mIntelGraphicsPropertyTable[6].Value = (VOID *)DeviceTableEntry->Name;
-
-  // Inject the device properties in the property table.
-  for (Index = 0; mIntelGraphicsPropertyTable[Index].Name != NULL; ++Index) {
-    /// Skip AAPL,GfxYTile for older Intel HD Graphics devices.
-    if (!(DeviceTableEntry->Flags & FLAG_SKL_IG) && Index == 0) {
-      continue;
-    }
-
-    /// Skip AAPL,ig-platform-id for Sandy Bridge HD Graphics devices.
-    if (DeviceTableEntry->Flags & FLAG_SNB_IG && Index == 1) {
-      continue;
-    }
-
-    /// Skip AAPL,snb-platform-id for newer Intel HD Graphics devices.
-    if (!(DeviceTableEntry->Flags & FLAG_SNB_IG) && Index == 2) {
-      continue;
-    }
-
-    /// Skip device-id if a fake device ID isn't set.
-    if (!gSettings.FakeIntel && Index == 3) {
-      continue;
-    }
-
-    Status = gEfiDppDbProtocol->SetProperty (
-                                  gEfiDppDbProtocol,
-                                  DevicePath,
-                                  mIntelGraphicsPropertyTable[Index].Name,
-                                  mIntelGraphicsPropertyTable[Index].Value,
-                                  mIntelGraphicsPropertyTable[Index].Size
-                                  );
-
-    LogInjectionStatus (&mIntelGraphicsPropertyTable[Index], Status);
+  // Inject a EDID override (if specified).
+  // This is something AppleGraphicsPolicy should be doing...
+  if (gSettings.InjectEDID && gSettings.CustomEDID) {
+    gEfiDppDbProtocol->SetProperty (
+      gEfiDppDbProtocol,
+      DevicePath,
+      L"AAPL00,override-no-connect",
+      &gSettings.CustomEDID,
+      128
+      );
   }
 
-  return Status;
+  // Inject the fake device ID (if needed).
+  /// gSettings.FakeIntel is already initialized to the default value in
+  /// GetDevices if the user does not specify a value.
+  mFakeId = gSettings.FakeIntel >> 16;
+  if (mFakeId) {
+    InjectDeviceProperty (
+      DevicePath,
+      L"device-id",
+      DevicePropertyUint32,
+      &mFakeId,
+      DevicePropertyWidthUint32
+      );
+  }
+
+  // Inject the graphic-options property.
+  InjectDeviceProperty (
+    DevicePath,
+    L"graphic-options",
+    DevicePropertyUint32,
+    &mGraphicOptions,
+    DevicePropertyWidthUint32
+    );
+
+  // Inject the hda-gfx property (if needed).
+  if (gSettings.UseIntelHDMI) {
+    InjectDeviceProperty (
+      DevicePath,
+      L"hda-gfx",
+      DevicePropertyChar8,
+      "onboard-1",
+      10
+      );
+  }
+
+  // Inject the model name.
+  InjectDeviceProperty (
+    DevicePath,
+    L"model",
+    DevicePropertyChar8,
+    DeviceTableEntry->Name,
+    AsciiStrLen (DeviceTableEntry->Name) + 1
+    );
+
+  return EFI_SUCCESS;
 }

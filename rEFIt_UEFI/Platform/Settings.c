@@ -5131,7 +5131,11 @@ GetUserSettings(
       }
 
       Prop                   = GetProperty (DictPointer, "UseIntelHDMI");
-      gSettings.UseIntelHDMI = IsPropertyTrue (Prop);
+      if (Prop != NULL) {
+        gSettings.UseIntelHDMI = IsPropertyTrue (Prop);
+      } else {
+        gSettings.UseIntelHDMI = gSettings.InjectIntel;
+      }
 
       Prop                = GetProperty (DictPointer, "ForceHPET");
       gSettings.ForceHPET = IsPropertyTrue (Prop);
@@ -6753,11 +6757,8 @@ GetDevices ()
               // Set the Intel graphics model name.
               AsciiSPrint (gfx->Model, 64, "%a", GetIntelGraphicsName (Pci.Hdr.DeviceId));
 
-              // Set the default Intel fake device ID (if it exists).
-              UINT32 FakeIntelId = GetDefaultIntelFakeId (Pci.Hdr.DeviceId);
-              if (FakeIntelId) {
-                gSettings.FakeIntel = FakeIntelId;
-              }
+              // Set the default Intel fake ID.
+              gSettings.FakeIntel = GetDefaultIntelFakeId (Pci.Hdr.DeviceId);
 
               // Set the default Intel platform ID.
               gSettings.IgPlatform = GetDefaultIntelPlatformId (Pci.Hdr.DeviceId);

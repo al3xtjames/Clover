@@ -1,20 +1,23 @@
 /** @file
   Device property injector for High Definition Audio (HDA) controllers.
 
-  Copyright (C) 2016-2017 Alex James. All rights reserved.<BR>
+  Copyright (C) 2016-2017 Alex James (TheRacerMaster). All rights reserved.<BR>
   Portions copyright (C) 2008-2009 Jasmin Fazlic. All rights reserved.<BR>
   Portions copyright (C) 2008-2009 iNDi. All rights reserved.<BR>
   Portions copyright (C) 2012 Sergey Slice. All rights reserved.<BR>
   Portions copyright (C) 2012 Damir Mazar. All rights reserved.<BR>
 
-  This program and the accompanying materials are licensed and made
-  available under the terms and conditions of the BSD License which
-  accompanies this distribution. The full text of the license may be
-  found at http://opensource.org/licenses/bsd-license.php
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS"
-  BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER
-  EXPRESS OR IMPLIED.
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 **/
 
 #include <Platform.h>
@@ -30,48 +33,43 @@ typedef struct {
 
 // HDA controller flags
 enum {
-  FLAG_HDA_HDMI = 1,
-  FLAG_HDA_BOTH
+  /// Used for normal HDA devices on chipsets
+  FLAG_HDA_HDEF = 1,
+  /// Used for HDMI/DP audio controllers on PCIe GPUs/IGPUs
+  FLAG_HDA_HDMI = 2,
+  /// Used for Skylake/Kaby Lake chipset audio controllers
+  FLAG_HDA_IDLE = 4
 };
 
-STATIC UINT8 mZeroValue = 0;
+STATIC UINT8 mZeroValue = 0x00;
 
 STATIC CONST HDA_CONTROLLER mHdaControllerTable[] = {
-  { 0x1002, 0xAAA0, "AMD Tahiti HDMI/DP Audio Controller", },
-  { 0x1002, 0xAAB0, "AMD Cape Verde/Pitcairn HDMI/DP Audio Controller" },
-  { 0x1002, 0xAAC0, "AMD Tobago HDMI/DP Audio Controller" },
-  { 0x1002, 0xAAC8, "AMD Hawaii HDMI/DP Audio Controller" },
-  { 0x1002, 0xAAD8, "AMD Tonga HDMI/DP Audio Controller" },
-  { 0x1002, 0xAAE8, "AMD Fiji HDMI/DP Audio Controller" },
-  { 0x10DE, 0x0E0A, "NVIDIA GK104 HDMI/DP Audio Controller" },
-  { 0x10DE, 0x0E0B, "NVIDIA GK106 HDMI/DP Audio Controller" },
-  { 0x10DE, 0x0E0F, "NVIDIA GK208 HDMI/DP Audio Controller" },
-  { 0x10DE, 0x0E1A, "NVIDIA GK110 HDMI/DP Audio Controller" },
-  { 0x10DE, 0x0E1B, "NVIDIA GK107 HDMI/DP Audio Controller" },
-  { 0x10DE, 0x0FB0, "NVIDIA GM200 HDMI/DP Audio Controller" },
-  { 0x10DE, 0x0FBB, "NVIDIA GM204 HDMI/DP Audio Controller" },
-  { 0x10DE, 0x10F0, "NVIDIA GP104 HDMI/DP Audio Controller" },
-  { 0x8086, 0x1C20, "Intel 6 Series/C200 Series Chipset Family HDA Controller", FLAG_HDA_BOTH },
-  { 0x8086, 0x1D20, "Intel C600 Series/X79 Chipset Family HDA Controller" },
-  { 0x8086, 0x1E20, "Intel 7 Series/C210 Series Chipset Family HDA Controller", FLAG_HDA_BOTH },
-  { 0x8086, 0x8C20, "Intel 8 Series/C220 Series Chipset Family HDA Controller" },
-  { 0x8086, 0x8C21, "Intel 8 Series/C220 Series Chipset Family HDA Controller" },
-  { 0x8086, 0x8CA0, "Intel 9 Series Chipset Family HDA Controller" },
-  { 0x8086, 0x8D20, "Intel C610 Series/X99 Chipset Family HDA Controller" },
-  { 0x8086, 0x8D21, "Intel C610 Series/X99 Chipset Family HDA Controller" },
-  { 0x8086, 0xA170, "Intel 100 Series/C230 Series Chipset Family HDA Controller", FLAG_HDA_BOTH },
-  { 0x8086, 0xA171, "Intel 200 Series Chipset Family HDA Controller", FLAG_HDA_BOTH },
-  { 0, 0, NULL, 0 }
-};
+  { 0x1002, 0xAAA0, "AMD Tahiti HDMI/DP Audio Controller", FLAG_HDA_HDMI },
+  { 0x1002, 0xAAB0, "AMD Cape Verde/Pitcairn HDMI/DP Audio Controller", FLAG_HDA_HDMI },
+  { 0x1002, 0xAAC0, "AMD Tobago HDMI/DP Audio Controller", FLAG_HDA_HDMI },
+  { 0x1002, 0xAAC8, "AMD Hawaii HDMI/DP Audio Controller", FLAG_HDA_HDMI },
+  { 0x1002, 0xAAD8, "AMD Tonga HDMI/DP Audio Controller", FLAG_HDA_HDMI },
+  { 0x1002, 0xAAE8, "AMD Fiji HDMI/DP Audio Controller", FLAG_HDA_HDMI },
+  { 0x10DE, 0x0E0A, "NVIDIA GK104 HDMI/DP Audio Controller", FLAG_HDA_HDMI },
+  { 0x10DE, 0x0E0B, "NVIDIA GK106 HDMI/DP Audio Controller", FLAG_HDA_HDMI },
+  { 0x10DE, 0x0E0F, "NVIDIA GK208 HDMI/DP Audio Controller", FLAG_HDA_HDMI },
+  { 0x10DE, 0x0E1A, "NVIDIA GK110 HDMI/DP Audio Controller", FLAG_HDA_HDMI },
+  { 0x10DE, 0x0E1B, "NVIDIA GK107 HDMI/DP Audio Controller", FLAG_HDA_HDMI },
+  { 0x10DE, 0x0FB0, "NVIDIA GM200 HDMI/DP Audio Controller", FLAG_HDA_HDMI },
+  { 0x10DE, 0x0FBB, "NVIDIA GM204 HDMI/DP Audio Controller", FLAG_HDA_HDMI },
+  { 0x10DE, 0x10F0, "NVIDIA GP104 HDMI/DP Audio Controller", FLAG_HDA_HDMI, },
+  { 0x8086, 0x1C20, "Intel 6 Series/C200 Series Chipset Family HDA Controller", FLAG_HDA_HDEF|FLAG_HDA_HDMI },
+  { 0x8086, 0x1D20, "Intel C600 Series/X79 Chipset Family HDA Controller", FLAG_HDA_HDEF|FLAG_HDA_HDMI },
+  { 0x8086, 0x1E20, "Intel 7 Series/C210 Series Chipset Family HDA Controller", FLAG_HDA_HDEF|FLAG_HDA_HDMI },
+  { 0x8086, 0x8C20, "Intel 8 Series/C220 Series Chipset Family HDA Controller", FLAG_HDA_HDEF },
+  { 0x8086, 0x8C21, "Intel 8 Series/C220 Series Chipset Family HDA Controller", FLAG_HDA_HDEF },
+  { 0x8086, 0x8CA0, "Intel 9 Series Chipset Family HDA Controller", FLAG_HDA_HDEF },
+  { 0x8086, 0x8D20, "Intel C610 Series/X99 Chipset Family HDA Controller", FLAG_HDA_HDEF },
+  { 0x8086, 0x8D21, "Intel C610 Series/X99 Chipset Family HDA Controller", FLAG_HDA_HDEF },
+  { 0x8086, 0xA170, "Intel 100 Series/C230 Series Chipset Family HDA Controller", FLAG_HDA_HDEF|FLAG_HDA_HDMI|FLAG_HDA_IDLE },
+  { 0x8086, 0xA171, "Intel 100 Series/C230 Series Chipset Family HDA Controller", FLAG_HDA_HDEF|FLAG_HDA_HDMI|FLAG_HDA_IDLE },
 
-STATIC DEVICE_PROPERTY mHdaPropertyTable[] = {
-  { L"hda-gfx",                  DevicePropertyChar8,  "onboard-2", 10, FLAG_HDA_HDMI },
-  { L"layout-id",                DevicePropertyUint32, &gSettings.HDALayoutId, 4 },
-  { L"MaximumBootBeepVolume",    DevicePropertyUint8,  &mZeroValue, 1 },
-  { L"MaximumBootBeepVolumeAlt", DevicePropertyUint8,  &mZeroValue, 1 },
-  { L"PinConfigurations",        DevicePropertyUint8,  &mZeroValue, 1 },
-  { L"platformFamily",           DevicePropertyUint8,  &mZeroValue, 1 },
-  { NULL, 0, NULL, 0 }
+  { 0, 0, NULL, 0 }
 };
 
 STATIC
@@ -165,9 +163,7 @@ InjectHdaProperties (
 {
   CONST HDA_CONTROLLER *DeviceTableEntry;
   CHAR8                HdaGfxString[10];
-  STATIC UINTN         HdmiControllerCount = 2;
-  INTN                 Index;
-  EFI_STATUS           Status;
+  STATIC UINTN         HdmiControllerCount;
 
   DeviceTableEntry = GetHdaControllerTableEntry (
                        HdaDevice->Hdr.VendorId,
@@ -189,40 +185,113 @@ InjectHdaProperties (
     return EFI_PROTOCOL_ERROR;
   }
 
-  // Set the hda-gfx property value.
-  /// Inject "onboard-1" for IGPUs.
-  if (DeviceTableEntry->Flags & FLAG_HDA_BOTH && gSettings.InjectIntel) {
-    mHdaPropertyTable[0].Value = "onboard-1";
-  /// Inject hda-gfx values, starting with "onboard-2", for GPU HDMI/DP audio
-  /// controllers.
-  } else if (IsHdmiAudio) {
-    AsciiSPrint (HdaGfxString, 10, "onboard-%d", HdmiControllerCount);
-    mHdaPropertyTable[0].Value = HdaGfxString;
-    ++HdmiControllerCount;
-  }
+  HdmiControllerCount = gSettings.UseIntelHDMI ? 1 : 2;
 
-  // Inject the device properties in the property table.
-  for (Index = 0; mHdaPropertyTable[Index].Name != NULL; ++Index) {
-    /// Skip hda-gfx for HDA controllers that are not HDMI/DP audio controllers.
-    if ((!(DeviceTableEntry->Flags & FLAG_HDA_BOTH) && !IsHdmiAudio) && Index == 0) {
-      continue;
-    /// Skip platformFamily and MaximumBootBeepVolume for HDMI/DP audio controllers.
-    } else if (IsHdmiAudio) {
-      if (Index == 2 || Index == 3 || Index == 5) {
-        continue;
-      }
+  // Inject controller-specific device properties (based off the device table entry).
+  if (DeviceTableEntry != NULL)
+  {
+    // Inject the hda-gfx property for HDMI/DP audio controllers.
+    /// IGPU HDMI/DP audio controllers get priority (onboard-1) if UseIntelHDMI
+    /// is true (uses the same value as InjectIntel by default).
+    /// Don't inject hda-gfx for IGPUs if UseIntelHDMI isn't set, and increment
+    /// the onboard-n value for subsequent HDMI/DP audio controllers.
+    if ((DeviceTableEntry->Flags & (FLAG_HDA_HDEF|FLAG_HDA_HDMI))
+        && HdaDevice->Hdr.VendorId == 0x8086 && gSettings.UseIntelHDMI) {
+      InjectDeviceProperty (
+        DevicePath,
+        L"hda-gfx",
+        DevicePropertyChar8,
+        "onboard-1",
+        10
+        );
+    } else if ((IsHdmiAudio || (DeviceTableEntry->Flags & FLAG_HDA_HDMI))
+               && HdaDevice->Hdr.VendorId != 0x8086) {
+      AsciiSPrint (HdaGfxString, 10, "onboard-%d", HdmiControllerCount);
+      InjectDeviceProperty (
+        DevicePath,
+        L"hda-gfx",
+        DevicePropertyChar8,
+        HdaGfxString,
+        10
+        );
+
+      ++HdmiControllerCount;
     }
 
-    Status = gEfiDppDbProtocol->SetProperty (
-                                  gEfiDppDbProtocol,
-                                  DevicePath,
-                                  mHdaPropertyTable[Index].Name,
-                                  mHdaPropertyTable[Index].Value,
-                                  mHdaPropertyTable[Index].Size
-                                  );
+    // Inject the hda-idle-support property for SKL/KBL audio controllers.
+    if (DeviceTableEntry->Flags & FLAG_HDA_IDLE) {
+      InjectDeviceProperty (
+        DevicePath,
+        L"hda-idle-support",
+        DevicePropertyChar8,
+        "1",
+        2
+        );
+    }
 
-    LogInjectionStatus (&mHdaPropertyTable[Index], Status);
+    // Only inject the following properties for chipset HDA controllers.
+    if (DeviceTableEntry->Flags & FLAG_HDA_HDEF) {
+      // Inject the MaximumBootBeepVolume properties.
+      InjectDeviceProperty (
+        DevicePath,
+        L"MaximumBootBeepVolume",
+        DevicePropertyUint32,
+        &gSettings.HDALayoutId,
+        DevicePropertyWidthUint32
+        );
+
+      InjectDeviceProperty (
+        DevicePath,
+        L"MaximumBootBeepVolumeAlt",
+        DevicePropertyUint32,
+        &gSettings.HDALayoutId,
+        DevicePropertyWidthUint32
+        );
+
+      // Inject the platformFamily property.
+      InjectDeviceProperty (
+        DevicePath,
+        L"platformFamily",
+        DevicePropertyUint8,
+        &mZeroValue,
+        DevicePropertyWidthUint8
+        );
+    }
+
+  // Fall back to generic property values if no device table entry exists.
+  } else {
+    // Inject the hda-gfx property (if needed).
+    if (IsHdmiAudio) {
+      AsciiSPrint (HdaGfxString, 10, "onboard-%d", HdmiControllerCount);
+      InjectDeviceProperty (
+        DevicePath,
+        L"hda-gfx",
+        DevicePropertyChar8,
+        HdaGfxString,
+        10
+        );
+
+      ++HdmiControllerCount;
+    }
   }
 
-  return Status;
+  // Inject the layout ID.
+  InjectDeviceProperty (
+    DevicePath,
+    L"layout-id",
+    DevicePropertyUint32,
+    &gSettings.HDALayoutId,
+    DevicePropertyWidthUint32
+    );
+
+  // Inject the PinConfigurations property.
+  InjectDeviceProperty (
+    DevicePath,
+    L"PinConfigurations",
+    DevicePropertyUint8,
+    &mZeroValue,
+    DevicePropertyWidthUint8
+    );
+
+  return EFI_SUCCESS;
 }
