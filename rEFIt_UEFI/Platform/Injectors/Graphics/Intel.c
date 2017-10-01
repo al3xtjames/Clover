@@ -186,35 +186,35 @@ InjectIntelGraphicsProperties (
     );
 
   // Do not inject properties if the EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL
-  // is missing.
+  // is missing
   if (gEfiDppDbProtocol == NULL) {
     MsgLog (" - EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL not found, disabling device property injection");
     return EFI_PROTOCOL_ERROR;
   }
 
-  // Inject model-specific properties (based off the device table entry).
+  // Inject model-specific properties (based off the device table entry)
   if (DeviceTableEntry != NULL) {
-    // Inject the AAPL,GfxYTile property for SKL/KBL IGPUs.
+    // Inject the AAPL,GfxYTile property for SKL/KBL IGPUs
     if (DeviceTableEntry->Flags & FLAG_SKL_IG) {
       InjectDeviceProperty (
         DevicePath,
         L"AAPL,GfxYTile",
-        DevicePropertyUint32,
+        DevicePropertyUint,
         &mAaplGfxYTile,
         DevicePropertyWidthUint32
         );
     }
 
-    // Inject the platform ID (SNB or IG).
+    // Inject the platform ID (SNB or IG)
     /// gSettings.IgPlatform (and mPlatformId) are already initialized to the
-    /// default value in GetDevices if the user does not specify a value.
+    /// default value in GetDevices if the user does not specify a value
     if (gSettings.IgPlatform)
     {
       if (DeviceTableEntry->Flags & FLAG_SNB_IG) {
         InjectDeviceProperty (
           DevicePath,
           L"AAPL,snb-platform-id",
-          DevicePropertyUint32,
+          DevicePropertyUint,
           &gSettings.IgPlatform,
           DevicePropertyWidthUint32
           );
@@ -222,62 +222,62 @@ InjectIntelGraphicsProperties (
         InjectDeviceProperty (
           DevicePath,
           L"AAPL,ig-platform-id",
-          DevicePropertyUint32,
+          DevicePropertyUint,
           &gSettings.IgPlatform,
           DevicePropertyWidthUint32
           );
       }
     }
   } else {
-    // Fall back to generic property values if no device table entry exists.
+    // Fall back to generic property values if no device table entry exists
     if (gSettings.IgPlatform)
     {
       InjectDeviceProperty (
         DevicePath,
         L"AAPL,ig-platform-id",
-        DevicePropertyUint32,
+        DevicePropertyUint,
         &gSettings.IgPlatform,
         DevicePropertyWidthUint32
         );
     }
   }
 
-  // Inject a EDID override (if specified).
+  // Inject a EDID override (if specified)
   // This is something AppleGraphicsPolicy should be doing...
   if (gSettings.InjectEDID && gSettings.CustomEDID) {
-    gEfiDppDbProtocol->SetProperty (
-      gEfiDppDbProtocol,
+    InjectDeviceProperty (
       DevicePath,
       L"AAPL00,override-no-connect",
-      &gSettings.CustomEDID,
+      DevicePropertyUint,
+      gSettings.CustomEDID,
       128
       );
   }
 
-  // Inject the fake device ID (if needed).
+  // Inject the fake device ID (if needed)
   /// gSettings.FakeIntel is already initialized to the default value in
-  /// GetDevices if the user does not specify a value.
+  /// GetDevices if the user does not specify a value
   mFakeId = gSettings.FakeIntel >> 16;
   if (mFakeId) {
     InjectDeviceProperty (
       DevicePath,
       L"device-id",
-      DevicePropertyUint32,
+      DevicePropertyUint,
       &mFakeId,
       DevicePropertyWidthUint32
       );
   }
 
-  // Inject the graphic-options property.
+  // Inject the graphic-options property
   InjectDeviceProperty (
     DevicePath,
     L"graphic-options",
-    DevicePropertyUint32,
+    DevicePropertyUint,
     &mGraphicOptions,
     DevicePropertyWidthUint32
     );
 
-  // Inject the hda-gfx property (if needed).
+  // Inject the hda-gfx property (if needed)
   if (gSettings.UseIntelHDMI) {
     InjectDeviceProperty (
       DevicePath,
@@ -288,7 +288,7 @@ InjectIntelGraphicsProperties (
       );
   }
 
-  // Inject the model name.
+  // Inject the model name
   InjectDeviceProperty (
     DevicePath,
     L"model",

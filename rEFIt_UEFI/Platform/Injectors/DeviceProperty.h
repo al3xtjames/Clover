@@ -20,10 +20,7 @@
 #define DEVICE_PROPERTY_H_
 
 typedef enum {
-  DevicePropertyUint8,
-  DevicePropertyUint16,
-  DevicePropertyUint32,
-  DevicePropertyUint64,
+  DevicePropertyUint,
   DevicePropertyChar8
 } DEVICE_PROPERTY_TYPE;
 

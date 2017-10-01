@@ -116,28 +116,20 @@ GetHdaControllerName (
 
   switch (VendorId) {
     case 0x1002:
-    {
       return "Unknown AMD HDA Controller";
       break;
-    }
 
     case 0x10DE:
-    {
       return "Unknown NVIDIA HDA Controller";
       break;
-    }
 
     case 0x8086:
-    {
       return "Unknown Intel HDA Controller";
       break;
-    }
 
     default:
-    {
       return "Unknown HDA Controller";
       break;
-    }
   }
 }
 
@@ -179,7 +171,7 @@ InjectHdaProperties (
     );
 
   // Do not inject properties if the EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL
-  // is missing.
+  // is missing
   if (gEfiDppDbProtocol == NULL) {
     MsgLog (" - EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL not found, disabling device property injection");
     return EFI_PROTOCOL_ERROR;
@@ -187,14 +179,14 @@ InjectHdaProperties (
 
   HdmiControllerCount = gSettings.UseIntelHDMI ? 1 : 2;
 
-  // Inject controller-specific device properties (based off the device table entry).
+  // Inject controller-specific device properties (based off the device table entry)
   if (DeviceTableEntry != NULL)
   {
-    // Inject the hda-gfx property for HDMI/DP audio controllers.
+    // Inject the hda-gfx property for HDMI/DP audio controllers
     /// IGPU HDMI/DP audio controllers get priority (onboard-1) if UseIntelHDMI
-    /// is true (uses the same value as InjectIntel by default).
+    /// is true (uses the same value as InjectIntel by default)
     /// Don't inject hda-gfx for IGPUs if UseIntelHDMI isn't set, and increment
-    /// the onboard-n value for subsequent HDMI/DP audio controllers.
+    /// the onboard-n value for subsequent HDMI/DP audio controllers
     if ((DeviceTableEntry->Flags & (FLAG_HDA_HDEF|FLAG_HDA_HDMI))
         && HdaDevice->Hdr.VendorId == 0x8086 && gSettings.UseIntelHDMI) {
       InjectDeviceProperty (
@@ -218,7 +210,7 @@ InjectHdaProperties (
       ++HdmiControllerCount;
     }
 
-    // Inject the hda-idle-support property for SKL/KBL audio controllers.
+    // Inject the hda-idle-support property for SKL/KBL audio controllers
     if (DeviceTableEntry->Flags & FLAG_HDA_IDLE) {
       InjectDeviceProperty (
         DevicePath,
@@ -229,13 +221,13 @@ InjectHdaProperties (
         );
     }
 
-    // Only inject the following properties for chipset HDA controllers.
+    // Only inject the following properties for chipset HDA controllers
     if (DeviceTableEntry->Flags & FLAG_HDA_HDEF) {
-      // Inject the MaximumBootBeepVolume properties.
+      // Inject the MaximumBootBeepVolume properties
       InjectDeviceProperty (
         DevicePath,
         L"MaximumBootBeepVolume",
-        DevicePropertyUint32,
+        DevicePropertyUint,
         &gSettings.HDALayoutId,
         DevicePropertyWidthUint32
         );
@@ -243,24 +235,24 @@ InjectHdaProperties (
       InjectDeviceProperty (
         DevicePath,
         L"MaximumBootBeepVolumeAlt",
-        DevicePropertyUint32,
+        DevicePropertyUint,
         &gSettings.HDALayoutId,
         DevicePropertyWidthUint32
         );
 
-      // Inject the platformFamily property.
+      // Inject the platformFamily property
       InjectDeviceProperty (
         DevicePath,
         L"platformFamily",
-        DevicePropertyUint8,
+        DevicePropertyUint,
         &mZeroValue,
         DevicePropertyWidthUint8
         );
     }
 
-  // Fall back to generic property values if no device table entry exists.
+  // Fall back to generic property values if no device table entry exists
   } else {
-    // Inject the hda-gfx property (if needed).
+    // Inject the hda-gfx property (if needed)
     if (IsHdmiAudio) {
       AsciiSPrint (HdaGfxString, 10, "onboard-%d", HdmiControllerCount);
       InjectDeviceProperty (
@@ -275,20 +267,20 @@ InjectHdaProperties (
     }
   }
 
-  // Inject the layout ID.
+  // Inject the layout ID
   InjectDeviceProperty (
     DevicePath,
     L"layout-id",
-    DevicePropertyUint32,
+    DevicePropertyUint,
     &gSettings.HDALayoutId,
     DevicePropertyWidthUint32
     );
 
-  // Inject the PinConfigurations property.
+  // Inject the PinConfigurations property
   InjectDeviceProperty (
     DevicePath,
     L"PinConfigurations",
-    DevicePropertyUint8,
+    DevicePropertyUint,
     &mZeroValue,
     DevicePropertyWidthUint8
     );

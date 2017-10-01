@@ -18,96 +18,31 @@
 
 #include <Platform.h>
 
-#include "DeviceProperty.h"
-
-// TODO: Consolidate LogUintProperty functions
+#include <Injectors/DeviceProperty.h>
 
 STATIC
 VOID
-LogUint8Property (
-  OUT CHAR8 *LogString,
-  IN  UINT8 *PropertyValue
+LogUintProperty (
+  IN UINT8 *PropertyValue,
+  IN UINTN Size
   )
 {
-  AsciiSPrint (LogString, 5, "<%02X>", *PropertyValue);
+  INTN  Index;
+  UINTN NumberOfSpaces = Size - 1;
+
+  // Integer properties are shown in the IORegistry like this:
+  // "AAPL,ig-platform-id" = <00 00 1b 59>
+  MsgLog ("<");
+  for (Index = 0; Index < Size; ++Index) {
+    MsgLog ("%02x", *(PropertyValue + Index));
+    if (Index < NumberOfSpaces) {
+      MsgLog (" ");
+    }
+  }
+
+  MsgLog (">");
 }
 
-STATIC
-VOID
-LogUint16Property (
-  OUT CHAR8  *LogString,
-  IN  UINT16 *PropertyValue
-  )
-{
-  AsciiSPrint (
-    LogString,
-    8,
-    "<%02X %02X>",
-    *PropertyValue & 0xFF,
-    (*PropertyValue >> (8)) & 0xFF
-    );
-}
-
-STATIC
-VOID
-LogUint32Property (
-  OUT CHAR8  *LogString,
-  IN  UINT32 *PropertyValue
-  )
-{
-  AsciiSPrint (
-    LogString,
-    14,
-    "<%02X %02X %02X %02X>",
-    *PropertyValue & 0xFF,
-    (*PropertyValue >> (8))  & 0xFF,
-    (*PropertyValue >> (16)) & 0xFF,
-    (*PropertyValue >> (24)) & 0xFF
-  );
-}
-
-STATIC
-VOID
-LogUint64Property (
-  OUT CHAR8  *LogString,
-  IN  UINT64 *PropertyValue
-  )
-{
-  AsciiSPrint (
-    LogString,
-    26,
-    "<%02llX %02llX %02llX %02llX %02llX %02llX %02llX %02llX>",
-    *PropertyValue & 0xFF,
-    (*PropertyValue >> (8))  & 0xFF,
-    (*PropertyValue >> (16)) & 0xFF,
-    (*PropertyValue >> (24)) & 0xFF,
-    (*PropertyValue >> (32)) & 0xFF,
-    (*PropertyValue >> (40)) & 0xFF,
-    (*PropertyValue >> (48)) & 0xFF,
-    (*PropertyValue >> (56)) & 0xFF
-  );
-}
-
-STATIC
-VOID
-LogChar8Property (
-  OUT CHAR8 *LogString,
-  IN  CHAR8 *PropertyValue
-  )
-{
-  AsciiSPrint (
-    LogString,
-    AsciiStrLen (PropertyValue) + 5,
-    "<\"%a\">",
-    PropertyValue
-    );
-}
-
-/** Logs a formatted string of the device property injection status.
-
-  @param[in] Property  A pointer to the device property.
-  @param[in] Status    The status of the device property injection.
-**/
 STATIC
 VOID
 LogInjectionStatus (
@@ -118,46 +53,23 @@ LogInjectionStatus (
   IN EFI_STATUS           Status
   )
 {
-  CHAR8 PropertyValueString[Size + 10];
-
-  switch (Type) {
-    case DevicePropertyUint8:
-    {
-      LogUint8Property (PropertyValueString, (UINT8 *)Value);
-      break;
-    }
-
-    case DevicePropertyUint16:
-    {
-      LogUint16Property (PropertyValueString, (UINT16 *)Value);
-      break;
-    }
-
-    case DevicePropertyUint32:
-    {
-      LogUint32Property (PropertyValueString, (UINT32 *)Value);
-      break;
-    }
-
-    case DevicePropertyUint64:
-    {
-      LogUint64Property (PropertyValueString, (UINT64 *)Value);
-      break;
-    }
-
-    case DevicePropertyChar8:
-    {
-      LogChar8Property (PropertyValueString, (CHAR8 *)Value);
-      break;
-    }
+  if (Value == NULL || Size == 0) {
+    return;
   }
 
-  MsgLog (
-    " - Injected %s = %a, Status = %r\n",
-    Name,
-    PropertyValueString,
-    Status
-  );
+  MsgLog (" - Injected %s = ", Name);
+
+  switch (Type) {
+    case DevicePropertyUint:
+      LogUintProperty ((UINT8 *)Value, Size);
+      break;
+
+    case DevicePropertyChar8:
+      MsgLog ("<\"%a\">", (CHAR8 *)Value);
+      break;
+  }
+
+  MsgLog (", Status = %r\n", Status);
 }
 
 /** Injects a single device property.
@@ -187,6 +99,10 @@ InjectDeviceProperty (
 
   if (gEfiDppDbProtocol == NULL) {
     return EFI_NOT_FOUND;
+  }
+
+  if (DevicePath == NULL || Name == NULL || Value == NULL) {
+    return EFI_INVALID_PARAMETER;
   }
 
   Status = gEfiDppDbProtocol->SetProperty (
