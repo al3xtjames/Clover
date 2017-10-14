@@ -155,7 +155,7 @@ InjectHdaProperties (
 {
   CONST HDA_CONTROLLER *DeviceTableEntry;
   CHAR8                HdaGfxString[10];
-  STATIC UINTN         HdmiControllerCount;
+  STATIC UINTN         HdmiControllerCount = 1;
 
   DeviceTableEntry = GetHdaControllerTableEntry (
                        HdaDevice->Hdr.VendorId,
@@ -177,8 +177,6 @@ InjectHdaProperties (
     return EFI_PROTOCOL_ERROR;
   }
 
-  HdmiControllerCount = gSettings.UseIntelHDMI ? 1 : 2;
-
   // Inject controller-specific device properties (based off the device table entry)
   if (DeviceTableEntry != NULL)
   {
@@ -187,7 +185,7 @@ InjectHdaProperties (
     /// is true (uses the same value as InjectIntel by default)
     /// Don't inject hda-gfx for IGPUs if UseIntelHDMI isn't set, and increment
     /// the onboard-n value for subsequent HDMI/DP audio controllers
-    if ((DeviceTableEntry->Flags & (FLAG_HDA_HDEF|FLAG_HDA_HDMI))
+    if ((DeviceTableEntry->Flags & FLAG_HDA_HDMI)
         && HdaDevice->Hdr.VendorId == 0x8086 && gSettings.UseIntelHDMI) {
       InjectDeviceProperty (
         DevicePath,
@@ -198,6 +196,10 @@ InjectHdaProperties (
         );
     } else if ((IsHdmiAudio || (DeviceTableEntry->Flags & FLAG_HDA_HDMI))
                && HdaDevice->Hdr.VendorId != 0x8086) {
+      if (HdmiControllerCount == 1 && gSettings.UseIntelHDMI) {
+        ++HdmiControllerCount;
+      }
+
       AsciiSPrint (HdaGfxString, 10, "onboard-%d", HdmiControllerCount);
       InjectDeviceProperty (
         DevicePath,
