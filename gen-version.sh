@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Generate Version.h for Clover
 
 # Usage: ./gen-version.sh <build info string>
@@ -20,7 +20,13 @@ if [ -z "$(git show-ref | grep refs/remotes/git-svn)" ]; then
 	git svn rebase
 fi
 
-SVN_REVISION=$(git svn info | grep Revision | awk '{print $2}')
+# Use value from RehabMan's _svnver.txt if present
+if [ -e _svnver.txt ]; then
+	SVN_REVISION=$(cat _svnver.txt)
+else
+	SVN_REVISION=$(git svn info | grep Revision | awk '{print $2}')
+fi
+
 SUFFIX="RM-$(git symbolic-ref --short HEAD)@$(git rev-parse --short HEAD)"
 REVISION="$SVN_REVISION-$SUFFIX"
 BUILD_DATE=$(date '+%Y-%m-%d %H:%M:%S')
