@@ -98,7 +98,7 @@ InjectDeviceProperty (
   EFI_STATUS Status;
 
   if (gEfiDppDbProtocol == NULL) {
-    return EFI_NOT_FOUND;
+    return EFI_PROTOCOL_ERROR;
   }
 
   if (DevicePath == NULL || Name == NULL || Value == NULL) {

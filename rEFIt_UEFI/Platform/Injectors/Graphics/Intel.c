@@ -23,11 +23,11 @@
 #include <Injectors/DeviceProperty.h>
 
 typedef struct {
-  UINT16 DeviceId;
-  UINT32 DefaultFakeId;
-  CHAR8  *Name;
-  UINT32 DefaultPlatformId;
-  UINT8  Flags;
+  UINT16      DeviceId;
+  UINT32      DefaultFakeId;
+  CONST CHAR8 *Name;
+  UINT32      DefaultPlatformId;
+  UINT8       Flags;
 } INTEL_IGPU;
 
 // Intel HD Graphics series flags
@@ -97,6 +97,7 @@ GetIntelGraphicsDeviceTableEntry (
   @return "Unknown Intel HD Graphics Device"  The name for the Intel HD Graphics
                                               device was not found.
 **/
+CONST
 CHAR8 *
 GetIntelGraphicsName (
   IN UINT16 DeviceId
@@ -293,7 +294,7 @@ InjectIntelGraphicsProperties (
     DevicePath,
     L"model",
     DevicePropertyChar8,
-    DeviceTableEntry->Name,
+    (CHAR8 *)DeviceTableEntry->Name,
     AsciiStrLen (DeviceTableEntry->Name) + 1
     );
 

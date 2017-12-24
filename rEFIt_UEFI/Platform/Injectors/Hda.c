@@ -24,13 +24,6 @@
 
 #include <Injectors/DeviceProperty.h>
 
-typedef struct {
-  UINT16 VendorId;
-  UINT16 DeviceId;
-  CHAR8  *Name;
-  UINT8  Flags;
-} HDA_CONTROLLER;
-
 // HDA controller flags
 enum {
   /// Used for normal HDA devices on chipsets
@@ -40,6 +33,13 @@ enum {
   /// Used for Skylake/Kaby Lake chipset audio controllers
   FLAG_HDA_IDLE = 4
 };
+
+typedef struct {
+  UINT16      VendorId;
+  UINT16      DeviceId;
+  CONST CHAR8 *Name;
+  UINT8       Flags;
+} HDA_CONTROLLER;
 
 STATIC UINT8 mZeroValue = 0x00;
 
@@ -102,6 +102,7 @@ GetHdaControllerTableEntry (
   @return                           The name of the HDA controller is returned.
   @return "Unknown HDA Controller"  The name of the HDA controller was not found.
 **/
+CONST
 CHAR8 *
 GetHdaControllerName (
   IN UINT16 VendorId,
@@ -117,19 +118,12 @@ GetHdaControllerName (
   switch (VendorId) {
     case 0x1002:
       return "Unknown AMD HDA Controller";
-      break;
-
     case 0x10DE:
       return "Unknown NVIDIA HDA Controller";
-      break;
-
     case 0x8086:
       return "Unknown Intel HDA Controller";
-      break;
-
     default:
       return "Unknown HDA Controller";
-      break;
   }
 }
 
