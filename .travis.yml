@@ -1,24 +1,24 @@
 language: c
 os: osx
-osx_image: xcode8.3
-compiler: clang
+osx_image: xcode9.3
 
 before_install:
- - brew update
- - brew install cctools
- - ln -s /usr/local/Cellar/cctools/855/efi/bin/mtoc /usr/local/bin/mtoc
- - brew install nasm
+ - export NUM_CPUS=$(sysctl -n hw.ncpu)
 
 install:
- - cd $TRAVIS_BUILD_DIR/../
- - git clone https://github.com/tianocore/edk2
- - cd edk2
- - make -C BaseTools -s
+ - brew install cctools nasm
+ - ln -s /usr/local/opt/cctools/bin/mtoc /usr/local/bin/mtoc
+ - git clone https://github.com/tianocore/edk2 ../edk2 --depth 1
+ - make -C ../edk2/BaseTools -s -j $NUM_CPUS
+
+before_script:
+ - cd ../edk2
  - source edksetup.sh
+ - export PACKAGES_PATH="$(pwd)/.."
+ - export TOOLCHAIN="XCODE5"
  - cd $TRAVIS_BUILD_DIR
- - export PACKAGES_PATH=$TRAVIS_BUILD_DIR/../
+ - ./gen-version.sh $TOOLCHAIN
 
 script:
- - ./gen-version.sh "$(xcodebuild -version | head -n 1) / $(clang -v 2>&1 | head -n 1)"
- - build -t XCODE5 -a IA32 -p Clover/Clover.dsc -b RELEASE -D USE_LOW_EBDA
- - build -t XCODE5 -a X64 -p Clover/Clover.dsc -b RELEASE -D USE_LOW_EBDA
+ - build -p Clover/Clover.dsc -a IA32 -b RELEASE -t $TOOLCHAIN -n $NUM_CPUS -s
+ - build -p Clover/Clover.dsc -a X64 -b RELEASE -t $TOOLCHAIN -n $NUM_CPUS -s

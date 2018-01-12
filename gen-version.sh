@@ -17,7 +17,6 @@ if [ -z "$(git show-ref | grep refs/remotes/git-svn)" ]; then
 	git update-ref refs/remotes/git-svn $(git rev-parse HEAD)
 	git svn rebase
 	git checkout development
-	git svn rebase
 fi
 
 # Use value from RehabMan's _svnver.txt if present
