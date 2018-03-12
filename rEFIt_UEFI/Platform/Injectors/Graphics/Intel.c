@@ -3,7 +3,7 @@
 
   TODO: Read the DVMT value and log it.
 
-  Copyright (C) 2016-2017 Alex James (TheRacerMaster). All rights reserved.<BR>
+  Copyright (C) 2016-2018 Alex James (TheRacerMaster). All rights reserved.<BR>
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -30,12 +30,14 @@ typedef struct {
   UINT8       Flags;
 } INTEL_IGPU;
 
-// Intel HD Graphics series flags
+// Intel HD Graphics generations
 enum {
-  /// Used for Sandy Bridge IGPUs
-  FLAG_SNB_IG = 1,
-  /// Used for Skylake IGPUs
-  FLAG_SKL_IG = 2,
+  IGPU_GEN_SNB = 1,
+  IGPU_GEN_IVB = 2,
+  IGPU_GEN_HSW = 4,
+  IGPU_GEN_BDW = 8,
+  IGPU_GEN_SKL = 16,
+  IGPU_GEN_KBL = 32
 };
 
 STATIC UINT32 mAaplGfxYTile   = 0x01000000;
@@ -45,27 +47,27 @@ STATIC UINT32 mGraphicOptions = 0x0000000C;
 // Table of Intel HD Graphics devices.
 STATIC CONST INTEL_IGPU mIntelGraphicsDeviceTable[] = {
   // Sandy Bridge Server GT2
-  { 0x010A, 0x01168086, "Intel HD Graphics P3000", 0x00030010, FLAG_SNB_IG },
+  { 0x010A, 0x01168086, "Intel HD Graphics P3000", 0x00030010, IGPU_GEN_SNB },
   // Sandy Bridge Desktop GT2
-  { 0x0112, 0x01168086, "Intel HD Graphics 3000",  0x00030010, FLAG_SNB_IG },
+  { 0x0112, 0x01168086, "Intel HD Graphics 3000",  0x00030010, IGPU_GEN_SNB },
   // Sandy Bridge Mobile GT2
-  { 0x0116, 0x00000000, "Intel HD Graphics 3000",  0x00000000, FLAG_SNB_IG },
+  { 0x0116, 0x00000000, "Intel HD Graphics 3000",  0x00000000, IGPU_GEN_SNB },
   // Sandy Bridge Desktop GT2
-  { 0x0122, 0x01268086, "Intel HD Graphics 3000",  0x00030010, FLAG_SNB_IG },
+  { 0x0122, 0x01268086, "Intel HD Graphics 3000",  0x00030010, IGPU_GEN_SNB },
   // Sandy Bridge Mobile GT2
-  { 0x0126, 0x00000000, "Intel HD Graphics 3000",  0x00000000, FLAG_SNB_IG },
+  { 0x0126, 0x00000000, "Intel HD Graphics 3000",  0x00000000, IGPU_GEN_SNB },
   // Ivy Bridge Desktop GT2
-  { 0x0162, 0x00000000, "Intel HD Graphics 4000",  0x0166000B },
+  { 0x0162, 0x00000000, "Intel HD Graphics 4000",  0x01620005, IGPU_GEN_IVB },
   // Ivy Bridge Mobile GT2
-  { 0x0166, 0x00000000, "Intel HD Graphics 4000",  0x01660001 },
+  { 0x0166, 0x00000000, "Intel HD Graphics 4000",  0x01660001, IGPU_GEN_IVB },
   // Ivy Bridge Server GT2
-  { 0x016A, 0x01628086, "Intel HD Graphics P4000", 0x0166000B },
+  { 0x016A, 0x01628086, "Intel HD Graphics P4000", 0x01620005, IGPU_GEN_IVB },
   // Haswell Desktop GT2
-  { 0x0412, 0x00000000, "Intel HD Graphics 4600",  0x0D220003 },
+  { 0x0412, 0x00000000, "Intel HD Graphics 4600",  0x0D220003, IGPU_GEN_HSW },
   // Skylake Mobile GT2
-  { 0x191B, 0x00000000, "Intel HD Graphics 530",   0x191B0000, FLAG_SKL_IG },
+  { 0x191B, 0x00000000, "Intel HD Graphics 530",   0x191B0000, IGPU_GEN_SKL },
   // Kaby Lake Mobile GT2
-  { 0x591B, 0x00000000, "Intel HD Graphics 630",   0x591B0000, FLAG_SKL_IG },
+  { 0x591B, 0x00000000, "Intel HD Graphics 630",   0x591B0000, IGPU_GEN_KBL },
 
   { 0, 0, NULL, 0 }
 };
@@ -86,6 +88,36 @@ GetIntelGraphicsDeviceTableEntry (
   }
 
   return NULL;
+}
+
+STATIC
+BOOLEAN
+IsConnectorlessIntelPlatformId (
+  IN UINT32 PlatformId
+  )
+{
+  switch (PlatformId) {
+    // Sandy Bridge
+    case 0x00030030:
+    case 0x00050000:
+    // Ivy Bridge
+    case 0x01620006:
+    case 0x01620007:
+    // Haswell
+    case 0x04120004:
+    case 0x0412000B:
+    // Skylake
+    case 0x19020001:
+    case 0x19170001:
+    case 0x19120001:
+    case 0x19320001:
+    // Kaby Lake
+    case 0x59180002:
+    case 0x59120003:
+      return TRUE;
+  }
+
+  return FALSE;
 }
 
 /** Retrieves the name of an Intel HD Graphics device.
@@ -174,6 +206,9 @@ InjectIntelGraphicsProperties (
   )
 {
   CONST INTEL_IGPU *DeviceTableEntry;
+  BOOLEAN          IsConnectorlessPlatformId = IsConnectorlessIntelPlatformId (
+                                                 gSettings.IgPlatform
+                                                 );
 
   DeviceTableEntry = GetIntelGraphicsDeviceTableEntry (
                        IntelGraphicsDevice->Hdr.DeviceId
@@ -193,25 +228,19 @@ InjectIntelGraphicsProperties (
     return EFI_PROTOCOL_ERROR;
   }
 
+  // Disable audio device property injection if a connectorless platform ID
+  // is used
+  if (IsConnectorlessPlatformId) {
+    gSettings.UseIntelHDMI = FALSE;
+  }
+
   // Inject model-specific properties (based off the device table entry)
   if (DeviceTableEntry != NULL) {
-    // Inject the AAPL,GfxYTile property for SKL/KBL IGPUs
-    if (DeviceTableEntry->Flags & FLAG_SKL_IG) {
-      InjectDeviceProperty (
-        DevicePath,
-        L"AAPL,GfxYTile",
-        DevicePropertyUint,
-        &mAaplGfxYTile,
-        DevicePropertyWidthUint32
-        );
-    }
-
     // Inject the platform ID (SNB or IG)
     /// gSettings.IgPlatform (and mPlatformId) are already initialized to the
     /// default value in GetDevices if the user does not specify a value
-    if (gSettings.IgPlatform)
-    {
-      if (DeviceTableEntry->Flags & FLAG_SNB_IG) {
+    if (gSettings.IgPlatform) {
+      if (DeviceTableEntry->Flags & IGPU_GEN_SNB) {
         InjectDeviceProperty (
           DevicePath,
           L"AAPL,snb-platform-id",
@@ -229,10 +258,23 @@ InjectIntelGraphicsProperties (
           );
       }
     }
+
+    // Inject the AAPL,GfxYTile property for SKL/KBL IGPUs when using
+    // non-connectorless platform IDs
+    if ((DeviceTableEntry->Flags & IGPU_GEN_SKL ||
+       DeviceTableEntry->Flags & IGPU_GEN_KBL) &&
+       !IsConnectorlessPlatformId) {
+      InjectDeviceProperty (
+        DevicePath,
+        L"AAPL,GfxYTile",
+        DevicePropertyUint,
+        &mAaplGfxYTile,
+        DevicePropertyWidthUint32
+        );
+    }
   } else {
     // Fall back to generic property values if no device table entry exists
-    if (gSettings.IgPlatform)
-    {
+    if (gSettings.IgPlatform) {
       InjectDeviceProperty (
         DevicePath,
         L"AAPL,ig-platform-id",
@@ -241,18 +283,6 @@ InjectIntelGraphicsProperties (
         DevicePropertyWidthUint32
         );
     }
-  }
-
-  // Inject a EDID override (if specified)
-  // This is something AppleGraphicsPolicy should be doing...
-  if (gSettings.InjectEDID && gSettings.CustomEDID) {
-    InjectDeviceProperty (
-      DevicePath,
-      L"AAPL00,override-no-connect",
-      DevicePropertyUint,
-      gSettings.CustomEDID,
-      128
-      );
   }
 
   // Inject the fake device ID (if needed)
@@ -269,26 +299,6 @@ InjectIntelGraphicsProperties (
       );
   }
 
-  // Inject the graphic-options property
-  InjectDeviceProperty (
-    DevicePath,
-    L"graphic-options",
-    DevicePropertyUint,
-    &mGraphicOptions,
-    DevicePropertyWidthUint32
-    );
-
-  // Inject the hda-gfx property (if needed)
-  if (gSettings.UseIntelHDMI) {
-    InjectDeviceProperty (
-      DevicePath,
-      L"hda-gfx",
-      DevicePropertyChar8,
-      "onboard-1",
-      10
-      );
-  }
-
   // Inject the model name
   InjectDeviceProperty (
     DevicePath,
@@ -297,6 +307,40 @@ InjectIntelGraphicsProperties (
     (CHAR8 *)DeviceTableEntry->Name,
     AsciiStrLen (DeviceTableEntry->Name) + 1
     );
+
+  // Only inject additional device properties for non-connectorless platform IDs
+  if (!IsConnectorlessPlatformId) {
+    // Inject a EDID override (if specified)
+    if (gSettings.InjectEDID && gSettings.CustomEDID != NULL) {
+      InjectDeviceProperty (
+        DevicePath,
+        L"AAPL00,override-no-connect",
+        DevicePropertyUint,
+        gSettings.CustomEDID,
+        128
+        );
+
+      // Inject the graphic-options property
+      InjectDeviceProperty (
+        DevicePath,
+        L"graphic-options",
+        DevicePropertyUint,
+        &mGraphicOptions,
+        DevicePropertyWidthUint32
+        );
+
+      // Inject the hda-gfx property (if needed)
+      if (gSettings.UseIntelHDMI) {
+        InjectDeviceProperty (
+          DevicePath,
+          L"hda-gfx",
+          DevicePropertyChar8,
+          "onboard-1",
+          10
+          );
+      }
+    }
+  }
 
   return EFI_SUCCESS;
 }
