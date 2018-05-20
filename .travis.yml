@@ -1,21 +1,47 @@
 language: c
-os: osx
-osx_image: xcode9.3
+matrix:
+  include:
+   - os: osx
+     osx_image: xcode9.3
+     compiler: clang
+     env:
+      - NUM_CPUS=$(sysctl -n hw.ncpu)
+      - TOOLCHAIN="XCODE5"
+     before_install:
+      - brew install cctools nasm
+      - ln -s /usr/local/opt/cctools/bin/mtoc /usr/local/bin/mtoc
 
-before_install:
- - export NUM_CPUS=$(sysctl -n hw.ncpu)
+   - os: linux
+     dist: xenial
+     compiler: clang
+     env:
+      - NUM_CPUS=$(nproc)
+      - TOOLCHAIN="CLANG38"
+     addons:
+       apt:
+         update: true
+         sources:
+          - sourceline: "ppa:ubuntu-toolchain-r/test"
+          - sourceline: "ppa:jonathonf/nasm"
+          - sourceline: "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-6.0 main"
+            key_url: "https://apt.llvm.org/llvm-snapshot.gpg.key"
+         packages:
+          - clang-6.0
+          - llvm-6.0
+          - llvm-6.0-dev
+          - nasm
+     before_install:
+       - sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-6.0 1000
+                                  --slave /usr/bin/llvm-ar llvm-ar /usr/bin/llvm-ar-6.0
 
 install:
- - brew install cctools nasm
- - ln -s /usr/local/opt/cctools/bin/mtoc /usr/local/bin/mtoc
- - git clone https://github.com/tianocore/edk2 ../edk2 --depth 1
- - make -C ../edk2/BaseTools -s -j $NUM_CPUS
+ - git clone https://github.com/tianocore/edk2 ../edk2 --depth 1;
+ - make -C ../edk2/BaseTools -j $NUM_CPUS -s
 
 before_script:
  - cd ../edk2
  - source edksetup.sh
  - export PACKAGES_PATH="$(pwd)/.."
- - export TOOLCHAIN="XCODE5"
  - cd $TRAVIS_BUILD_DIR
  - ./gen-version.sh $TOOLCHAIN
 
