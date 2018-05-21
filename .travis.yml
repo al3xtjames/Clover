@@ -21,12 +21,14 @@ matrix:
        apt:
          update: true
          sources:
+          - sourceline: "ppa:git-core/ppa"
           - sourceline: "ppa:ubuntu-toolchain-r/test"
           - sourceline: "ppa:jonathonf/nasm"
           - sourceline: "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-6.0 main"
             key_url: "https://apt.llvm.org/llvm-snapshot.gpg.key"
          packages:
           - clang-6.0
+          - git-svn
           - llvm-6.0
           - llvm-6.0-dev
           - nasm
@@ -44,10 +46,12 @@ matrix:
        apt:
          update: true
          sources:
+          - sourceline: "ppa:git-core/ppa"
           - sourceline: "ppa:ubuntu-toolchain-r/test"
           - sourceline: "ppa:jonathonf/nasm"
          packages:
           - gcc-8
+          - git-svn
           - nasm
      before_install:
        - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 1000
