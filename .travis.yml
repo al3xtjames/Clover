@@ -34,6 +34,25 @@ matrix:
        - sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-6.0 1000
                                   --slave /usr/bin/llvm-ar llvm-ar /usr/bin/llvm-ar-6.0
 
+   - os: linux
+     dist: xenial
+     compiler: gcc
+     env:
+      - NUM_CPUS=$(nproc)
+      - TOOLCHAIN="GCC5"
+     addons:
+       apt:
+         update: true
+         sources:
+          - sourceline: "ppa:ubuntu-toolchain-r/test"
+          - sourceline: "ppa:jonathonf/nasm"
+         packages:
+          - gcc-8
+          - nasm
+     before_install:
+       - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 1000
+                                  --slave /usr/bin/gcc-ar gcc-ar /usr/bin/gcc-ar-8
+
 install:
  - git clone https://github.com/tianocore/edk2 ../edk2 --depth 1;
  - make -C ../edk2/BaseTools -j $NUM_CPUS -s
