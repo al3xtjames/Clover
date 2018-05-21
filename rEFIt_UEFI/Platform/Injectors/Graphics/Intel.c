@@ -1,9 +1,9 @@
 /** @file
   Device property injector for Intel HD Graphics devices.
 
-  TODO: Read the DVMT value and log it.
-
   Copyright (C) 2016-2018 Alex James (TheRacerMaster). All rights reserved.<BR>
+  Portions copyright (C) 2017-2018 Sherlocks. All rights reserved.<BR>
+  Portions copyright (C) 2018 vit9696. All rights reserved.<BR>
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ STATIC UINT32 mAaplGfxYTile   = 0x01000000;
 STATIC UINT32 mFakeId         = 0x00000000;
 STATIC UINT32 mGraphicOptions = 0x0000000C;
 
-// Table of Intel HD Graphics devices.
+// Table of Intel HD Graphics devices
 STATIC CONST INTEL_IGPU mIntelGraphicsDeviceTable[] = {
   // Sandy Bridge Server GT2
   { 0x010A, 0x01168086, "Intel HD Graphics P3000", 0x00030010, IGPU_GEN_SNB },
@@ -79,7 +79,7 @@ GetIntelGraphicsDeviceTableEntry (
   IN UINT16 DeviceId
   )
 {
-  INTN Index;
+  UINTN Index;
 
   for (Index = 0; mIntelGraphicsDeviceTable[Index].DeviceId != 0; ++Index) {
     if (mIntelGraphicsDeviceTable[Index].DeviceId == DeviceId) {
@@ -126,7 +126,7 @@ IsConnectorlessIntelPlatformId (
 
   @return                                     The name of the Intel HD Graphics
                                               device is returned.
-  @return "Unknown Intel HD Graphics Device"  The name for the Intel HD Graphics
+  @return "Unknown Intel HD Graphics Device"  The name of the Intel HD Graphics
                                               device was not found.
 **/
 CONST
@@ -169,7 +169,8 @@ GetDefaultIntelFakeId (
 
   @param[in] DeviceId  The PCI device ID of the Intel HD Graphics device.
 
-  @return    The default platform ID for the Intel HD Graphics device is returned.
+  @return    The default platform ID for the Intel HD Graphics device is
+             returned.
   @return 0  The default platform ID for the Intel HD Graphics device was not
              found.
 **/
@@ -189,15 +190,16 @@ GetDefaultIntelPlatformId (
 
 /** Injects device properties for Intel HD Graphics devices.
 
-  @param[in] IntelGraphicsDev  A pointer to the PCI type of the Intel HD
-                               Graphics device.
-  @param[in] DevicePath        The device path of the Intel HD Graphics device.
+  @param[in] IntelGraphicsDevice  A pointer to the PCI type of the Intel HD
+                                  Graphics device.
+  @param[in] DevicePath           The device path of the Intel HD Graphics
+                                  device.
 
-  @return                       The status of the Intel HD Graphics device
-                                property injection is returned.
-  @retval EFI_OUT_OF_RESOURCES  The memory necessary to complete the operation
-                                could not be allocated.
-  @retval EFI_SUCCESS           The operation completed successfully.
+  @return                     The status of the Intel HD Graphics device
+                              property injection is returned.
+  @retval EFI_PROTOCOL_ERROR  The EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL was
+                              not found.
+  @retval EFI_SUCCESS         The operation completed successfully.
 **/
 EFI_STATUS
 InjectIntelGraphicsProperties (
@@ -224,7 +226,11 @@ InjectIntelGraphicsProperties (
   // Do not inject properties if the EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL
   // is missing
   if (gEfiDppDbProtocol == NULL) {
-    MsgLog (" - EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL not found, disabling device property injection");
+    MsgLog (
+      " - EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL not found, "
+      "disabling device property injection"
+      );
+
     return EFI_PROTOCOL_ERROR;
   }
 

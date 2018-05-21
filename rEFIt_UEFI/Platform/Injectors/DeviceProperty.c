@@ -1,7 +1,7 @@
 /** @file
   Helpers for device property injection.
 
-  Copyright (C) 2016-2017 Alex James (TheRacerMaster). All rights reserved.<BR>
+  Copyright (C) 2016-2018 Alex James (TheRacerMaster). All rights reserved.<BR>
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -76,15 +76,17 @@ LogInjectionStatus (
 
   @param[in] DevicePath  The device path.
   @param[in] Name        The Unicode name of the device property.
-  @param[in] Type        The type of the device property.
+  @param[in] Type        The type of the device property value.
   @param[in] Value       The value of the device property.
-  @param[in] Size        The size of the device property.
+  @param[in] Size        The size of the device property value.
 
-  @return                The status of setting the device property is
-                         returned.
-  @retval EFI_NOT_FOUND  The EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL
-                         was not found.
-  @retval EFI_SUCCESS    The operation completed successfully.
+  @return                        The status of setting the device property is
+                                 returned.
+  @retval EFI_PROTOCOL_ERROR     The EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL
+                                 was not found.
+  @retval EFI_INVALID_PARAMETER  The specified DevicePath, Name, or Value was
+                                 NULL.
+  @retval EFI_SUCCESS            The operation completed successfully.
 **/
 EFI_STATUS
 InjectDeviceProperty (

@@ -1,7 +1,7 @@
 /** @file
   Device property injector for High Definition Audio (HDA) controllers.
 
-  Copyright (C) 2016-2017 Alex James (TheRacerMaster). All rights reserved.<BR>
+  Copyright (C) 2016-2018 Alex James (TheRacerMaster). All rights reserved.<BR>
   Portions copyright (C) 2008-2009 Jasmin Fazlic. All rights reserved.<BR>
   Portions copyright (C) 2008-2009 iNDi. All rights reserved.<BR>
   Portions copyright (C) 2012 Sergey Slice. All rights reserved.<BR>
@@ -43,6 +43,7 @@ typedef struct {
 
 STATIC UINT8 mZeroValue = 0x00;
 
+// Table of HDA controllers
 STATIC CONST HDA_CONTROLLER mHdaControllerTable[] = {
   { 0x1002, 0xAAA0, "AMD Tahiti HDMI/DP Audio Controller", FLAG_HDA_HDMI },
   { 0x1002, 0xAAB0, "AMD Cape Verde/Pitcairn HDMI/DP Audio Controller", FLAG_HDA_HDMI },
@@ -80,7 +81,7 @@ GetHdaControllerTableEntry (
   IN UINT16 DeviceId
   )
 {
-  INTN Index;
+  UINTN Index;
 
   for (Index = 0; mHdaControllerTable[Index].VendorId != 0; ++Index) {
     if (
@@ -109,7 +110,10 @@ GetHdaControllerName (
   IN UINT16 DeviceId
   )
 {
-  CONST HDA_CONTROLLER *TableEntry = GetHdaControllerTableEntry (VendorId, DeviceId);
+  CONST HDA_CONTROLLER *TableEntry = GetHdaControllerTableEntry (
+                                       VendorId,
+                                       DeviceId
+                                       );
 
   if (TableEntry != NULL) {
     return TableEntry->Name;
@@ -134,11 +138,11 @@ GetHdaControllerName (
   @param[in] IsHdmiAudio    Specifies whether the HDA controller is a GPU
                             HDMI/DP audio controller.
 
-  @return                       The status of the HDA device property injection
-                                is returned.
-  @retval EFI_OUT_OF_RESOURCES  The memory necessary to complete the operation
-                                could not be allocated.
-  @retval EFI_SUCCESS           The operation completed successfully.
+  @return                     The status of the HDA device property injection is
+                              returned.
+  @retval EFI_PROTOCOL_ERROR  The EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL was
+                              not found.
+  @retval EFI_SUCCESS         The operation completed successfully.
 **/
 EFI_STATUS
 InjectHdaProperties (
@@ -167,11 +171,15 @@ InjectHdaProperties (
   // Do not inject properties if the EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL
   // is missing
   if (gEfiDppDbProtocol == NULL) {
-    MsgLog (" - EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL not found, disabling device property injection");
+    MsgLog (
+      " - EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL not found, "
+      "disabling device property injection"
+      );
+
     return EFI_PROTOCOL_ERROR;
   }
 
-  // Inject controller-specific device properties (based off the device table entry)
+  // Inject controller-specific device properties (using the device table entry)
   if (DeviceTableEntry != NULL)
   {
     // Inject the hda-gfx property for HDMI/DP audio controllers
