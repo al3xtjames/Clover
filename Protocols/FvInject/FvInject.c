@@ -3,9 +3,9 @@
   and injects images for boot.efi/FileVault 2.
 
   Copyright (C) 2016 Sergey Slice. All rights reserved.<BR>
-  Portions copyright (C) 2005-2016, Apple Inc. All rights reserved.<BR>
+  Portions copyright (C) 2005-2018, Apple Inc. All rights reserved.<BR>
   Portions copyright (C) 2006-2014 Intel Corporation. All rights reserved.<BR>
-  Portions copyright (C) 2016 Alex James. All rights reserved.<BR>
+  Portions copyright (C) 2016-2018 Alex James. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made
   available under the terms and conditions of the BSD License which
