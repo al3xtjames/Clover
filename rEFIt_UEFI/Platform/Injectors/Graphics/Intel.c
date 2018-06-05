@@ -57,11 +57,11 @@ STATIC CONST INTEL_IGPU mIntelGraphicsDeviceTable[] = {
   // Sandy Bridge Mobile GT2
   { 0x0126, 0x00000000, "Intel HD Graphics 3000",  0x00000000, IGPU_GEN_SNB },
   // Ivy Bridge Desktop GT2
-  { 0x0162, 0x00000000, "Intel HD Graphics 4000",  0x01620005, IGPU_GEN_IVB },
+  { 0x0162, 0x00000000, "Intel HD Graphics 4000",  0x0166000A, IGPU_GEN_IVB },
   // Ivy Bridge Mobile GT2
   { 0x0166, 0x00000000, "Intel HD Graphics 4000",  0x01660001, IGPU_GEN_IVB },
   // Ivy Bridge Server GT2
-  { 0x016A, 0x01628086, "Intel HD Graphics P4000", 0x01620005, IGPU_GEN_IVB },
+  { 0x016A, 0x01628086, "Intel HD Graphics P4000", 0x0166000A, IGPU_GEN_IVB },
   // Haswell Desktop GT2
   { 0x0412, 0x00000000, "Intel HD Graphics 4600",  0x0D220003, IGPU_GEN_HSW },
   // Skylake Mobile GT2
