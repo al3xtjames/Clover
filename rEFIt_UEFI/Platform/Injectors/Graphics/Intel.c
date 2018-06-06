@@ -115,9 +115,9 @@ IsConnectorlessIntelPlatformId (
     case 0x59180002:
     case 0x59120003:
       return TRUE;
+    default:
+      return FALSE;
   }
-
-  return FALSE;
 }
 
 /** Retrieves the name of an Intel HD Graphics device.
@@ -325,26 +325,26 @@ InjectIntelGraphicsProperties (
         gSettings.CustomEDID,
         128
         );
+    }
 
-      // Inject the graphic-options property
+    // Inject the graphic-options property
+    InjectDeviceProperty (
+      DevicePath,
+      L"graphic-options",
+      DevicePropertyUint,
+      &mGraphicOptions,
+      DevicePropertyWidthUint32
+      );
+
+    // Inject the hda-gfx property (if needed)
+    if (gSettings.UseIntelHDMI) {
       InjectDeviceProperty (
         DevicePath,
-        L"graphic-options",
-        DevicePropertyUint,
-        &mGraphicOptions,
-        DevicePropertyWidthUint32
+        L"hda-gfx",
+        DevicePropertyChar8,
+        "onboard-1",
+        10
         );
-
-      // Inject the hda-gfx property (if needed)
-      if (gSettings.UseIntelHDMI) {
-        InjectDeviceProperty (
-          DevicePath,
-          L"hda-gfx",
-          DevicePropertyChar8,
-          "onboard-1",
-          10
-          );
-      }
     }
   }
 
