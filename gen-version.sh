@@ -8,37 +8,46 @@
 #                        if a <build info string> isn't specified
 #
 
+set -u
+
+# Manually fetch the svn branch if it's missing (shallow/single branch clone)
+if ! git show-ref --verify --quiet refs/heads/svn &> /dev/null; then
+    git remote set-branches --add origin svn
+    git fetch origin svn:svn
+fi
+
+# Undo shallow clones
+if [[ $(git rev-parse --is-shallow-repository) == "true" ]]; then
+    git fetch --unshallow
+fi
+
 # Fix git-svn history if it doesn't exist
-if [ -z "$(git show-ref | grep refs/remotes/git-svn)" ]; then
-	git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-	git fetch origin --unshallow
-	git checkout svn
-	git svn init svn://svn.code.sf.net/p/cloverefiboot/code/
-	git update-ref refs/remotes/git-svn $(git rev-parse HEAD)
-	git svn rebase
-	git checkout development
+if ! git show-ref | grep -q refs/remotes/git-svn; then
+    git checkout svn
+    git svn init svn://svn.code.sf.net/p/cloverefiboot/code/
+    git update-ref refs/remotes/git-svn "$(git rev-parse HEAD)"
+    git svn rebase
+    git checkout development
 fi
 
 # Use value from RehabMan's _svnver.txt if present
-if [ -e _svnver.txt ]; then
-	SVN_REVISION=$(cat _svnver.txt)
+if [[ -e _svnver.txt ]]; then
+    SVN_REVISION=$(< _svnver.txt)
 else
-	SVN_REVISION=$(git svn info | grep Revision | awk '{print $2}')
+    SVN_REVISION=$(git svn info | awk '/Revision/ {print $2}')
 fi
 
 SUFFIX="RM-$(git symbolic-ref --short HEAD)@$(git rev-parse --short HEAD)"
 REVISION="$SVN_REVISION-$SUFFIX"
 BUILD_DATE=$(date '+%Y-%m-%d %H:%M:%S')
 
-if [ -e Version.h ]; then
-	rm -f Version.h
-fi
+rm -f Version.h
+cat << EOF > Version.h
+#define FIRMWARE_BUILDDATE "$BUILD_DATE"
+#define FIRMWARE_REVISION L"$REVISION"
+#define REVISION_STR "Clover revision: $REVISION"
+EOF
 
-echo -e \#define FIRMWARE_VERSION \"2.31\"\ > Version.h
-echo -e \#define FIRMWARE_BUILDDATE \"$BUILD_DATE\"\ >> Version.h
-echo -e \#define FIRMWARE_REVISION L\"$REVISION\"\ >> Version.h
-echo -e \#define REVISION_STR \"Clover revision: $REVISION\" >> Version.h
-
-if [ ! -z "$1" ]; then
-	echo -e \#define BUILDINFOS_STR \"$1\" >> Version.h
+if [[ ${1+x} && $1 ]]; then
+    echo "#define BUILDINFOS_STR \"$1\"" >> Version.h
 fi
