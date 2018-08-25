@@ -442,15 +442,10 @@
 
   # Misc
   Clover/Protocols/AppleGraphicsConfiguration/AppleGraphicsConfiguration.inf
-  Clover/Protocols/AppleImageCodec/AppleImageCodec.inf
   Clover/Protocols/AppleKeyFeeder/AppleKeyFeeder.inf
-  Clover/Protocols/AppleKeyMapAggregator/AppleKeyMapAggregator.inf
   Clover/Protocols/EfiOSInfo/EfiOSInfo.inf
   Clover/Protocols/FSInject/FSInject.inf
-  Clover/Protocols/FvInject/FvInject.inf
-  Clover/Protocols/HashServiceFix/HashServiceFix.inf
   Clover/Protocols/MsgLog/MsgLog.inf
-  Clover/Protocols/UserInterfaceThemeDriver/UserInterfaceThemeDriver.inf
 
 !ifdef DEBUG_ON_SERIAL_PORT
 

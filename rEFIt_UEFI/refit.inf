@@ -147,12 +147,6 @@
   # Include/Driver/EfiOSInfo.h
   ../Protocols/EfiOSInfo/EfiOSInfo.c
 
-  # Include/Driver/FvInject.h
-  ../Protocols/FvInject/FvInject.c
-
-  # Include/Driver/UserInterfaceThemeDriver.h
-  ../Protocols/UserInterfaceThemeDriver/UserInterfaceThemeDriver.c
-
 [Packages]
 	Clover/CloverPkg.dec
     MdePkg/MdePkg.dec
@@ -210,25 +204,10 @@
   gEfiSasDevicePathGuid
   gEfiImageSecurityDatabaseGuid
 
-  # Include/Guid/AppleFirmwareVolume.h
-  gAppleArrowCursorImageGuid
-
-  # Include/Driver/AppleFirmwareVolume.h
-  gAppleArrowCursor2xImageGuid
-
-  # Include/Guid/AppleNvram.h
+  # Apple
   gAppleBootVariableGuid
-
-  # Include/Driver/AppleFirmwareVolume.h
-  gAppleImageListGuid
-
-  # Include/Driver/EfiOSInfo.h
   gAppleOsLoadedNamedEventGuid
-
-  # Include/Guid/AppleSystemInfo.h
   gAppleSystemInfoProducerNameGuid
-
-  # Include/Guid/AppleNvram.h
   gAppleVendorVariableGuid
 
 
@@ -294,13 +273,7 @@
   # Include/Driver/AppleImageCodec.h
   # gAppleImageCodecProtocolGuid
 
-  # Include/Driver/UserInterfaceThemeDriver.h
-  gAppleUserInterfaceThemeProtocolGuid
-
   gEfiDevicePathPropertyDatabaseProtocolGuid
-
-  # Include/Driver/FvInject.h
-  gEfiFirmwareVolumeProtocolGuid
 
   # Include/Driver/EfiOSInfo.h
   gEfiOSInfoProtocolGuid

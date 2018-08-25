@@ -17,8 +17,6 @@
 
 #include <Driver/AppleGraphicsConfiguration.h>
 #include <Driver/EfiOSInfo.h>
-#include <Driver/FvInject.h>
-#include <Driver/UserInterfaceThemeDriver.h>
 
 // INSTALL_PROTOCOL_IMPL
 /// Macro to install a protocol implementation.
@@ -50,12 +48,17 @@ InstallAppleProtocols (
                   );
 
   if (EFI_ERROR (Status)) {
-    MsgLog ("EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL not found. Device property injection will fail.\n");
+    MsgLog (
+      "EFI_DEVICE_PATH_PROPERTY_DATABASE_PROTOCOL not found."
+      "Device property injection will fail.\n"
+      );
   }
 
-  INSTALL_PROTOCOL_IMPL ("APPLE_GRAPHICS_CONFIGURATION_PROTOCOL", AppleGraphicsConfigurationMain);
-  INSTALL_PROTOCOL_IMPL ("APPLE_USER_INTERFACE_THEME_PROTOCOL", UserInterfaceThemeDriverMain);
-  INSTALL_PROTOCOL_IMPL ("EFI_FIRMWARE_VOLUME_PROTOCOL", FvInjectMain);
+  INSTALL_PROTOCOL_IMPL (
+    "APPLE_GRAPHICS_CONFIGURATION_PROTOCOL",
+    AppleGraphicsConfigurationMain
+    );
+
   INSTALL_PROTOCOL_IMPL ("EFI_OS_INFO_PROTOCOL", EfiOSInfoMain);
 
   return EFI_SUCCESS;
