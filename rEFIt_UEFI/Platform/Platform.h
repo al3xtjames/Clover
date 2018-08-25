@@ -76,7 +76,6 @@ Headers collection for procedures
 //#include "entry_scan.h"
 
 #define CLOVER_SIGNATURE      SIGNATURE_32 ('C', 'l', 'v', 'r')
-#define SMC_HELPER_SIGNATURE  SIGNATURE_64 ('E', 'm', 'u', 'l', 'a', 't', 'o', 'r')
 
 
 /* XML Tags */
@@ -1930,11 +1929,6 @@ EFI_GUID
 
 VOID
 PutNvramPlistToRtVars (VOID);
-
-VOID
-GetSmcKeys(BOOLEAN WriteToSMC);
-
-//VOID DumpSmcKeys(VOID);
 
 VOID
 GetMacAddress(VOID);

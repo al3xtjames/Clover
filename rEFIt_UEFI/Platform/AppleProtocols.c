@@ -18,7 +18,6 @@
 #include <Driver/AppleGraphicsConfiguration.h>
 #include <Driver/EfiOSInfo.h>
 #include <Driver/FvInject.h>
-#include <Driver/SmcHelper.h>
 #include <Driver/UserInterfaceThemeDriver.h>
 
 // INSTALL_PROTOCOL_IMPL
@@ -55,7 +54,6 @@ InstallAppleProtocols (
   }
 
   INSTALL_PROTOCOL_IMPL ("APPLE_GRAPHICS_CONFIGURATION_PROTOCOL", AppleGraphicsConfigurationMain);
-  INSTALL_PROTOCOL_IMPL ("APPLE_SMC_IO_PROTOCOL", SmcHelperMain);
   INSTALL_PROTOCOL_IMPL ("APPLE_USER_INTERFACE_THEME_PROTOCOL", UserInterfaceThemeDriverMain);
   INSTALL_PROTOCOL_IMPL ("EFI_FIRMWARE_VOLUME_PROTOCOL", FvInjectMain);
   INSTALL_PROTOCOL_IMPL ("EFI_OS_INFO_PROTOCOL", EfiOSInfoMain);

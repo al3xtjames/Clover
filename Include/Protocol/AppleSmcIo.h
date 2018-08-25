@@ -43,7 +43,7 @@ EFI_STATUS
 (EFIAPI *SMC_IO_SMC_WRITE_VALUE)(
   IN  APPLE_SMC_IO_PROTOCOL  *This,
   IN  SMC_KEY                Key,
-  IN  UINT32                 Size,
+  IN  SMC_DATA_SIZE          Size,
   OUT SMC_DATA               *Value
   );
 

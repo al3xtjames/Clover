@@ -450,7 +450,6 @@
   Clover/Protocols/FvInject/FvInject.inf
   Clover/Protocols/HashServiceFix/HashServiceFix.inf
   Clover/Protocols/MsgLog/MsgLog.inf
-  Clover/Protocols/SmcHelper/SmcHelper.inf
   Clover/Protocols/UserInterfaceThemeDriver/UserInterfaceThemeDriver.inf
 
 !ifdef DEBUG_ON_SERIAL_PORT

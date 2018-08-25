@@ -150,9 +150,6 @@
   # Include/Driver/FvInject.h
   ../Protocols/FvInject/FvInject.c
 
-  # Include/Driver/SmcHelper.h
-  ../Protocols/SmcHelper/SmcHelper.c
-
   # Include/Driver/UserInterfaceThemeDriver.h
   ../Protocols/UserInterfaceThemeDriver/UserInterfaceThemeDriver.c
 
@@ -296,9 +293,6 @@
 
   # Include/Driver/AppleImageCodec.h
   # gAppleImageCodecProtocolGuid
-
-  # Include/Driver/SmcHelper.h
-  gAppleSmcIoProtocolGuid
 
   # Include/Driver/UserInterfaceThemeDriver.h
   gAppleUserInterfaceThemeProtocolGuid

@@ -58,8 +58,6 @@ EFI_SUBCLASS_TYPE1_HEADER mCpuDataRecordHeader = {
   0                                     // RecordType (initialize later)
 };
 
-extern APPLE_SMC_IO_PROTOCOL *gAppleSmc;
-
 typedef union {
   EFI_CPU_DATA_RECORD *DataRecord;
   UINT8               *Raw;
@@ -347,15 +345,6 @@ SetVariablesForOSX(LOADER_ENTRY *Entry)
   return EFI_SUCCESS;
 }
 
-VOID
-AddSMCkey(SMC_KEY Key, SMC_DATA_SIZE Size, SMC_KEY_TYPE Type, SMC_DATA *Data)
-{
-  if (gAppleSmc && (gAppleSmc->Revision == SMC_HELPER_SIGNATURE)) {
-    gAppleSmc->SmcAddKey(gAppleSmc,     Key, Size, Type, 0xC0);
-    gAppleSmc->SmcWriteValue(gAppleSmc, Key, Size, Data);
-  }
-}
-
 // SetupDataForOSX
 /// Sets the DataHub data used by OS X
 VOID EFIAPI
@@ -371,7 +360,6 @@ SetupDataForOSX(BOOLEAN Hibernate)
   CHAR16*    ProductName;
   CHAR16*    SerialNumber;
   UINTN      Revision;
-  UINT16     Zero = 0;
 
   Revision = StrDecimalToUintn(gFirmwareRevision);
 
@@ -454,29 +442,4 @@ SetupDataForOSX(BOOLEAN Hibernate)
     // all current settings
     LogDataHub(&gEfiMiscSubClassGuid, L"Settings", &gSettings, sizeof(gSettings));
   }
-  if (!gAppleSmc) {
-    return;
-  }
-  AddSMCkey(SMC_MAKE_KEY('R','P','l','t'), 8, SmcKeyTypeCh8, (SMC_DATA *)&gSettings.RPlt);
-  AddSMCkey(SMC_MAKE_KEY('R','B','r',' '), 8, SmcKeyTypeCh8, (SMC_DATA *)&gSettings.RBr);
-  AddSMCkey(SMC_MAKE_KEY('E','P','C','I'), 4, SmcKeyTypeUint32, (SMC_DATA *)&gSettings.EPCI);
-  AddSMCkey(SMC_MAKE_KEY('R','E','V',' '), 6, SmcKeyTypeCh8, (SMC_DATA *)&gSettings.REV);
-  AddSMCkey(SMC_MAKE_KEY('B','E','M','B'), 1, SmcKeyTypeFlag, (SMC_DATA *)&gSettings.Mobile);
-  //laptop battery keys will be better to import from nvram.plist or read from ACPI(?)
-  //they are needed for FileVault2 who want to draw battery status
-  AddSMCkey(SMC_MAKE_KEY('B','A','T','P'), 1, SmcKeyTypeFlag, (SMC_DATA *)&Zero); //isBatteryPowered
-  AddSMCkey(SMC_MAKE_KEY('B','N','u','m'), 1, SmcKeyTypeUint8, (SMC_DATA *)&gSettings.Mobile); // Num Batteries
-  if (gSettings.Mobile) {
-    AddSMCkey(SMC_MAKE_KEY('B','B','I','N'), 1, SmcKeyTypeFlag, (SMC_DATA *)&gSettings.Mobile); //Battery inserted
-  }
-  AddSMCkey(SMC_MAKE_KEY('M','S','T','c'), 1, SmcKeyTypeUint8, (SMC_DATA *)&Zero); // CPU Plimit
-  AddSMCkey(SMC_MAKE_KEY('M','S','A','c'), 2, SmcKeyTypeUint16, (SMC_DATA *)&Zero);// GPU Plimit
-//  AddSMCkey(SMC_MAKE_KEY('M','S','L','D'), 1, SmcKeyTypeUint8, (SMC_DATA *)&Zero);   //isLidClosed
-  Zero = Hibernate?((ResumeFromCoreStorage||GlobalConfig.HibernationFixup)?25:29):0;
-
-  AddSMCkey(SMC_MAKE_KEY('M','S','W','r'), 1, SmcKeyTypeUint8, (SMC_DATA *)&Zero);
-  Zero = 1;
-  AddSMCkey(SMC_MAKE_KEY('M','S','F','W'), 2, SmcKeyTypeFlag, (SMC_DATA *)&Zero);
-  Zero = 0x300;
-  AddSMCkey(SMC_MAKE_KEY('M','S','P','S'), 2, SmcKeyTypeUint16, (SMC_DATA *)&Zero);
 }

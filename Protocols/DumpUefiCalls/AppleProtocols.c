@@ -18,7 +18,7 @@
 
 //#include <EfiImageFormat.h>
 #include <Protocol/UgaDraw.h>
-#include <Protocol/AppleSMC.h>
+#include <Protocol/AppleSmcIo.h>
 #include <Protocol/AppleImageCodec.h>
 #include <Protocol/AppleKeyMapAggregator.h>
 #include <Protocol/OSInfo.h>
@@ -104,7 +104,7 @@ OvrWriteValue (IN  APPLE_SMC_IO_PROTOCOL  *This,
 EFI_STATUS
 EFIAPI
 OvrGetKeyCount (IN  APPLE_SMC_IO_PROTOCOL  *This,
-                    OUT SMC_DATA           *Count
+                    OUT UINT32             *Count
                     )
 {
   EFI_STATUS				Status;
