@@ -69,5 +69,5 @@ before_script:
  - ./gen-version.sh $TOOLCHAIN
 
 script:
- - build -p Clover/Clover.dsc -a IA32 -b RELEASE -t $TOOLCHAIN -n $NUM_CPUS -s -D NO_GRUB_DRIVERS
- - build -p Clover/Clover.dsc -a X64 -b RELEASE -t $TOOLCHAIN -n $NUM_CPUS -s -D NO_GRUB_DRIVERS
+ - build -p Clover/Clover.dsc -a IA32 -b RELEASE -t $TOOLCHAIN -n $NUM_CPUS -s -D NO_CLOVER_SHELL -D NO_GRUB_DRIVERS
+ - build -p Clover/Clover.dsc -a X64 -b RELEASE -t $TOOLCHAIN -n $NUM_CPUS -s -D NO_CLOVER_SHELL -D NO_GRUB_DRIVERS
