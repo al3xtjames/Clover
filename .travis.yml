@@ -2,7 +2,7 @@ language: c
 matrix:
   include:
    - os: osx
-     osx_image: xcode10
+     osx_image: xcode10.1
      compiler: clang
      env:
       - NUM_CPUS=$(sysctl -n hw.ncpu)
