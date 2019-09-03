@@ -87,7 +87,7 @@ EMU_VARIABLE_CONTROL_PROTOCOL *gEmuVariableControl = NULL;
 
 EFI_HANDLE ConsoleInHandle;
 EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL* SimpleTextEx;
-
+EFI_KEY_DATA KeyData;
 
 extern VOID HelpRefit(VOID);
 extern VOID AboutRefit(VOID);
@@ -2081,7 +2081,7 @@ RefitMain (IN EFI_HANDLE           ImageHandle,
   if ( EFI_ERROR (Status) ) {
     SimpleTextEx = NULL;
   }
-  DBG("SimpleTextEx Status=%x\n", Status);
+  DBG("SimpleTextEx Status=%r\n", Status);
 
   PrepatchSmbios();
 
@@ -2585,7 +2585,7 @@ RefitMain (IN EFI_HANDLE           ImageHandle,
         MainMenu.AnimeRun = MainAnime;
         MenuExit = RunMainMenu(&MainMenu, DefaultIndex, &ChosenEntry);
       }
-      DBG("exit from MainMenu %d\n", MenuExit); //MENU_EXIT_ENTER       (1)
+      DBG("exit from MainMenu %d\n", MenuExit); //MENU_EXIT_ENTER=(1) MENU_EXIT_DETAILS=3
       // disable default boot - have sense only in the first run
       GlobalConfig.Timeout = -1;
       //remember OS before go to second row
@@ -2647,16 +2647,19 @@ RefitMain (IN EFI_HANDLE           ImageHandle,
       switch (ChosenEntry->Tag) {
 
         case TAG_RESET:    // Restart
-          if (SimpleTextEx) {
-            EFI_KEY_DATA KeyData;
-            ZeroMem(&KeyData, sizeof KeyData);
-            SimpleTextEx->ReadKeyStrokeEx (SimpleTextEx, &KeyData);
-            if ((KeyData.KeyState.KeyShiftState & (EFI_LEFT_CONTROL_PRESSED | EFI_RIGHT_CONTROL_PRESSED)) != 0) {
-              //do clear cmos
-              break; //to test
-            }
+          if (MenuExit == MENU_EXIT_DETAILS) {
+//            EFI_KEY_DATA KeyData;
+//            ZeroMem(&KeyData, sizeof KeyData);
+//            SimpleTextEx->ReadKeyStrokeEx (SimpleTextEx, &KeyData);
+//            if ((KeyData.KeyState.KeyShiftState & (EFI_LEFT_CONTROL_PRESSED | EFI_RIGHT_CONTROL_PRESSED)) != 0) {
+            //do clear cmos as for AMI BIOS
+            // not sure for more robust method
+            IoWrite8 (PCAT_RTC_ADDRESS_REGISTER, 0x10);
+            IoWrite8 (PCAT_RTC_DATA_REGISTER, 0x0);
+            IoWrite8 (PCAT_RTC_ADDRESS_REGISTER, 0x11);
+            IoWrite8 (PCAT_RTC_DATA_REGISTER, 0x0);
+//          }
           }
-          
           // Attempt warm reboot
           gRS->ResetSystem(EfiResetWarm, EFI_SUCCESS, 0, NULL);
           // Warm reboot may not be supported attempt cold reboot
