@@ -2648,7 +2648,8 @@ RefitMain (IN EFI_HANDLE           ImageHandle,
 
         case TAG_RESET:    // Restart
           if (SimpleTextEx) {
-            EFI_KEY_DATA KeyData = 0;
+            EFI_KEY_DATA KeyData;
+            ZeroMem(&KeyData, sizeof KeyData);
             SimpleTextEx->ReadKeyStrokeEx (SimpleTextEx, &KeyData);
             if ((KeyData.KeyState.KeyShiftState & (EFI_LEFT_CONTROL_PRESSED | EFI_RIGHT_CONTROL_PRESSED)) != 0) {
               //do clear cmos
