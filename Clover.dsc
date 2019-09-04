@@ -312,7 +312,7 @@
   #Clover/UefiCpuPkg/CpuDxe/CpuDxe.inf
   #UefiCpuPkg/CpuDxe/CpuDxe.inf
   Clover/CloverEFI/CpuDxe/Cpu.inf
-  PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf {
+  Clover/CloverEFI/8259InterruptControllerDxe/8259.inf {
       <PcdsFixedAtBuild>
       gPcAtChipsetPkgTokenSpaceGuid.Pcd8259LegacyModeMask|0xFFFC
   }
@@ -325,7 +325,7 @@
   #Chipset
   #PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
   Clover/CloverEFI/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
-  PcAtChipsetPkg/8254TimerDxe/8254Timer.inf
+  Clover/CloverEFI/8254TimerDxe/8254Timer.inf
   #PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
   #PcAtChipsetPkg/PciHostBridgeDxe/PciHostBridgeDxe.inf
   #DuetPkg/PciRootBridgeNoEnumerationDxe/PciRootBridgeNoEnumeration.inf
@@ -412,7 +412,7 @@
   #Clover/Drivers/UsbMouseDxe/UsbMouseDxe.inf
 
   # ISA Support
-  PcAtChipsetPkg/IsaAcpiDxe/IsaAcpi.inf
+  Clover/CloverEFI/IsaAcpiDxe/IsaAcpi.inf
   IntelFrameworkModulePkg/Bus/Isa/IsaBusDxe/IsaBusDxe.inf
   #IntelFrameworkModulePkg/Bus/Isa/IsaSerialDxe/IsaSerialDxe.inf
   IntelFrameworkModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2keyboardDxe.inf

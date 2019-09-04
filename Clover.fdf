@@ -63,7 +63,7 @@ READ_LOCK_STATUS   = TRUE
 
 APRIORI DXE {
   INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
-  INF  PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
+  INF  Clover/CloverEFI/8259InterruptControllerDxe/8259.inf
   INF  Clover/Protocols/MsgLog/MsgLog.inf
 }
 
@@ -139,12 +139,12 @@ INF  RuleOverride=BINARY Clover/FileSystems/HFSPlus/HFSPlus.inf
 INF  Clover/FileSystems/VBoxFsDxe/VBoxHfs.inf
 !endif
 
-INF  PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
+INF  Clover/CloverEFI/8259InterruptControllerDxe/8259.inf
 #INF  DuetPkg/AcpiResetDxe/Reset.inf
 INF  Clover/CloverEFI/AcpiReset/Reset.inf
 #INF  DuetPkg/LegacyMetronome/Metronome.inf
 INF  MdeModulePkg/Universal/Metronome/Metronome.inf
-INF  PcAtChipsetPkg/8254TimerDxe/8254Timer.inf
+INF  Clover/CloverEFI/8254TimerDxe/8254Timer.inf
 #INF  PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
 #INF  PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
 INF Clover/CloverEFI/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
@@ -235,7 +235,7 @@ INF   Clover/LegacyBios/Region2Dxe/LegacyRegion2Dxe.inf
 !endif
 
     # ISA Support
-INF  PcAtChipsetPkg/IsaAcpiDxe/IsaAcpi.inf
+INF  Clover/CloverEFI/IsaAcpiDxe/IsaAcpi.inf
 INF  IntelFrameworkModulePkg/Bus/Isa/IsaBusDxe/IsaBusDxe.inf
 #INF  IntelFrameworkModulePkg/Bus/Isa/IsaSerialDxe/IsaSerialDxe.inf
 #INF  IntelFrameworkModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2keyboardDxe.inf
