@@ -168,6 +168,7 @@
     MdeModulePkg/MdeModulePkg.dec
   Clover/CloverEFI/IntelFrameworkPkg.dec
   Clover/CloverEFI/IntelFrameworkModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
 
 [LibraryClasses]
   UefiApplicationEntryPoint

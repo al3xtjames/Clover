@@ -191,6 +191,7 @@ CoreInitializeImageServices (
   gDxeCoreImageHandle = Image->Handle;
   gDxeCoreLoadedImage = &Image->Info;
 
+#if 0
   if (FeaturePcdGet (PcdFrameworkCompatibilitySupport)) {
     //
     // Export DXE Core PE Loader functionality for backward compatibility.
@@ -202,6 +203,7 @@ CoreInitializeImageServices (
                &mLoadPe32PrivateData.Pe32Image
                );
   }
+#endif
 
   return Status;
 }
