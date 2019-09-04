@@ -41,7 +41,6 @@
 
 [Packages]
    MdePkg/MdePkg.dec
-   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
    Clover/CloverPkg.dec
 #  VBoxPkg/VBoxPkg.dec
 

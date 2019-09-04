@@ -27,7 +27,7 @@
   Clover/CloverPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  Clover/CloverEFI/IntelFrameworkPkg.dec
 
 [LibraryClasses]
   BaseLib

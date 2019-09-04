@@ -30,8 +30,8 @@
 [Packages]
   MdePkg/MdePkg.dec
   Clover/CloverPkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+  Clover/CloverEFI/IntelFrameworkPkg.dec
+  Clover/CloverEFI/IntelFrameworkModulePkg.dec
 
 [LibraryClasses]
   BaseLib

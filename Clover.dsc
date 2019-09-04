@@ -338,7 +338,7 @@
 
   #DataHub
   #Clover/VBoxAppleSim/VBoxAppleSim.inf
-  IntelFrameworkModulePkg/Universal/DataHubDxe/DataHubDxe.inf
+  Clover/CloverEFI/DataHubDxe/DataHubDxe.inf
   #IntelFrameworkModulePkg/Universal/DataHubStdErrDxe/DataHubStdErrDxe.inf
 
   # foreign file system support
@@ -413,11 +413,11 @@
 
   # ISA Support
   Clover/CloverEFI/IsaAcpiDxe/IsaAcpi.inf
-  IntelFrameworkModulePkg/Bus/Isa/IsaBusDxe/IsaBusDxe.inf
+  Clover/CloverEFI/IsaBusDxe/IsaBusDxe.inf
   #IntelFrameworkModulePkg/Bus/Isa/IsaSerialDxe/IsaSerialDxe.inf
-  IntelFrameworkModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2keyboardDxe.inf
+  Clover/Drivers/Ps2KeyboardDxe/Ps2keyboardDxe.inf
   #IntelFrameworkModulePkg/Bus/Isa/IsaFloppyDxe/IsaFloppyDxe.inf
-  IntelFrameworkModulePkg/Bus/Isa/Ps2MouseAbsolutePointerDxe/Ps2MouseAbsolutePointerDxe.inf
+  Clover/Drivers/Ps2MouseAbsolutePointerDxe/Ps2MouseAbsolutePointerDxe.inf
   #IntelFrameworkModulePkg/Bus/Isa/Ps2MouseDxe/Ps2MouseDxe.inf
   Clover/Drivers/Ps2MouseDxe/Ps2MouseDxe.inf
 

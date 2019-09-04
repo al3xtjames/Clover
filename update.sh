@@ -9,10 +9,6 @@ cd ../MdeModulePkg/
 svn up
 cd ../CryptoPkg/
 svn up
-cd ../IntelFrameworkModulePkg/
-svn up
-cd ../IntelFrameworkPkg/
-svn up
 cd ../PcAtChipsetPkg/
 svn up
 cd ../UefiCpuPkg/

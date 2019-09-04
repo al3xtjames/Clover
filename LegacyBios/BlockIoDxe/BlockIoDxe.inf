@@ -63,8 +63,6 @@
 [Packages]
   Clover/CloverPkg.dec
   MdePkg/MdePkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
 [BuildOptions]
   XCODE:*_*_*_CC_FLAGS = -Os -fno-builtin -DMDEPKG_NDEBUG

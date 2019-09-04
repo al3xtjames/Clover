@@ -49,8 +49,8 @@
   Clover/CloverPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+  Clover/CloverEFI/IntelFrameworkPkg.dec
+  Clover/CloverEFI/IntelFrameworkModulePkg.dec
 
 
 [LibraryClasses]

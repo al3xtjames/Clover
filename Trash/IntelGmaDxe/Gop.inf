@@ -33,7 +33,6 @@ FILE_GUID            = 048B4BA8-3666-4fa7-A7ED-D75D9BA6358D
 [Packages]
   Clover/CloverPkg.dec
   MdePkg/MdePkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
 
 
 [Sources]

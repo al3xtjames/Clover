@@ -41,7 +41,6 @@
 [Packages]
     Clover/CloverPkg.dec
         MdePkg/MdePkg.dec
-        IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 #        VBoxPkg/VBoxPkg.dec
 
 [LibraryClasses]

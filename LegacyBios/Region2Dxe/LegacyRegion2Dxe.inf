@@ -43,7 +43,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  Clover/CloverEFI/IntelFrameworkPkg.dec
   Clover/CloverPkg.dec
 
 [LibraryClasses]
