@@ -33,7 +33,7 @@ PLATFORMFILE=
 MODULEFILE=
 TARGETRULE=
 
-SCRIPT_VERS="2018-06-18"
+SCRIPT_VERS="2019-09-06"
 
 # Macro
 M_NOGRUB=0
@@ -157,7 +157,8 @@ checkPatch() {
     # inside any sub folder instead of only in ~/
     export NASM_PREFIX="${TOOLCHAIN_DIR}/bin/"
   else
-    export NASM_PREFIX=""
+    export NASM_PREFIX="${TOOLCHAIN_DIR}/bin/"
+    ./buildnasm.sh
   fi
 
   echo "NASM_PREFIX: $NASM_PREFIX"
