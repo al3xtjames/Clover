@@ -60,7 +60,8 @@ UINTN         *XsdtReplaceSizes = NULL;
 UINT64      BiosDsdt;
 UINT32      BiosDsdtLen;
 UINT8       acpi_cpu_count;
-CHAR8*      acpi_cpu_name[128];
+CHAR8*      acpi_cpu_name[acpi_cpu_max];
+UINT8       acpi_cpu_processor_id[acpi_cpu_max];
 CHAR8*      acpi_cpu_score;
 
 UINT64      machineSignature;
@@ -1712,13 +1713,11 @@ EFI_STATUS PatchACPI(IN REFIT_VOLUME *Volume, CHAR8 *OSVersion)
   EFI_ACPI_2_0_PROCESSOR_LOCAL_APIC_STRUCTURE           *ProcLocalApic;
   EFI_ACPI_2_0_LOCAL_APIC_NMI_STRUCTURE                 *LocalApicNMI;
   //  UINTN             ApicLen;
-  UINT8             CPUBase;
   UINTN             ApicCPUNum;
   UINT8             *SubTable;
   BOOLEAN           DsdtLoaded = FALSE;
   BOOLEAN           NeedUpdate = FALSE;
   OPER_REGION       *tmpRegion;
-  INTN              ApicCPUBase = 0;
   CHAR16*           AcpiOemPath = PoolPrint(L"%s\\ACPI\\patched", OEMPath);
 
   DbgHeader("PatchACPI");
@@ -2052,7 +2051,7 @@ EFI_STATUS PatchACPI(IN REFIT_VOLUME *Volume, CHAR8 *OSVersion)
                         (UINT8*)(UINTN)FadtPointer->XDsdt, bufferLen);
   }
   //native DSDT or loaded we want to apply autoFix to this
-  //  if (gSettings.FixDsdt) { //fix even with zero mask because we want to know PCIRootUID and CPUBase and count(?)
+  //  if (gSettings.FixDsdt) { //fix even with zero mask because we want to know PCIRootUID and count(?)
   DBG("Apply DsdtFixMask=0x%08x\n", gSettings.FixDsdt);
   DBG("   drop _DSM mask=0x%04x\n", dropDSM);
   FixBiosDsdt((UINT8*)(UINTN)FadtPointer->XDsdt, FadtPointer, OSVersion);
@@ -2120,13 +2119,6 @@ EFI_STATUS PatchACPI(IN REFIT_VOLUME *Volume, CHAR8 *OSVersion)
   //  DBG("Fool proof: size of APIC NMI  = %d\n", sizeof(EFI_ACPI_2_0_LOCAL_APIC_NMI_STRUCTURE));
   //  DBG("----------- size of APIC DESC = %d\n", sizeof(EFI_ACPI_2_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER));
   //  DBG("----------- size of APIC PROC = %d\n", sizeof(EFI_ACPI_2_0_PROCESSOR_LOCAL_APIC_STRUCTURE));
-  //
-  // 1. For CPU base number 0 or 1.  codes from SunKi
-  CPUBase = acpi_cpu_name[0][3] - '0'; //"CPU0"
-  if ((UINT8)CPUBase > 11) {
-    DBG("Abnormal CPUBase=%x will set to 0\n", CPUBase);
-    CPUBase = 0;
-  }
 
   ApicCPUNum = 0;
   // 2. For absent NMI subtable
@@ -2135,12 +2127,6 @@ EFI_STATUS PatchACPI(IN REFIT_VOLUME *Volume, CHAR8 *OSVersion)
     ApicTable = (EFI_ACPI_DESCRIPTION_HEADER*)(UINTN)(*xf);
     //      ApicLen = ApicTable->Length;
     ProcLocalApic = (EFI_ACPI_2_0_PROCESSOR_LOCAL_APIC_STRUCTURE *)(UINTN)(*xf + sizeof(EFI_ACPI_2_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER));
-    //determine first ID of CPU. This must be 0 for Mac and for good Hack
-    // but = 1 for stupid ASUS
-    //
-    if (ProcLocalApic->Type == EFI_ACPI_4_0_PROCESSOR_LOCAL_APIC) {
-      ApicCPUBase = ProcLocalApic->AcpiProcessorId; //we want first instance
-    }
 
     while ((ProcLocalApic->Type == EFI_ACPI_4_0_PROCESSOR_LOCAL_APIC) && (ProcLocalApic->Length == 8)) {
       if (ProcLocalApic->Flags & EFI_ACPI_4_0_LOCAL_APIC_ENABLED) {
@@ -2157,7 +2143,7 @@ EFI_STATUS PatchACPI(IN REFIT_VOLUME *Volume, CHAR8 *OSVersion)
       ApicCPUNum = gCPUStructure.Threads;
     }
 
-    DBG("CPUBase=%d and ApicCPUBase=%d ApicCPUNum=%d\n", CPUBase, ApicCPUBase, ApicCPUNum);
+    DBG("ApicCPUNum=%d\n", ApicCPUNum);
     //reallocate table
     if (gSettings.PatchNMI) {
       BufferPtr = EFI_SYSTEM_TABLE_MAX_ADDRESS;
@@ -2179,13 +2165,14 @@ EFI_STATUS PatchACPI(IN REFIT_VOLUME *Volume, CHAR8 *OSVersion)
           DBG("Found subtable in MADT: type=%d\n", *SubTable);
           if (*SubTable == EFI_ACPI_4_0_PROCESSOR_LOCAL_APIC) {
             ProcLocalApic = (EFI_ACPI_2_0_PROCESSOR_LOCAL_APIC_STRUCTURE *)SubTable;
+            // macOS assumes that the first processor from DSDT is always enabled, without checking MADT table
+            // here we're trying to assign first IDs found in DSDT to enabled processors in MADT, such that macOS assumption to be true
             if (ProcLocalApic->Flags & EFI_ACPI_4_0_LOCAL_APIC_ENABLED) {
-              if (Index == 0 && ProcLocalApic->AcpiProcessorId > 1) {
-                DBG("ProcLocalApic changed: %d to %d\n", ProcLocalApic->AcpiProcessorId, 0);
-                ProcLocalApic->AcpiProcessorId = 0;
-                ApicCPUBase = 0;
+              if (ProcLocalApic->AcpiProcessorId != acpi_cpu_processor_id[Index]) {
+                DBG("AcpiProcessorId changed: 0x%02x to 0x%02x\n", ProcLocalApic->AcpiProcessorId, acpi_cpu_processor_id[Index]);
+                ProcLocalApic->AcpiProcessorId = acpi_cpu_processor_id[Index];
               } else {
-                DBG("ProcLocalApic: %d\n", ProcLocalApic->AcpiProcessorId);
+                DBG("AcpiProcessorId: 0x%02x\n", ProcLocalApic->AcpiProcessorId);
               }
               Index++;
             }
@@ -2204,11 +2191,11 @@ EFI_STATUS PatchACPI(IN REFIT_VOLUME *Volume, CHAR8 *OSVersion)
           for (Index = 0; Index < ApicCPUNum; Index++) {
             LocalApicNMI->Type = EFI_ACPI_4_0_LOCAL_APIC_NMI;
             LocalApicNMI->Length = sizeof(EFI_ACPI_4_0_LOCAL_APIC_NMI_STRUCTURE);
-            LocalApicNMI->AcpiProcessorId = (UINT8)(ApicCPUBase + Index);
+            LocalApicNMI->AcpiProcessorId = acpi_cpu_processor_id[Index];
             LocalApicNMI->Flags = 5;
             LocalApicNMI->LocalApicLint = 1;
             LocalApicNMI++;
-            ApicTable->Length += LocalApicNMI->Length;
+            ApicTable->Length += sizeof(EFI_ACPI_4_0_LOCAL_APIC_NMI_STRUCTURE);
           }
           DBG("ApicTable new Length=%d\n", ApicTable->Length);
           // insert corrected MADT
@@ -2253,7 +2240,7 @@ EFI_STATUS PatchACPI(IN REFIT_VOLUME *Volume, CHAR8 *OSVersion)
 
   if (gSettings.GeneratePStates || gSettings.GeneratePluginType) {
     Status = EFI_NOT_FOUND;
-    Ssdt = generate_pss_ssdt(CPUBase, ApicCPUNum);
+    Ssdt = generate_pss_ssdt(ApicCPUNum);
     if (Ssdt) {
       Status = InsertTable(Ssdt, Ssdt->Length);
     }
@@ -2264,7 +2251,7 @@ EFI_STATUS PatchACPI(IN REFIT_VOLUME *Volume, CHAR8 *OSVersion)
 
   if (gSettings.GenerateCStates) {
     Status = EFI_NOT_FOUND;
-    Ssdt = generate_cst_ssdt(FadtPointer, CPUBase, ApicCPUNum);
+    Ssdt = generate_cst_ssdt(FadtPointer, ApicCPUNum);
     if (Ssdt) {
       Status = InsertTable(Ssdt, Ssdt->Length);
     }
