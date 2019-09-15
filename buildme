@@ -61,13 +61,12 @@ pathmunge "$TOOLCHAIN_DIR"/bin
 export TOOLCHAIN_DIR=$TOOLCHAIN_DIR
 export DIR_MAIN=${DIR_MAIN:-$(dirname $EDK2ROOT)}
 export DIR_TOOLS=${DIR_TOOLS:-$DIR_MAIN/tools}
-export DIR_BUILD=${DIR_BUILD:-$RAMDISK_MNT_PT}
 export DIR_DOWNLOADS=${DIR_DOWNLOADS:-$DIR_TOOLS/download}
 export DIR_LOGS=${DIR_LOGS:-$DIR_TOOLS/logs}
 }
 
 checkTools() {
-if [[ "$(uname)" == Darwin && $TOOLCHAIN != GCC* ]]; then
+if [[ "$(uname)" == Darwin && $MYTOOLCHAIN != GCC* ]]; then
   checkXCODE
 fi
 
@@ -107,12 +106,58 @@ cd "${CLOVERROOT}"
 svn up
 }
 
+updateResetClover() {
+echo "[UPDATE RESET CLOVER]"
+cd "${CLOVERROOT}"
+svn revert -R .
+svn up
+}
+
 buildClover() {
 checkTools
-cd "${CLOVERROOT}"
+
 echo "[BUILD CLOVER]"
-./ebuild.sh -fr -t $MYTOOLCHAIN
-./ebuild.sh -fr -mc --no-usb -D NO_GRUB_DRIVERS_EMBEDDED -t $MYTOOLCHAIN
+if [[ -z "$WORKSPACE" ]]; then
+  cd "${EDK2ROOT}"
+  export EDK_TOOLS_PATH="${PWD}"/BaseTools
+  set +u
+  source ./edksetup.sh BaseTools
+  set -u
+fi
+
+cd "${CLOVERROOT}"
+# Run a custom build script if exist (~/src/tools/Scripts/build.sh)
+# This allow the user to run ebuild.sh with own parameters
+if [[ -x "${DIR_TOOLS}"/Scripts/build.sh ]]; then
+  echo "Running custom build script"
+  "${DIR_TOOLS}"/Scripts/build.sh "${CLOVERROOT}" $MYTOOLCHAIN
+else
+  ./ebuild.sh -fr -t $MYTOOLCHAIN
+  ./ebuild.sh -fr -mc --no-usb -D NO_GRUB_DRIVERS_EMBEDDED -t $MYTOOLCHAIN
+fi
+
+# Run a post build script if exist (~/src/tools/Scripts/postbuild.sh)
+if [[ -x "${DIR_TOOLS}"/Scripts/postbuild.sh ]]; then
+  echo "Running postbuild script"
+  "${DIR_TOOLS}"/Scripts/postbuild.sh "${CLOVERROOT}" $MYTOOLCHAIN
+fi
+}
+
+buildCloverTest() {
+checkTools
+
+echo "[BUILD CLOVER]"
+if [[ -z "$WORKSPACE" ]]; then
+  cd "${EDK2ROOT}"
+  export EDK_TOOLS_PATH="${PWD}"/BaseTools
+  set +u
+  source ./edksetup.sh BaseTools
+  set -u
+fi
+
+cd "${CLOVERROOT}"
+echo "[BUILD CLOVER TEST]"
+./ebuild.sh -nb -t $MYTOOLCHAIN
 }
 
 buildPkg() {
@@ -142,6 +187,11 @@ cd "${CLOVERROOT}"
 svn diff -r head
 }
 
+cleanBaseTools() {
+cd "${EDK2ROOT}"/BaseTools
+make clean
+}
+
 menu() {
 echo
 echo '------------------------------------------------------------------------'
@@ -150,7 +200,21 @@ echo "buildme, Clover v2.5k r$(svn info | grep "Revision" | tr -cd [:digit:])"
 echo "TOOLCHAIN: $MYTOOLCHAIN (override example: './buildme GCC53')"
 echo
 PS3='Please enter your choice: '
-options=('build Clover' 'make pkg' 'make iso' 'build all' 'update Clover' 'update edk2' 'status' 'check remote changes' 'show diff' 'quit')
+options=( 'build Clover'
+          'make pkg'
+          'make iso'
+          'build all'
+          'test build (no autogen, no boot files)'
+          'update Clover'
+          'update Clover (reset changes)'
+          'update edk2'
+          'status'
+          'check remote changes'
+          'show diff'
+          'open drivers directory'
+          'clean BaseTools'
+          'quit')
+
 select opt in "${options[@]}"
 do
   case $opt in
@@ -172,8 +236,16 @@ do
       buildIso
       break
     ;;
+    "test build (no autogen, no boot files)")
+      buildCloverTest
+      break
+    ;;
     "update Clover")
       updateClover
+      break
+    ;;
+    "update Clover (reset changes)")
+      updateResetClover
       break
     ;;
     "update edk2")
@@ -192,6 +264,19 @@ do
       showdiff
       break
     ;;
+    "open drivers directory")
+      if [[ -d "${CLOVERROOT}"/CloverPackage/CloverV2/EFI/CLOVER/drivers ]]; then
+        open "${CLOVERROOT}"/CloverPackage/CloverV2/EFI/CLOVER/drivers
+      else
+        echo && echo "Directory not found. Compile Clover first!!"
+        sleep 2
+      fi
+      break
+    ;;
+    "clean BaseTools")
+      cleanBaseTools
+      break
+    ;;
     "quit")
       exit 0
     ;;
@@ -206,4 +291,10 @@ menu
 
 # Main
 set -e
-menu
+if [[ "$2" == travis ]]; then
+  buildClover
+  buildPkg
+  buildIso
+else
+  menu
+fi
