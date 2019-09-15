@@ -16,7 +16,7 @@ cd "$(dirname $0)"
 declare -r CLOVERROOT="$PWD"
 declare -r edk2Link='https://github.com/CloverHackyColor/edk2.git'
 declare -r EDK2ROOT=$(dirname $CLOVERROOT)
-MYTOOLCHAIN=${1:-XCODE8}
+MYTOOLCHAIN=${1:-GCC53}
 
 TOOLCHAIN_DIR=${TOOLCHAIN_DIR:-$(dirname $EDK2ROOT)/opt/local}
 
