@@ -16,11 +16,22 @@ cd "$(dirname $0)"
 declare -r CLOVERROOT="$PWD"
 declare -r edk2Link='https://github.com/CloverHackyColor/edk2.git'
 declare -r EDK2ROOT=$(dirname $CLOVERROOT)
-declare -r MYTOOLCHAIN=${1:-XCODE8}
+MYTOOLCHAIN=${1:-XCODE8}
 
 TOOLCHAIN_DIR=${TOOLCHAIN_DIR:-$(dirname $EDK2ROOT)/opt/local}
 
 # Functions
+checkToolchain() {
+local GCC53_BIN="$TOOLCHAIN_DIR/cross/bin/x86_64-clover-linux-gnu-gcc"
+
+# in Linux ebuild.sh force to use the CGG toolchain
+if [[ "$(uname)" == Darwin ]]; then
+  if [[ $MYTOOLCHAIN == GCC* ]] && [[ ! -x "${GCC53_BIN}" ]]; then
+    MYTOOLCHAIN=XCODE8
+  fi
+fi
+}
+
 pathmunge() {
 if [[ ! $PATH =~ (^|:)$1(:|$) ]]; then
   if [[ "${2:-}" = "after" ]]; then
@@ -66,15 +77,11 @@ export DIR_LOGS=${DIR_LOGS:-$DIR_TOOLS/logs}
 }
 
 checkTools() {
-if [[ "$(uname)" == Darwin && $MYTOOLCHAIN != GCC* ]]; then
+if [[ "$MYTOOLCHAIN" == XCODE* ]]; then
   checkXCODE
 fi
 
 exportPaths
-
-if [[ "$(uname)" == Darwin ]]; then
-  checkGETTEXT
-fi
 }
 
 updateEDK2() {
@@ -161,9 +168,15 @@ echo "[BUILD CLOVER TEST]"
 }
 
 buildPkg() {
-cd "${CLOVERROOT}"/CloverPackage
-echo "[BUILD PKG]"
-make pkg
+if [[ "$(uname)" == Darwin ]]; then
+  cd "${CLOVERROOT}"/CloverPackage
+  echo "[BUILD PKG]"
+  checkXCODE
+  checkGETTEXT
+  make pkg
+else
+  echo && echo "can't build pkg on a non Darwin OS!"
+fi
 }
 
 buildIso() {
@@ -291,6 +304,7 @@ menu
 
 # Main
 set -e
+checkToolchain
 if [[ "$2" == travis ]]; then
   buildClover
   buildPkg
