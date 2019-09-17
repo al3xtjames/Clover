@@ -37,6 +37,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/ApplePartitionInfo.h>
 #include <Protocol/ApfsEfiBootRecordInfo.h>
 #include <Protocol/NullTextOutput.h>
+#include <Guid/AppleApfsInfo.h>
 
 #define APPLE_SUPPORT_VERSION  L"2.0.9"
 #include "ApfsDriverLoader.h"
@@ -45,45 +46,47 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 STATIC BOOLEAN  LegacyScan       = FALSE;
 STATIC UINT64   LegacyBaseOffset = 0;
 
+STATIC
 UINT64
 ApfsBlockChecksumCalculate (
-  UINT32  *Data,
-  UINTN   DataSize
+  UINT32  CONST *Data,
+  UINTN   DataSizeInBytes
   )
 {
   UINTN         Index;
-  UINT64        Sum1 = 0;
-  UINT64        Check1 = 0;
-  UINT64        Sum2 = 0;
-  UINT64        Check2 = 0;
-  CONST UINT64  ModValue = 0xFFFFFFFF;
+  UINT32        Sum1 = 0;
+  UINT32        Check1 = 0;
+  UINT32        Sum2 = 0;
+  UINT32        Check2 = 0;
+  CONST UINT32  ModValue = 0xFFFFFFFF;
 
-  for (Index = 0; Index < DataSize / sizeof (UINT32); Index++) {
-    Sum1 = ((Sum1 + (UINT64)Data[Index]) % ModValue);
-    Sum2 = (Sum2 + Sum1) % ModValue;
+  for (Index = 0; Index < DataSizeInBytes / sizeof (UINT32); Index++) {
+    Sum1 = ModU64x32((UINT64)Sum1 + Data[Index], ModValue);
+    Sum2 = ModU64x32((UINT64)Sum2 + Sum1, ModValue);
   }
 
-  Check1 = ModValue - ((Sum1 + Sum2) % ModValue);
-  Check2 = ModValue - ((Sum1 + Check1) % ModValue);
+  Check1 = ModValue - ModU64x32((UINT64)Sum1 + Sum2, ModValue);
+  Check2 = ModValue - ModU64x32((UINT64)Sum1 + Check1, ModValue);
 
-  return (Check2 << 32) | Check1;
+  return ((UINT64)Check2 << 32) | Check1;
 }
 
 //
 // Function to check block checksum.
 // Returns TRUE if the checksum is valid.
 //
+STATIC
 BOOLEAN
 ApfsBlockChecksumVerify (
-  UINT8   *Data,
+  UINT8   CONST *Data,
   UINTN   DataSize
   )
 {
   UINT64  NewChecksum;
-  UINT64  *CurrChecksum = (UINT64 *) Data;
+  UINT64  CONST*CurrChecksum = (UINT64 CONST*) Data;
 
   NewChecksum = ApfsBlockChecksumCalculate (
-    (UINT32 *) (Data + sizeof (UINT64)),
+    (UINT32 CONST*) (Data + sizeof (UINT64)),
     DataSize - sizeof (UINT64)
     );
 
@@ -142,8 +145,8 @@ StartApfsDriver (
 
   DEBUG ((DEBUG_WARN, "New ImageSize after verification: %lu\n", EfiFileSize));
 
-*/
   if (!EFI_ERROR (Status)) {
+*/
     Status = gBS->LoadImage (
       FALSE,
       gImageHandle,
@@ -156,8 +159,8 @@ StartApfsDriver (
         DEBUG ((DEBUG_WARN, "Load image failed with Status: %r\n", Status));
         return Status;
       }
-  }
-  /* else {
+  /*
+  } else {
       DEBUG ((DEBUG_WARN, "SECURITY VIOLATION!!! Binary modified!\n"));
       return Status;
     }
@@ -170,7 +173,8 @@ StartApfsDriver (
     );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_WARN, "Failed to Handle LoadedImage Protool with Status: %r\n", Status));
+    DEBUG ((DEBUG_WARN, "Failed to Handle LoadedImage Protocol with Status: %r\n", Status));
+    gBS->UnloadImage (ImageHandle);
     return Status;
   }
 
@@ -180,6 +184,7 @@ StartApfsDriver (
   NewSystemTable = (EFI_SYSTEM_TABLE *) AllocateZeroPool (gST->Hdr.HeaderSize);
 
   if (NewSystemTable == NULL) {
+      gBS->UnloadImage (ImageHandle);
       return EFI_OUT_OF_RESOURCES;
   }
 
@@ -195,6 +200,8 @@ StartApfsDriver (
 
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_WARN, "Failed to calculated new system table CRC32 with Status: %r\n", Status));
+    FreePool (NewSystemTable);
+    gBS->UnloadImage (ImageHandle);
     return Status;
   }
 
@@ -213,6 +220,7 @@ StartApfsDriver (
     // Unload ApfsDriver image from memory
     //
     gBS->UnloadImage (ImageHandle);
+    FreePool (NewSystemTable);
     return Status;
   }
 
@@ -274,7 +282,7 @@ LegacyApfsContainerScan (
   EFI_STATUS                  Status;
   UINTN                       Index               = 0;
   UINT8                       *Block              = NULL;
-  UINTN                       Lba                 = 0;
+  EFI_LBA                     Lba                 = 0;
   UINT32                      PartitionNumber     = 0;
   UINT32                      PartitionEntrySize  = 0;
   EFI_PARTITION_TABLE_HEADER  *GptHeader          = NULL;
@@ -392,7 +400,7 @@ LegacyApfsContainerScan (
     // Reallocate Block size to contain all of partition entries.
     //
     FreePool (Block);
-    Block = AllocateZeroPool (PartitionNumber * PartitionEntrySize);
+    Block = AllocateZeroPool ((UINTN)PartitionNumber * PartitionEntrySize);
     if (Block == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
@@ -406,7 +414,7 @@ LegacyApfsContainerScan (
     DiskIo2,
     MediaId,
     MultU64x32 (Lba, BlockSize),
-    PartitionNumber * PartitionEntrySize,
+    (UINTN)PartitionNumber * PartitionEntrySize,
     Block
     );
 
@@ -418,7 +426,7 @@ LegacyApfsContainerScan (
   //
   // Analyze partition entries.
   //
-  for (Index = 0; Index < PartitionEntrySize * PartitionNumber; Index += PartitionEntrySize) {
+  for (Index = 0; Index < (UINTN)PartitionEntrySize * PartitionNumber; Index += PartitionEntrySize) {
     EFI_PARTITION_ENTRY *CurrentEntry = (EFI_PARTITION_ENTRY *) (Block + Index);
     if (CompareGuid (&CurrentEntry->PartitionTypeGUID, &gAppleApfsPartitionTypeGuid)) {
       ApfsGptEntry = CurrentEntry;
@@ -585,7 +593,7 @@ ApfsDriverLoaderSupported (
         //
         // Verify GPT entry GUID
         //
-        if (CompareGuid ((EFI_GUID *) ApplePartitionInfo->PartitionType,
+        if (!CompareGuid ((EFI_GUID *) ApplePartitionInfo->PartitionType,
                          &gAppleApfsPartitionTypeGuid)) {
           return EFI_UNSUPPORTED;
         }
@@ -602,7 +610,7 @@ ApfsDriverLoaderSupported (
       //
       // Verify GPT entry GUID
       //
-      if (CompareGuid (&Edk2PartitionInfo->Info.Gpt.PartitionTypeGUID,
+      if (!CompareGuid (&Edk2PartitionInfo->Info.Gpt.PartitionTypeGUID,
                        &gAppleApfsPartitionTypeGuid)) {
         return EFI_UNSUPPORTED;
       }
@@ -652,7 +660,7 @@ ApfsDriverLoaderStart (
   UINT8                             *ApfsBlock                   = NULL;
   EFI_GUID                          ContainerUuid;
   UINT64                            EfiBootRecordBlockOffset     = 0;
-  UINT64                            EfiBootRecordBlockPtr        = 0;
+  INT64                             EfiBootRecordBlockPtr        = 0;
   APFS_EFI_BOOT_RECORD              *EfiBootRecordBlock          = NULL;
   APFS_CSB                          *ContainerSuperBlock         = NULL;
   UINT64                            EfiFileCurrentExtentOffset   = 0;
@@ -763,18 +771,19 @@ ApfsDriverLoaderStart (
   //
   // Verify ObjectOid and ObjectType
   //
-  DEBUG ((DEBUG_VERBOSE, "ObjectId: %04x\n", ContainerSuperBlock->BlockHeader.ObjectOid ));
-  DEBUG ((DEBUG_VERBOSE, "ObjectType: %04x\n", ContainerSuperBlock->BlockHeader.ObjectType ));
+  DEBUG ((DEBUG_VERBOSE, "ObjectId: %016llx\n", ContainerSuperBlock->BlockHeader.ObjectOid ));
+  DEBUG ((DEBUG_VERBOSE, "ObjectType: %08x\n", ContainerSuperBlock->BlockHeader.ObjectType ));
   if (ContainerSuperBlock->BlockHeader.ObjectOid != 1
       || ContainerSuperBlock->BlockHeader.ObjectType != 0x80000001) {
+    FreePool (ApfsBlock);
     return EFI_UNSUPPORTED;
   }
 
   //
   // Verify ContainerSuperblock magic.
   //
-  DEBUG ((DEBUG_VERBOSE, "CsbMagic: %04x\n", ContainerSuperBlock->Magic));
-  DEBUG ((DEBUG_VERBOSE, "Should be: %04x\n", APFS_CSB_SIGNATURE));
+  DEBUG ((DEBUG_VERBOSE, "CsbMagic: %08x\n", ContainerSuperBlock->Magic));
+  DEBUG ((DEBUG_VERBOSE, "Should be: %08x\n", APFS_CSB_SIGNATURE));
 
   if (ContainerSuperBlock->Magic != APFS_CSB_SIGNATURE) {
     FreePool (ApfsBlock);
@@ -793,7 +802,7 @@ ApfsDriverLoaderStart (
     ));
   DEBUG ((
     DEBUG_VERBOSE,
-    "ContainerSuperblock checksum: %08llx \n",
+    "ContainerSuperblock checksum: %016llx \n",
     ContainerSuperBlock->BlockHeader.Checksum
     ));
 
@@ -804,7 +813,7 @@ ApfsDriverLoaderStart (
 
   DEBUG ((
     DEBUG_VERBOSE,
-    "EfiBootRecord located at: %llu block\n",
+    "EfiBootRecord located at: %lld block\n",
     EfiBootRecordBlockPtr
     ));
 
@@ -851,12 +860,12 @@ ApfsDriverLoaderStart (
   //
   // Calculate Offset of EfiBootRecordBlock
   //
-  EfiBootRecordBlockOffset = MultU64x32 (EfiBootRecordBlockPtr, ApfsBlockSize)
+  EfiBootRecordBlockOffset = MultU64x32 ((UINT64)EfiBootRecordBlockPtr, ApfsBlockSize)
                               + LegacyBaseOffset;
 
   DEBUG ((
     DEBUG_VERBOSE,
-    "EfiBootRecordBlock offset: %08llx \n",
+    "EfiBootRecordBlock offset: %016llx \n",
      EfiBootRecordBlockOffset
      ));
 
@@ -893,7 +902,7 @@ ApfsDriverLoaderStart (
 
   DEBUG ((
     DEBUG_VERBOSE,
-    "EfiBootRecordBlock checksum: %08llx\n",
+    "EfiBootRecordBlock checksum: %016llx\n",
     EfiBootRecordBlock->BlockHeader.Checksum
     ));
 
@@ -903,7 +912,7 @@ ApfsDriverLoaderStart (
   //
   DEBUG ((
     DEBUG_VERBOSE,
-    "EFI embedded driver extents number %llu\n",
+    "EFI embedded driver extents number %u\n",
     EfiBootRecordBlock->NumOfExtents
     ));
 
@@ -913,20 +922,24 @@ ApfsDriverLoaderStart (
   for (Index = 0; Index < EfiBootRecordBlock->NumOfExtents; Index++) {
     DEBUG ((
         DEBUG_VERBOSE,
-        "EFI embedded driver extent located at: %llu block\n with size %llu\n",
+        "EFI embedded driver extent located at: %lld block\n with size %llu\n",
         EfiBootRecordBlock->RecordExtents[Index].StartPhysicalAddr,
         EfiBootRecordBlock->RecordExtents[Index].BlockCount
         ));
 
     EfiFileCurrentExtentOffset = MultU64x32 (
-                                EfiBootRecordBlock->RecordExtents[Index].StartPhysicalAddr,
+                                (UINT64)EfiBootRecordBlock->RecordExtents[Index].StartPhysicalAddr,
                                 ApfsBlockSize
                                 )  + LegacyBaseOffset;
 
-    EfiFileCurrentExtentSize = MultU64x32 (
+    EfiFileCurrentExtentSize = (UINTN)MultU64x32 (
                                 EfiBootRecordBlock->RecordExtents[Index].BlockCount,
                                 ApfsBlockSize
                                 );
+
+    if (EfiFileCurrentExtentSize == 0) {
+      continue;
+    }
 
     //
     // Adjust buffer size
@@ -938,6 +951,7 @@ ApfsDriverLoaderStart (
                       );
 
     if (EfiFileBuffer == NULL) {
+      FreePool (ApfsBlock);
       return EFI_OUT_OF_RESOURCES;
     }
 
@@ -954,6 +968,8 @@ ApfsDriverLoaderStart (
       );
 
     if (EFI_ERROR (Status)) {
+      FreePool (EfiFileBuffer);
+      FreePool (ApfsBlock);
       return EFI_DEVICE_ERROR;
     }
     //
@@ -991,6 +1007,9 @@ ApfsDriverLoaderStart (
   //
   Private = AllocatePool (sizeof (APFS_DRIVER_INFO_PRIVATE_DATA));
   if (Private == NULL) {
+    if (EfiFileBuffer != NULL) {
+      FreePool (EfiFileBuffer);
+    }
     FreePool (ApfsBlock);
     return EFI_OUT_OF_RESOURCES;
   }
